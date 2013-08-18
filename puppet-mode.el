@@ -396,7 +396,7 @@ The variable puppet-indent-level controls the amount of indentation.
   (run-hooks 'puppet-mode-hook))
 
 ;;;###autoload
-(add-to-list 'auto-mode-alist '("\\.pp$" . puppet-mode))
+(add-to-list 'auto-mode-alist '("\\.pp\\'" . puppet-mode))
 
 (provide 'puppet-mode)
 
