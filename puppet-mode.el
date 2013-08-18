@@ -47,8 +47,6 @@
 
 ;;; Code:
 
-(defconst puppet-mode-version "0.2")
-
 (defvar puppet-mode-abbrev-table nil
   "Abbrev table in use in puppet-mode buffers.")
 
