@@ -61,11 +61,7 @@
   "*Indentation of continued Puppet include statements."
   :type 'integer :group 'puppet)
 
-(defvar puppet-mode-map
-  (let ((map (make-sparse-keymap)))
-    (define-key map "\C-j" 'newline-and-indent)
-    (define-key map "\C-m" 'newline-and-indent)
-    map)
+(defvar puppet-mode-map (make-sparse-keymap)
   "Key map used in puppet-mode buffers.")
 
 (defvar puppet-mode-syntax-table
