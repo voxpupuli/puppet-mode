@@ -361,18 +361,10 @@ of the initial include plus puppet-include-indent."
   "*Additional expressions to highlight in puppet mode.")
 
 ;;;###autoload
-(defun puppet-mode ()
-  "Major mode for editing puppet manifests.
+(define-derived-mode puppet-mode prog-mode "Puppet" ()
+  "Major mode for editing Puppet manifests.
 
-The variable puppet-indent-level controls the amount of indentation.
 \\{puppet-mode-map}"
-  (interactive)
-  (kill-all-local-variables)
-  (use-local-map puppet-mode-map)
-  (setq mode-name "Puppet")
-  (setq major-mode 'puppet-mode)
-  (set-syntax-table puppet-mode-syntax-table)
-  (set (make-local-variable 'local-abbrev-table) puppet-mode-abbrev-table)
   (set (make-local-variable 'comment-start) "# ")
   (set (make-local-variable 'comment-start-skip) "#+ *")
   (set (make-local-variable 'comment-use-syntax) t)
@@ -390,10 +382,7 @@ The variable puppet-indent-level controls the amount of indentation.
   (set (make-local-variable 'font-lock-keywords) puppet-font-lock-keywords)
   (set (make-local-variable 'font-lock-multiline) t)
   (set (make-local-variable 'font-lock-defaults)
-       '((puppet-font-lock-keywords) nil nil))
-  (set (make-local-variable 'font-lock-syntax-table)
-       puppet-font-lock-syntax-table)
-  (run-hooks 'puppet-mode-hook))
+       '((puppet-font-lock-keywords) nil nil)))
 
 ;;;###autoload
 (add-to-list 'auto-mode-alist '("\\.pp\\'" . puppet-mode))
