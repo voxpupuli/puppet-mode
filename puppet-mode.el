@@ -7,6 +7,7 @@
 ;; Author: Russ Allbery <rra@stanford.edu>
 ;; Maintainer: Sebastian Wiesner <lunaryorn@gmail.com>
 ;; Maintainer: Bozhidar Batsov <bozhidar@batsov.com>
+;; URL: https://github.com/lunaryorn/puppet-mode
 ;; Keywords: languages
 ;; Version: 0.2
 ;; Package-Requires:
