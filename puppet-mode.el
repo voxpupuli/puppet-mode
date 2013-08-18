@@ -1,9 +1,15 @@
-;;; puppet-mode.el --- A simple mode for editing puppet manifests
+;;; puppet-mode.el --- Major mode for Puppet manifests
 
-;; Copyright (C) 2011 Puppet Labs Inc
+;; Copyright (C) 2011  Puppet Labs Inc
+;; Copyright (C) 2013  Sebastian Wiesner <lunaryorn@gmail.com>
+;; Copyright (C) 2013  Bozhidar Batsov <bozhidar@batsov.com>
 
 ;; Author: Russ Allbery <rra@stanford.edu>
-;; Maintainer: <info@puppetlabs.com>
+;; Maintainer: Sebastian Wiesner <lunaryorn@gmail.com>
+;; Maintainer: Bozhidar Batsov <bozhidar@batsov.com>
+;; Keywords: languages
+;; Version: 0.2
+;; Package-Requires:
 
 ;; This file is not part of GNU Emacs.
 
@@ -37,7 +43,7 @@
 
 ;;; Commentary:
 
-;; A simple mode for editing puppet manifests.
+;; Major mode for Puppet manifests
 
 ;;; Code:
 
@@ -392,3 +398,5 @@ The variable puppet-indent-level controls the amount of indentation.
   (run-hooks 'puppet-mode-hook))
 
 (provide 'puppet-mode)
+
+;;; puppet-mode.el ends here
