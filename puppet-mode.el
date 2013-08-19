@@ -387,8 +387,6 @@ of the initial include plus puppet-include-indent."
   (setq-local paragraph-ignore-fill-prefix t)
   (setq-local paragraph-start "\f\\|[ 	]*$\\|#$")
   (setq-local paragraph-separate "\\([ 	\f]*\\|#\\)$")
-  (or (boundp 'font-lock-variable-name-face)
-      (setq font-lock-variable-name-face font-lock-type-face))
   (setq-local font-lock-keywords puppet-font-lock-keywords)
   (setq-local font-lock-multiline t)
   (setq-local font-lock-defaults
