@@ -48,11 +48,8 @@
 
 ;;; Code:
 
-(defvar puppet-mode-abbrev-table nil
-  "Abbrev table in use in puppet-mode buffers.")
-
-(define-abbrev-table 'puppet-mode-abbrev-table ())
-
+
+;;;; Customization
 (defcustom puppet-indent-level 2
   "*Indentation of Puppet statements."
   :type 'integer :group 'puppet)
@@ -60,31 +57,6 @@
 (defcustom puppet-include-indent 2
   "*Indentation of continued Puppet include statements."
   :type 'integer :group 'puppet)
-
-(defvar puppet-mode-map (make-sparse-keymap)
-  "Key map used in puppet-mode buffers.")
-
-(defvar puppet-mode-syntax-table
-  (let ((table (make-syntax-table)))
-    (modify-syntax-entry ?\' "\"'"  table)
-    (modify-syntax-entry ?\" "\"\"" table)
-    (modify-syntax-entry ?#  "<"    table)
-    (modify-syntax-entry ?\n ">#"   table)
-    (modify-syntax-entry ?\\ "\\"   table)
-    (modify-syntax-entry ?$  "'"    table)
-    (modify-syntax-entry ?-  "_"    table)
-    (modify-syntax-entry ?:  "_"    table)
-    (modify-syntax-entry ?>  "."    table)
-    (modify-syntax-entry ?=  "."    table)
-    (modify-syntax-entry ?\; "."    table)
-    (modify-syntax-entry ?\( "()"   table)
-    (modify-syntax-entry ?\) ")("   table)
-    (modify-syntax-entry ?\{ "(}"   table)
-    (modify-syntax-entry ?\} "){"   table)
-    (modify-syntax-entry ?\[ "(]"   table)
-    (modify-syntax-entry ?\] ")["   table)
-    table)
-  "Syntax table in use in puppet-mode buffers.")
 
 (defcustom puppet-indent-tabs-mode nil
   "*Indentation can insert tabs in puppet mode if this is non-nil."
@@ -94,6 +66,8 @@
   "*Indentation column of comments."
   :type 'integer :group 'puppet)
 
+
+;;;; Indentation code
 (defun puppet-count-matches (re start end)
   "The same as Emacs 22 count-matches, for portability to other versions
 of Emacs."
@@ -285,6 +259,39 @@ of the initial include plus puppet-include-indent."
       (if (and cur-indent (> cur-indent 0))
           (indent-line-to cur-indent)
         (indent-line-to 0)))))
+
+
+;;;; Major mode definition
+
+(defvar puppet-mode-abbrev-table nil
+  "Abbrev table in use in puppet-mode buffers.")
+
+(define-abbrev-table 'puppet-mode-abbrev-table ())
+
+(defvar puppet-mode-map (make-sparse-keymap)
+  "Key map used in puppet-mode buffers.")
+
+(defvar puppet-mode-syntax-table
+  (let ((table (make-syntax-table)))
+    (modify-syntax-entry ?\' "\"'"  table)
+    (modify-syntax-entry ?\" "\"\"" table)
+    (modify-syntax-entry ?#  "<"    table)
+    (modify-syntax-entry ?\n ">#"   table)
+    (modify-syntax-entry ?\\ "\\"   table)
+    (modify-syntax-entry ?$  "'"    table)
+    (modify-syntax-entry ?-  "_"    table)
+    (modify-syntax-entry ?:  "_"    table)
+    (modify-syntax-entry ?>  "."    table)
+    (modify-syntax-entry ?=  "."    table)
+    (modify-syntax-entry ?\; "."    table)
+    (modify-syntax-entry ?\( "()"   table)
+    (modify-syntax-entry ?\) ")("   table)
+    (modify-syntax-entry ?\{ "(}"   table)
+    (modify-syntax-entry ?\} "){"   table)
+    (modify-syntax-entry ?\[ "(]"   table)
+    (modify-syntax-entry ?\] ")["   table)
+    table)
+  "Syntax table in use in puppet-mode buffers.")
 
 (defvar puppet-font-lock-syntax-table
   (let* ((tbl (copy-syntax-table puppet-mode-syntax-table)))
