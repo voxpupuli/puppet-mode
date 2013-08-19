@@ -50,21 +50,32 @@
 
 
 ;;;; Customization
+(defgroup puppet nil
+  "Puppet mastering in Emacs"
+  :prefix "puppet-"
+  :group 'languages
+  :link '(url-link :tag "Github" "https://github.com/lunaryorn/puppet-mode")
+  :link '(emacs-commentary-link :tag "Commentary" "puppet-mode"))
+
 (defcustom puppet-indent-level 2
-  "*Indentation of Puppet statements."
-  :type 'integer :group 'puppet)
+  "Indentation of Puppet statements."
+  :type 'integer
+  :group 'puppet)
 
 (defcustom puppet-include-indent 2
-  "*Indentation of continued Puppet include statements."
-  :type 'integer :group 'puppet)
+  "Indentation of continued Puppet include statements."
+  :type 'integer
+  :group 'puppet)
 
 (defcustom puppet-indent-tabs-mode nil
-  "*Indentation can insert tabs in puppet mode if this is non-nil."
-  :type 'boolean :group 'puppet)
+  "Indentation can insert tabs in puppet mode if this is non-nil."
+  :type 'boolean
+  :group 'puppet)
 
 (defcustom puppet-comment-column 32
-  "*Indentation column of comments."
-  :type 'integer :group 'puppet)
+  "Indentation column of comments."
+  :type 'integer
+  :group 'puppet)
 
 
 ;;;; Indentation code
