@@ -265,11 +265,6 @@ of the initial include plus puppet-include-indent."
 
 ;;;; Major mode definition
 
-(defvar puppet-mode-abbrev-table nil
-  "Abbrev table in use in puppet-mode buffers.")
-
-(define-abbrev-table 'puppet-mode-abbrev-table ())
-
 (defvar puppet-mode-map (make-sparse-keymap)
   "Key map used in puppet-mode buffers.")
 
