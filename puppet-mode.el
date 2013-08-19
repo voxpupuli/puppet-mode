@@ -79,15 +79,6 @@
 
 
 ;;;; Indentation code
-(defun puppet-count-matches (re start end)
-  "The same as Emacs 22 count-matches, for portability to other versions
-of Emacs."
-  (save-excursion
-    (let ((n 0))
-      (goto-char start)
-      (while (re-search-forward re end t) (setq n (1+ n)))
-      n)))
-
 (defun puppet-comment-line-p ()
   "Return non-nil iff this line is a comment."
   (save-excursion
@@ -106,12 +97,12 @@ of the closing brace of a block."
         (when apoint
           ;; This is a bit of a hack and doesn't allow for strings.  We really
           ;; want to parse by sexps at some point.
-          (let ((close-braces (puppet-count-matches "}" apoint opoint))
+          (let ((close-braces (count-matches "}" apoint opoint))
                 (open-braces 0))
             (while (and apoint (> close-braces open-braces))
               (setq apoint (search-backward "{" nil t))
               (when apoint
-                (setq close-braces (puppet-count-matches "}" apoint opoint))
+                (setq close-braces (count-matches "}" apoint opoint))
                 (setq open-braces (1+ open-braces)))))
           (if apoint
               (current-indentation)
@@ -127,12 +118,12 @@ that array, else return nil."
         (when apoint
           ;; This is a bit of a hack and doesn't allow for strings.  We really
           ;; want to parse by sexps at some point.
-          (let ((close-brackets (puppet-count-matches "]" apoint opoint))
+          (let ((close-brackets (count-matches "]" apoint opoint))
                 (open-brackets 0))
             (while (and apoint (> close-brackets open-brackets))
               (setq apoint (search-backward "[" nil t))
               (when apoint
-                (setq close-brackets (puppet-count-matches "]" apoint opoint))
+                (setq close-brackets (count-matches "]" apoint opoint))
                 (setq open-brackets (1+ open-brackets)))))
           apoint)))))
 
