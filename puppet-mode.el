@@ -1,8 +1,8 @@
 ;;; puppet-mode.el --- Major mode for Puppet manifests
 
-;; Copyright (C) 2011  Puppet Labs Inc
 ;; Copyright (C) 2013  Sebastian Wiesner <lunaryorn@gmail.com>
 ;; Copyright (C) 2013  Bozhidar Batsov <bozhidar@batsov.com>
+;; Copyright (C) 2011  Puppet Labs Inc
 
 ;; Author: Russ Allbery <rra@stanford.edu>
 ;; Maintainer: Sebastian Wiesner <lunaryorn@gmail.com>
