@@ -69,22 +69,26 @@
 (defcustom puppet-indent-level 2
   "Indentation of Puppet statements."
   :type 'integer
-  :group 'puppet)
+  :group 'puppet
+  :safe 'integerp)
 
 (defcustom puppet-include-indent 2
   "Indentation of continued Puppet include statements."
   :type 'integer
-  :group 'puppet)
+  :group 'puppet
+  :safe 'integerp)
 
 (defcustom puppet-indent-tabs-mode nil
   "Indentation can insert tabs in puppet mode if this is non-nil."
   :type 'boolean
-  :group 'puppet)
+  :group 'puppet
+  :safe 'booleanp)
 
 (defcustom puppet-comment-column 32
   "Indentation column of comments."
   :type 'integer
-  :group 'puppet)
+  :group 'puppet
+  :safe 'integerp)
 
 
 ;;;; Indentation code
