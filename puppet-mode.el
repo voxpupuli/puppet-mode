@@ -49,6 +49,15 @@
 ;;; Code:
 
 
+;;;; Compatibility
+(eval-and-compile
+  ;; `setq-local' for Emacs 24.2 and below
+  (unless (fboundp 'setq-local)
+    (defmacro setq-local (var val)
+      "Set variable VAR to value VAL in current buffer."
+      `(set (make-local-variable ',var) ,val))))
+
+
 ;;;; Customization
 (defgroup puppet nil
   "Puppet mastering in Emacs"
@@ -366,23 +375,23 @@ of the initial include plus puppet-include-indent."
   "Major mode for editing Puppet manifests.
 
 \\{puppet-mode-map}"
-  (set (make-local-variable 'comment-start) "# ")
-  (set (make-local-variable 'comment-start-skip) "#+ *")
-  (set (make-local-variable 'comment-use-syntax) t)
-  (set (make-local-variable 'comment-end) "")
-  (set (make-local-variable 'comment-auto-fill-only-comments) t)
-  (set (make-local-variable 'comment-column) puppet-comment-column)
-  (set (make-local-variable 'indent-line-function) 'puppet-indent-line)
-  (set (make-local-variable 'indent-tabs-mode) puppet-indent-tabs-mode)
-  (set (make-local-variable 'require-final-newline) t)
-  (set (make-local-variable 'paragraph-ignore-fill-prefix) t)
-  (set (make-local-variable 'paragraph-start) "\f\\|[ 	]*$\\|#$")
-  (set (make-local-variable 'paragraph-separate) "\\([ 	\f]*\\|#\\)$")
+  (setq-local comment-start "# ")
+  (setq-local comment-start-skip "#+ *")
+  (setq-local comment-use-syntax t)
+  (setq-local comment-end "")
+  (setq-local comment-auto-fill-only-comments t)
+  (setq-local comment-column puppet-comment-column)
+  (setq-local indent-line-function 'puppet-indent-line)
+  (setq-local indent-tabs-mode puppet-indent-tabs-mode)
+  (setq-local require-final-newline t)
+  (setq-local paragraph-ignore-fill-prefix t)
+  (setq-local paragraph-start "\f\\|[ 	]*$\\|#$")
+  (setq-local paragraph-separate "\\([ 	\f]*\\|#\\)$")
   (or (boundp 'font-lock-variable-name-face)
       (setq font-lock-variable-name-face font-lock-type-face))
-  (set (make-local-variable 'font-lock-keywords) puppet-font-lock-keywords)
-  (set (make-local-variable 'font-lock-multiline) t)
-  (set (make-local-variable 'font-lock-defaults)
+  (setq-local font-lock-keywords puppet-font-lock-keywords)
+  (setq-local font-lock-multiline t)
+  (setq-local font-lock-defaults
        '((puppet-font-lock-keywords) nil nil)))
 
 ;;;###autoload
