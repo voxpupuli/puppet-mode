@@ -58,6 +58,10 @@
       `(set (make-local-variable ',var) ,val))))
 
 
+;;;; Requirements
+(require 'align)
+
+
 ;;;; Customization
 (defgroup puppet nil
   "Puppet mastering in Emacs"
@@ -386,6 +390,13 @@ of the initial include plus puppet-include-indent."
        (2 font-lock-string-face)))
   "*Additional expressions to highlight in puppet mode.")
 
+(defconst puppet-mode-align-rules
+  '((puppet-resource-arrow
+     (regexp . "\\(\\s-*\\)=>\\(\\s-*\\)")
+     (group  . (1 2))
+     (modes  . '(puppet-mode))))
+  "Align rules for Puppet Mode.")
+
 ;;;###autoload
 (define-derived-mode puppet-mode prog-mode "Puppet" ()
   "Major mode for editing Puppet manifests.
@@ -405,8 +416,8 @@ of the initial include plus puppet-include-indent."
   (setq-local paragraph-separate "\\([ 	\f]*\\|#\\)$")
   (setq-local font-lock-keywords puppet-font-lock-keywords)
   (setq-local font-lock-multiline t)
-  (setq-local font-lock-defaults
-       '((puppet-font-lock-keywords) nil nil)))
+  (setq-local font-lock-defaults '((puppet-font-lock-keywords) nil nil))
+  (setq align-mode-rules-list puppet-mode-align-rules))
 
 ;;;###autoload
 (add-to-list 'auto-mode-alist '("\\.pp\\'" . puppet-mode))
