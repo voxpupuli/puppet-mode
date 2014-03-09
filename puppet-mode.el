@@ -286,7 +286,7 @@ of the initial include plus puppet-include-indent."
   "Key map used in puppet-mode buffers.")
 
 (defvar puppet-mode-syntax-table
-  (let ((table (make-syntax-table)))
+  (let ((table (make-syntax-table prog-mode-syntax-table)))
     (modify-syntax-entry ?\' "\"'"  table)
     (modify-syntax-entry ?\" "\"\"" table)
     (modify-syntax-entry ?#  "<"    table)
@@ -306,11 +306,6 @@ of the initial include plus puppet-include-indent."
     (modify-syntax-entry ?\] ")["   table)
     table)
   "Syntax table in use in puppet-mode buffers.")
-
-(defvar puppet-font-lock-syntax-table
-  (let* ((tbl (copy-syntax-table puppet-mode-syntax-table)))
-    (modify-syntax-entry ?_ "w" tbl)
-    tbl))
 
 (defvar puppet-font-lock-keywords
   (list
@@ -419,9 +414,8 @@ of the initial include plus puppet-include-indent."
   (setq-local paragraph-start "\f\\|[ 	]*$\\|#$")
   (setq-local paragraph-separate "\\([ 	\f]*\\|#\\)$")
   ;; Font locking
-  (setq-local font-lock-keywords puppet-font-lock-keywords)
-  (setq-local font-lock-multiline t)
   (setq font-lock-defaults '((puppet-font-lock-keywords) nil nil))
+  (setq-local font-lock-multiline t)
   ;; Alignment
   (setq align-mode-rules-list puppet-mode-align-rules))
 
