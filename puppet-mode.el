@@ -402,21 +402,27 @@ of the initial include plus puppet-include-indent."
   "Major mode for editing Puppet manifests.
 
 \\{puppet-mode-map}"
+  ;; Misc variables
+  (setq-local require-final-newline t)
+  ;; Comment setup
   (setq-local comment-start "# ")
   (setq-local comment-start-skip "#+ *")
   (setq-local comment-use-syntax t)
   (setq-local comment-end "")
   (setq-local comment-auto-fill-only-comments t)
-  (setq-local comment-column puppet-comment-column)
+  (setq comment-column puppet-comment-column)
+  ;; Indentation
   (setq-local indent-line-function 'puppet-indent-line)
-  (setq-local indent-tabs-mode puppet-indent-tabs-mode)
-  (setq-local require-final-newline t)
+  (setq indent-tabs-mode puppet-indent-tabs-mode)
+  ;; Paragaphs
   (setq-local paragraph-ignore-fill-prefix t)
   (setq-local paragraph-start "\f\\|[ 	]*$\\|#$")
   (setq-local paragraph-separate "\\([ 	\f]*\\|#\\)$")
+  ;; Font locking
   (setq-local font-lock-keywords puppet-font-lock-keywords)
   (setq-local font-lock-multiline t)
-  (setq-local font-lock-defaults '((puppet-font-lock-keywords) nil nil))
+  (setq font-lock-defaults '((puppet-font-lock-keywords) nil nil))
+  ;; Alignment
   (setq align-mode-rules-list puppet-mode-align-rules))
 
 ;;;###autoload
