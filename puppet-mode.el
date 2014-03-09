@@ -368,7 +368,7 @@ of the initial include plus puppet-include-indent."
             "unless"
             "versioncmp"
             "warning")
-          'words)
+          'symbols)
          1)
      ;; variables
      '("\\(^\\|[^_:.@$]\\)\\b\\(true\\|false\\)\\>"
