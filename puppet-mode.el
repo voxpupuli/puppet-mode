@@ -293,8 +293,9 @@ of the initial include plus puppet-include-indent."
     (modify-syntax-entry ?\n ">#"   table)
     (modify-syntax-entry ?\\ "\\"   table)
     (modify-syntax-entry ?$  "'"    table)
-    (modify-syntax-entry ?-  "_"    table)
     (modify-syntax-entry ?:  "_"    table)
+    (modify-syntax-entry ?_  "_"    table)
+    (modify-syntax-entry ?-  "."    table)
     (modify-syntax-entry ?>  "."    table)
     (modify-syntax-entry ?=  "."    table)
     (modify-syntax-entry ?\; "."    table)
@@ -305,7 +306,7 @@ of the initial include plus puppet-include-indent."
     (modify-syntax-entry ?\[ "(]"   table)
     (modify-syntax-entry ?\] ")["   table)
     table)
-  "Syntax table in use in puppet-mode buffers.")
+  "Syntax table in use in `puppet-mode' buffers.")
 
 (defvar puppet-font-lock-keywords
   (list
