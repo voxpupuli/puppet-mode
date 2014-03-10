@@ -59,6 +59,7 @@
 
 
 ;;;; Requirements
+(require 'rx)
 (require 'align)
 
 
@@ -303,83 +304,150 @@ of the initial include plus puppet-include-indent."
     table)
   "Syntax table in use in `puppet-mode' buffers.")
 
+(eval-and-compile
+  ;; Make these available during compilation, for use with `rx'
+
+  (defconst puppet-keywords-re
+    ;; See
+    ;; http://docs.puppetlabs.com/puppet/latest/reference/lang_reserved.html#reserved-words
+    (rx symbol-start
+        (or "and" "case" "class" "default" "define" "else" "elsif" "false" "if"
+            "in" "import" "inherits" "node" "or" "true" "undef" "unless")
+        symbol-end)
+    "Regular expression to match Puppet keywords.")
+
+  (defconst puppet-builtin-functions-re
+    ;; See http://docs.puppetlabs.com/references/latest/function.html
+    (rx symbol-start
+        (or "alert" "collect" "contain" "create_resources" "crit" "debug"
+            "defined" "each" "emerg" "err" "extlookup" "fail" "file" "filter"
+            "fqdn_rand" "generate" "hiera" "hiera_array" "hiera_hash"
+            "hiera_include" "include" "info" "inline_template" "lookup" "map"
+            "md5" "notice" "realize" "reduce" "regsubst" "require" "search"
+            "select" "sha1" "shellquote" "slice" "split" "sprintf" "tag"
+            "tagged" "template" "versioncmp" "warning")
+        symbol-end)
+    "Regular expression to match all builtin functions of Puppet.")
+
+  (defconst puppet-builtin-types-re
+    ;; See http://docs.puppetlabs.com/references/latest/type.html
+    (rx symbol-start
+        (or "augeas" "computer" "cron" "exec" "file" "filebucket"
+            "group" "host" "interface" "k5login" "macauthorization"
+            "mailalias" "maillist" "mcx" "mount" "nagios_command"
+            "nagios_contact" "nagios_contactgroup" "nagios_host"
+            "nagios_hostdependency" "nagios_hostescalation"
+            "nagios_hostextinfo" "nagios_hostgroup" "nagios_service"
+            "nagios_servicedependency" "nagios_serviceescalation"
+            "nagios_serviceextinfo" "nagios_servicegroup"
+            "nagios_timeperiod" "notify" "package" "resources" "router"
+            "schedule" "scheduled_task" "selboolean" "selmodule"
+            "service" "ssh_authorized_key" "sshkey" "stage" "tidy"
+            "user" "vlan" "yumrepo" "zfs" "zone" "zpool")
+        symbol-end)
+    "Regular expression to match all builtin types of Puppet.")
+
+  (defconst puppet-builtin-metaparameters-re
+    ;; See http://docs.puppetlabs.com/references/stable/metaparameter.html
+    (rx symbol-start
+        (or "alias" "audit" "before" "loglevel" "noop" "notify"
+            "require" "schedule" "stage" "subscribe" "tag"
+            ;; Strictly speaking, this is no meta parameter, but it's so
+            ;; common that it got a mention in the docs, see
+            ;; http://docs.puppetlabs.com/puppet/latest/reference/lang_resources.html#ensure,
+            ;; so we'll consider it as metaparameter anyway
+            "ensure")
+        symbol-end)
+    "Regular expression to match all builtin meta parameters of Puppet.")
+
+  (defconst puppet-resource-name-re
+    (rx
+     ;; Optional top-level scope
+     (optional (any "a-z")
+               (zero-or-more (any "a-z" "0-9" "_")))
+     ;; Nested sub-scopes
+     (zero-or-more "::"
+                   (any "a-z")
+                   (zero-or-more (any "a-z" "0-9" "_"))))
+    "Regular expression to match a Puppet resource name.")
+
+  (defconst puppet-capitalized-resource-name-re
+    (rx
+     ;; Optional top-level scope
+     (optional (any "A-z")
+               (zero-or-more (any "a-z" "0-9" "_")))
+     ;; Nested sub-scopes
+     (zero-or-more "::"
+                   (any "A-z")
+                   (zero-or-more (any "a-z" "0-9" "_"))))
+    "Regular expression to match a capitalized Puppet resource name."))
+
 (defvar puppet-font-lock-keywords
-  (list
-   ;; defines, classes, and nodes
-   '("^\\s *\\(class\\|define\\|node\\)\\s +\\([^( \t\n]+\\)"
-     2 font-lock-function-name-face)
-   ;; inheritence
-   '("\\s +inherits\\s +\\([^( \t\n]+\\)"
-     1 font-lock-function-name-face)
-   ;; include
-   '("\\(^\\|\\s +\\)include\\s +\\(\\([a-zA-Z0-9:_-]+\\(,[ \t\n]*\\)?\\)+\\)"
-     2 font-lock-reference-face)
-   ;; keywords
-   (cons (regexp-opt
-          '("alert"
-            "case"
-            "class"
-            "create_resources"
-            "crit"
-            "debug"
-            "default"
-            "define"
-            "defined"
-            "else"
-            "emerg"
-            "err"
-            "extlookup"
-            "fail"
-            "false"
-            "file"
-            "filebucket"
-            "fqdn_rand"
-            "generate"
-            "hiera"
-            "hiera_array"
-            "hiera_hash"
-            "hiera_include"
-            "if"
-            "import"
-            "include"
-            "info"
-            "inherits"
-            "inline_template"
-            "md5"
-            "node"
-            "notice"
-            "realize"
-            "regsubst"
-            "require"
-            "search"
-            "sha1"
-            "shellquote"
-            "split"
-            "sprintf"
-            "tag"
-            "tagged"
-            "template"
-            "true"
-            "unless"
-            "versioncmp"
-            "warning")
-          'symbols)
-         1)
-     ;; variables
-     '("\\(^\\|[^_:.@$]\\)\\b\\(true\\|false\\)\\>"
-       2 font-lock-variable-name-face)
-     '("\\$[a-zA-Z0-9_:]+"
-       0 font-lock-variable-name-face)
-     ;; usage of types
-     '("^\\s *\\([a-z][a-zA-Z0-9_:-]*\\)\\s +{"
-       1 font-lock-type-face)
-     ;; overrides and type references
-     '("\\s +\\([A-Z][a-zA-Z0-9_:-]*\\)\\["
-       1 font-lock-type-face)
-     ;; general delimited string
-     '("\\(^\\|[[ \t\n<+(,=]\\)\\(%[xrqQwW]?\\([^<[{(a-zA-Z0-9 \n]\\)[^\n\\\\]*\\(\\\\.[^\n\\\\]*\\)*\\(\\3\\)\\)"
-       (2 font-lock-string-face)))
-  "*Additional expressions to highlight in puppet mode.")
+  `(
+    ;; Keywords
+    (,(rx (group (eval (list 'regexp puppet-keywords-re))))
+     1 font-lock-keyword-face)
+    ;; Built-in functions
+    (,(rx (group (eval (list 'regexp puppet-builtin-functions-re))))
+     1 font-lock-builtin-face)
+    ;; Variables
+    (,(rx (group "$"
+                 symbol-start
+                 ;; The optional scope designation
+                 (optional
+                  (optional (any "a-z")
+                            (zero-or-more (any "A-Z" "a-z" "0-9" "_")))
+                  (zero-or-more "::"
+                                (any "a-z")
+                                (zero-or-more (any "A-Z" "a-z" "0-9" "_")))
+                  "::")
+                 ;; The final variable name
+                 (one-or-more (any "A-Z" "a-z" "0-9" "_"))
+                 symbol-end)) 1 font-lock-variable-name-face t)
+    ;; Type declarations
+    (,(rx symbol-start (or "class" "define" "node") symbol-end
+          (one-or-more space)
+          symbol-start
+          (group (eval (list 'regexp puppet-resource-name-re)))
+          symbol-end)
+     1 font-lock-type-face)
+    ;; Resource usage, see
+    ;; http://docs.puppetlabs.com/puppet/latest/reference/lang_resources.html
+    (,(rx symbol-start
+          (group
+           ;; Virtual and exported resources
+           (repeat 0 2 "@")
+           (eval (list 'regexp puppet-resource-name-re)))
+          symbol-end
+          (zero-or-more space) "{") 1 font-lock-type-face)
+    ;; Resource defaults, see
+    ;; http://docs.puppetlabs.com/puppet/latest/reference/lang_defaults.html
+    (,(rx symbol-start
+          (group (eval (list 'regexp puppet-capitalized-resource-name-re)))
+          symbol-end
+          (zero-or-more space) "{") 1 font-lock-type-face)
+    ;; Resource references, see
+    ;; http://docs.puppetlabs.com/puppet/latest/reference/lang_datatypes.html#resource-references
+    (,(rx symbol-start
+          (group (eval (list 'regexp puppet-capitalized-resource-name-re)))
+          symbol-end
+          (zero-or-more space) "[") 1 font-lock-type-face)
+    ;; Resource collectors, see
+    ;; http://docs.puppetlabs.com/puppet/latest/reference/lang_collectors.html
+    (,(rx symbol-start
+          (group (eval (list 'regexp puppet-capitalized-resource-name-re)))
+          symbol-end
+          (zero-or-more space)
+          (optional "<")                ; Exported collector
+          "<|") 1 font-lock-type-face)
+    ;; Negation
+    ("!" 0 font-lock-negation-char-face t)
+    ;; Builtin meta parameters
+    (,(rx (group (eval (list 'regexp puppet-builtin-metaparameters-re)))
+          (zero-or-more space)
+          "=>") 1 font-lock-builtin-face t)
+    )
+  "Font lock keywords for Puppet Mode.")
 
 (defconst puppet-mode-align-rules
   '((puppet-resource-arrow
