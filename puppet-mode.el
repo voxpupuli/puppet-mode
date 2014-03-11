@@ -632,6 +632,8 @@ for each entry."
 
 (defvar puppet-mode-map
   (let ((map (make-sparse-keymap)))
+    ;; Navigation
+    (define-key map (kbd "C-c C-j") #'imenu)
     ;; Apply manifests
     (define-key map (kbd "C-c C-c") #'puppet-apply)
     ;; Linting and validation
@@ -641,6 +643,9 @@ for each entry."
     (easy-menu-define puppet-menu map "Puppet Mode menu"
       `("Puppet"
         :help "Puppet-specific Features"
+        ["Jump to resource/variable" imenu
+         :help "Jump to a resource or variable"]
+        "-"
         ["Apply manifest" puppet-apply :help "Apply a Puppet manifest"]
         "-"
         ["Validate file syntax" puppet-validate
