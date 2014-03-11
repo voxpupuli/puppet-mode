@@ -50,6 +50,8 @@ manifests with the extension `.pp`.
 The following key bindings are available in Puppet Mode:
 
 +---------------+------------------------------------------------------------+
+|:kbd:`C-c C-a` | Align parameters in the current block                      |
++---------------+------------------------------------------------------------+
 |:kbd:`C-c C-j` | Jump to a `class`, `define`, variable or resource          |
 +---------------+------------------------------------------------------------+
 |:kbd:`C-c C-c` | Apply the current manifest with `puppet apply`             |

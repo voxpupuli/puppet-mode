@@ -541,6 +541,15 @@ of the initial include plus puppet-include-indent."
      (modes  . '(puppet-mode))))
   "Align rules for Puppet Mode.")
 
+(defun puppet-align-block ()
+  "Align the current block."
+  (interactive)
+  (save-excursion
+    (save-match-data
+      (let ((beg (search-backward "{")))
+        (forward-list)
+        (align beg (point))))))
+
 
 ;;;; Imenu
 
@@ -632,6 +641,8 @@ for each entry."
 
 (defvar puppet-mode-map
   (let ((map (make-sparse-keymap)))
+    ;; Editing
+    (define-key map (kbd "C-c C-a") #'puppet-align-block)
     ;; Navigation
     (define-key map (kbd "C-c C-j") #'imenu)
     ;; Apply manifests
@@ -643,6 +654,9 @@ for each entry."
     (easy-menu-define puppet-menu map "Puppet Mode menu"
       `("Puppet"
         :help "Puppet-specific Features"
+        ["Align the current block" puppet-align-block
+         :help "Align parameters in the current block"]
+        "-"
         ["Jump to resource/variable" imenu
          :help "Jump to a resource or variable"]
         "-"
