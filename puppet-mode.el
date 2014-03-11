@@ -512,8 +512,13 @@ of the initial include plus puppet-include-indent."
 
 ;;;; Major mode definition
 
-(defvar puppet-mode-map (make-sparse-keymap)
-  "Key map used in puppet-mode buffers.")
+(defvar puppet-mode-map
+  (let ((map (make-sparse-keymap)))
+    ;; Linting and validationg
+    (define-key map (kbd "C-c C-v") #'puppet-validate)
+    (define-key map (kbd "C-c C-l") #'puppet-lint)
+    map)
+  "Key map for Puppet Mode buffers.")
 
 ;;;###autoload
 (define-derived-mode puppet-mode prog-mode "Puppet" ()
