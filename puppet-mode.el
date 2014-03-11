@@ -9,7 +9,7 @@
 ;; Maintainer: Bozhidar Batsov <bozhidar@batsov.com>
 ;; URL: https://github.com/lunaryorn/puppet-mode
 ;; Keywords: languages
-;; Version: 0.2
+;; Version: 0.3-cvs
 ;; Package-Requires: ((emacs "24.1"))
 
 ;; This file is not part of GNU Emacs.
