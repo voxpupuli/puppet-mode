@@ -387,9 +387,6 @@ of the initial include plus puppet-include-indent."
     ;; Keywords
     (,(rx (group (eval (list 'regexp puppet-keywords-re))))
      1 font-lock-keyword-face)
-    ;; Built-in functions
-    (,(rx (group (eval (list 'regexp puppet-builtin-functions-re))))
-     1 font-lock-builtin-face)
     ;; Variables
     (,(rx (group "$"
                  symbol-start
@@ -446,7 +443,9 @@ of the initial include plus puppet-include-indent."
     (,(rx (group (eval (list 'regexp puppet-builtin-metaparameters-re)))
           (zero-or-more space)
           "=>") 1 font-lock-builtin-face t)
-    )
+     ;; Built-in functions
+    (,(rx (group (eval (list 'regexp puppet-builtin-functions-re))))
+     1 font-lock-builtin-face))
   "Font lock keywords for Puppet Mode.")
 
 (defconst puppet-mode-align-rules
