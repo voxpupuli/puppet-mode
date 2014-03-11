@@ -373,6 +373,9 @@ of the initial include plus puppet-include-indent."
   (let ((table (make-syntax-table prog-mode-syntax-table)))
     (modify-syntax-entry ?\' "\"'"  table)
     (modify-syntax-entry ?\" "\"\"" table)
+    ;; C-style comments.  Yes, Puppet as these!
+    (modify-syntax-entry ?/ ". 14b" table)
+    (modify-syntax-entry ?* ". 23b"  table)
     (modify-syntax-entry ?#  "<"    table)
     (modify-syntax-entry ?\n ">#"   table)
     (modify-syntax-entry ?\\ "\\"   table)
