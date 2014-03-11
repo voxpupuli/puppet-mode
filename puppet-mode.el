@@ -457,11 +457,11 @@ of the initial include plus puppet-include-indent."
   (defconst puppet-capitalized-resource-name-re
     (rx
      ;; Optional top-level scope
-     (optional (any "A-z")
+     (optional (any "A-Z")
                (zero-or-more (any "a-z" "0-9" "_")))
      ;; Nested sub-scopes
      (zero-or-more "::"
-                   (any "A-z")
+                   (any "A-Z")
                    (zero-or-more (any "a-z" "0-9" "_"))))
     "Regular expression to match a capitalized Puppet resource name."))
 
