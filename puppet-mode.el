@@ -95,6 +95,60 @@
   :group 'puppet
   :safe 'integerp)
 
+(defcustom puppet-validate-command "puppet parser validate --color=false"
+  "Command to validate the syntax of a Puppet manifest."
+  :type 'string
+  :group 'puppet)
+
+(defcustom puppet-lint-command
+  (concat
+   "puppet-lint --with-context "
+   "--log-format \"%{path}:%{linenumber}: %{kind}: %{message} (%{check})\"")
+  "Command to lint a Puppet manifest."
+  :type 'string
+  :group 'puppet)
+
+
+;;;; Checking
+(defvar-local puppet-last-validate-command nil
+  "The last command used for validation.")
+
+(defvar-local puppet-last-lint-command nil
+  "The last command used for linting.")
+
+(defun puppet-run-check-command (command buffer-name-template)
+  "Run COMMAND to check the current buffer."
+  (save-some-buffers (not compilation-ask-about-save) nil)
+  (compilation-start command nil (lambda (_)
+                                   (format buffer-name-template command))))
+
+(defun puppet-read-command (prompt previous-command default-command)
+  "Read a command from minibuffer with PROMPT."
+  (let ((filename (or (buffer-file-name) "")))
+    (read-string prompt (or previous-command
+                            (concat default-command " "
+                                    (shell-quote-argument filename))))))
+
+(defun puppet-validate (command)
+  "Validate the syntax of the current buffer with COMMAND.
+
+When called interactively, prompt for command."
+  (interactive (list (puppet-read-command "Validate command: "
+                                          puppet-last-validate-command
+                                          puppet-validate-command)))
+  (setq puppet-last-validate-command command)
+  (puppet-run-check-command command "*Puppet Validate: %s*"))
+
+(defun puppet-lint (command)
+  "Lint the current buffer with COMMAND.
+
+When called interactively, prompt for command."
+  (interactive (list (puppet-read-command "Lint command: "
+                                          puppet-last-lint-command
+                                          puppet-lint-command)))
+  (setq puppet-last-lint-command command)
+  (puppet-run-check-command command "*Puppet Lint: %s*"))
+
 
 ;;;; Indentation code
 (defun puppet-comment-line-p ()
