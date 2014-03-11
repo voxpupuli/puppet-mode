@@ -517,6 +517,14 @@ of the initial include plus puppet-include-indent."
     ;; Linting and validationg
     (define-key map (kbd "C-c C-v") #'puppet-validate)
     (define-key map (kbd "C-c C-l") #'puppet-lint)
+    ;; The menu bar
+    (easy-menu-define puppet-menu map "Puppet Mode menu"
+      `("Puppet"
+        :help "Puppet-specific Features"
+        ["Validate file syntax" puppet-validate
+         :help "Validate the syntax of this file"]
+        ["Lint file" puppet-lint
+         :help "Check the file for semantic issues"]))
     map)
   "Key map for Puppet Mode buffers.")
 
