@@ -443,7 +443,13 @@ of the initial include plus puppet-include-indent."
     (,(rx (group (eval (list 'regexp puppet-builtin-metaparameters-re)))
           (zero-or-more space)
           "=>") 1 font-lock-builtin-face)
-     ;; Built-in functions
+    ;; Standard meta parameters
+    (,(rx symbol-start
+          (group (one-or-more (any "A-Z" "a-z" "0-9" "_")))
+          symbol-end
+          (zero-or-more space)
+          "=>") 1 font-lock-function-name-face)
+    ;; Built-in functions
     (,(rx (group (eval (list 'regexp puppet-builtin-functions-re))))
      1 font-lock-builtin-face))
   "Font lock keywords for Puppet Mode.")
