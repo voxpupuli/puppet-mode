@@ -4,7 +4,7 @@
 
 .. default-role:: literal
 
-.. role:: kbd
+.. role:: kbd(literal)
 
 If you discover issues, have ideas for improvements or new features, or want to
 contribute a new module, please report them to the `issue tracker`_ of the
