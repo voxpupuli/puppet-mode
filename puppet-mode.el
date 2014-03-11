@@ -542,6 +542,92 @@ of the initial include plus puppet-include-indent."
   "Align rules for Puppet Mode.")
 
 
+;;;; Imenu
+
+(defun puppet-imenu-collect-entries (pattern)
+  "Collect all index entries matching PATTERN.
+
+The first matching group of PATTERN is used as title and position
+for each entry."
+  (goto-char (point-min))
+  (let ((case-fold-search nil)
+        entries)
+    (while (re-search-forward pattern nil 'no-error)
+      (let ((context (save-excursion (syntax-ppss (match-beginning 0)))))
+        ;; Skip this match if it's inside a string or comment
+        (unless (or (nth 3 context) (nth 4 context))
+          (push (cons (match-string 1) (match-beginning 1)) entries))))
+    (nreverse entries)))
+
+(defun puppet-imenu-create-index ()
+  "Create an IMenu index for the current buffer."
+  (let ((case-fold-search nil)
+        ;; Variable assignments
+        (variables (puppet-imenu-collect-entries
+                    (rx (group "$" symbol-start
+                               (one-or-more (any "A-Z" "a-z" "0-9" "_"))
+                               symbol-end)
+                        (zero-or-more space) "=")))
+        ;; Resource defaults
+        (defaults (puppet-imenu-collect-entries
+                   (rx symbol-start
+                       (group (eval (list 'regexp puppet-capitalized-resource-name-re)))
+                       symbol-end
+                       (zero-or-more space) "{")))
+        ;; Nodes, classes and defines
+        (nodes (puppet-imenu-collect-entries
+                (rx symbol-start "node" symbol-end
+                    (one-or-more space)
+                    symbol-start
+                    (group (eval (list 'regexp puppet-resource-name-re)))
+                    symbol-end)))
+        (classes (puppet-imenu-collect-entries
+                  (rx symbol-start "class" symbol-end
+                      (one-or-more space)
+                      symbol-start
+                      (group (eval (list 'regexp puppet-resource-name-re)))
+                      symbol-end)))
+        (defines (puppet-imenu-collect-entries
+                  (rx symbol-start "define" symbol-end
+                      (one-or-more space)
+                      symbol-start
+                      (group (eval (list 'regexp puppet-resource-name-re)))
+                      symbol-end)))
+        resources)
+    ;; Resources are a little more complicated since we need to extract the type
+    ;; and the name
+    (goto-char (point-min))
+    (while (re-search-forward
+            (rx symbol-start
+                (group
+                 ;; Virtual and exported resources
+                 (repeat 0 2 "@")
+                 (eval (list 'regexp puppet-resource-name-re)))
+                symbol-end
+                (zero-or-more space) "{"
+                ;; FIXME: Support condensed forms
+                (zero-or-more space)
+                (group (one-or-more not-newline)) ":")
+            nil 'no-error)
+      ;; FIXME: Doesn't work for any condensed forms, see
+      ;; http://docs.puppetlabs.com/puppet/latest/reference/lang_resources.html#condensed-forms
+      ;; We probably need to be more clever here
+      (push (cons (concat (match-string 1) " " (match-string 2))
+                  (match-beginning 1))
+            resources))
+    (let (index
+          ;; Keep this in reversed order, for `push'
+          (parts (list (cons "Variables" (nreverse variables))
+                       (cons "Defaults" (nreverse defaults))
+                       (cons "Definitions" (nreverse defines))
+                       (cons "Classes" (nreverse classes))
+                       (cons "Nodes" (nreverse nodes)))))
+      (dolist (part parts)
+        (when (cdr part)
+          (push part index)))
+      (append index (nreverse resources)))))
+
+
 ;;;; Major mode definition
 
 (defvar puppet-mode-map
@@ -589,7 +675,9 @@ of the initial include plus puppet-include-indent."
   (setq font-lock-defaults '((puppet-font-lock-keywords) nil nil))
   (setq-local font-lock-multiline t)
   ;; Alignment
-  (setq align-mode-rules-list puppet-mode-align-rules))
+  (setq align-mode-rules-list puppet-mode-align-rules)
+  ;; IMenu
+  (setq imenu-create-index-function #'puppet-imenu-create-index))
 
 ;;;###autoload
 (add-to-list 'auto-mode-alist '("\\.pp\\'" . puppet-mode))
