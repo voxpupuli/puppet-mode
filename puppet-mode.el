@@ -438,7 +438,7 @@ of the initial include plus puppet-include-indent."
           (optional "<")                ; Exported collector
           "<|") 1 font-lock-type-face)
     ;; Negation
-    ("!" 0 font-lock-negation-char-face t)
+    ("!" 0 font-lock-negation-char-face)
     ;; Builtin meta parameters
     (,(rx (group (eval (list 'regexp puppet-builtin-metaparameters-re)))
           (zero-or-more space)
