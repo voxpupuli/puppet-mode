@@ -706,4 +706,8 @@ for each entry."
 
 (provide 'puppet-mode)
 
+;; Local Variables:
+;; indent-tabs-mode: nil
+;; End:
+
 ;;; puppet-mode.el ends here
