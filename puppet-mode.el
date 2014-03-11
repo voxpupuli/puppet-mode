@@ -534,8 +534,8 @@ of the initial include plus puppet-include-indent."
   (setq indent-tabs-mode puppet-indent-tabs-mode)
   ;; Paragaphs
   (setq-local paragraph-ignore-fill-prefix t)
-  (setq-local paragraph-start "\f\\|[ 	]*$\\|#$")
-  (setq-local paragraph-separate "\\([ 	\f]*\\|#\\)$")
+  (setq-local paragraph-start "\f\\|[ \t]*$\\|#$")
+  (setq-local paragraph-separate "\\([ \t\f]*\\|#\\)$")
   ;; Font locking
   (setq font-lock-defaults '((puppet-font-lock-keywords) nil nil))
   (setq-local font-lock-multiline t)
