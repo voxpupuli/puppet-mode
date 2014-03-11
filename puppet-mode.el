@@ -119,13 +119,24 @@ buffer-local wherever it is set."
   :type 'string
   :group 'puppet)
 
+(defcustom puppet-apply-command "puppet apply --verbose --noop"
+  "Command to apply a Puppet manifest."
+  :type 'string
+  :group 'puppet)
+
 
 ;;;; Checking
+
 (defvar-local puppet-last-validate-command nil
   "The last command used for validation.")
 
 (defvar-local puppet-last-lint-command nil
   "The last command used for linting.")
+
+;; This variable is intentionally not buffer-local, since you typically only
+;; apply top-level manifests, but not class or type definitions.
+(defvar puppet-last-apply-command nil
+  "The last command used to apply a manifest.")
 
 (defun puppet-run-check-command (command buffer-name-template)
   "Run COMMAND to check the current buffer."
@@ -143,7 +154,7 @@ buffer-local wherever it is set."
 (defun puppet-validate (command)
   "Validate the syntax of the current buffer with COMMAND.
 
-When called interactively, prompt for command."
+When called interactively, prompt for COMMAND."
   (interactive (list (puppet-read-command "Validate command: "
                                           puppet-last-validate-command
                                           puppet-validate-command)))
@@ -153,12 +164,22 @@ When called interactively, prompt for command."
 (defun puppet-lint (command)
   "Lint the current buffer with COMMAND.
 
-When called interactively, prompt for command."
+When called interactively, prompt for COMMAND."
   (interactive (list (puppet-read-command "Lint command: "
                                           puppet-last-lint-command
                                           puppet-lint-command)))
   (setq puppet-last-lint-command command)
   (puppet-run-check-command command "*Puppet Lint: %s*"))
+
+(defun puppet-apply (command)
+  "Apply the current manifest with COMMAND.
+
+When called interactively, prompt for COMMAND."
+  (interactive (list (puppet-read-command "Apply command: "
+                                          puppet-last-apply-command
+                                          puppet-apply-command)))
+  (setq puppet-last-apply-command command)
+  (puppet-run-check-command command "*Puppet Apply: %s*"))
 
 
 ;;;; Indentation code
@@ -525,13 +546,17 @@ of the initial include plus puppet-include-indent."
 
 (defvar puppet-mode-map
   (let ((map (make-sparse-keymap)))
-    ;; Linting and validationg
+    ;; Apply manifests
+    (define-key map (kbd "C-c C-c") #'puppet-apply)
+    ;; Linting and validation
     (define-key map (kbd "C-c C-v") #'puppet-validate)
     (define-key map (kbd "C-c C-l") #'puppet-lint)
     ;; The menu bar
     (easy-menu-define puppet-menu map "Puppet Mode menu"
       `("Puppet"
         :help "Puppet-specific Features"
+        ["Apply manifest" puppet-apply :help "Apply a Puppet manifest"]
+        "-"
         ["Validate file syntax" puppet-validate
          :help "Validate the syntax of this file"]
         ["Lint file" puppet-lint
