@@ -442,7 +442,7 @@ of the initial include plus puppet-include-indent."
     ;; Builtin meta parameters
     (,(rx (group (eval (list 'regexp puppet-builtin-metaparameters-re)))
           (zero-or-more space)
-          "=>") 1 font-lock-builtin-face t)
+          "=>") 1 font-lock-builtin-face)
      ;; Built-in functions
     (,(rx (group (eval (list 'regexp puppet-builtin-functions-re))))
      1 font-lock-builtin-face))
