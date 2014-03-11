@@ -335,10 +335,7 @@ of the initial include plus puppet-include-indent."
         (indent-line-to 0)))))
 
 
-;;;; Major mode definition
-
-(defvar puppet-mode-map (make-sparse-keymap)
-  "Key map used in puppet-mode buffers.")
+;;;; Font locking
 
 (defvar puppet-mode-syntax-table
   (let ((table (make-syntax-table prog-mode-syntax-table)))
@@ -502,12 +499,21 @@ of the initial include plus puppet-include-indent."
      1 font-lock-builtin-face))
   "Font lock keywords for Puppet Mode.")
 
+
+;;;; Alignment
+
 (defconst puppet-mode-align-rules
   '((puppet-resource-arrow
      (regexp . "\\(\\s-*\\)=>\\(\\s-*\\)")
      (group  . (1 2))
      (modes  . '(puppet-mode))))
   "Align rules for Puppet Mode.")
+
+
+;;;; Major mode definition
+
+(defvar puppet-mode-map (make-sparse-keymap)
+  "Key map used in puppet-mode buffers.")
 
 ;;;###autoload
 (define-derived-mode puppet-mode prog-mode "Puppet" ()
