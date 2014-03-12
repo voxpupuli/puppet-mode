@@ -62,6 +62,8 @@ The following key bindings are available in Puppet Mode:
 |:kbd:`C-c C-l` | Lint the current manifest with `puppet-lint`               |
 +---------------+------------------------------------------------------------+
 
+Use :kbd:`M-x customize-group RET puppet` to customize Puppet Mode.
+
 Support
 =======
 
