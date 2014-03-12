@@ -619,6 +619,11 @@ Used as `syntax-propertize-function' in Puppet Mode."
 
 ;;;; Alignment
 
+;; Configure alignment
+(add-to-list 'align-sq-string-modes 'puppet-mode)
+(add-to-list 'align-dq-string-modes 'puppet-mode)
+(add-to-list 'align-open-comment-modes 'puppet-mode)
+
 (defconst puppet-mode-align-rules
   '((puppet-resource-arrow
      (regexp . "\\(\\s-*\\)=>\\(\\s-*\\)")
