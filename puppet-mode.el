@@ -550,8 +550,71 @@ of the initial include plus puppet-include-indent."
           "=>") 1 font-lock-builtin-face)
      ;; Built-in functions
     (,(rx (group (eval (list 'regexp puppet-builtin-functions-re))))
-     1 font-lock-builtin-face))
+     1 font-lock-builtin-face)
+    ;; Variable expansions in strings
+    (puppet-match-valid-expansion 1 font-lock-variable-name-face t)
+    (puppet-match-invalid-expansion 1 font-lock-warning-face t))
   "Font lock keywords for Puppet Mode.")
+
+(defun puppet-match-expansion (string-type limit)
+  "Match a variable expansion in STRING-TYPE before LIMIT.
+
+STRING-TYPE is a single character denoting the type of string to
+match an expansion in."
+  (let* ((prop 'puppet-expansion-match-data)
+         (pos (next-single-char-property-change (point) prop nil limit)))
+    (when (and pos (> pos (point)))
+      (goto-char pos)
+      (let* ((value (get-text-property pos prop))
+             (string-state (car value))
+             (match-data (cdr value)))
+        (if (eq string-state string-type)
+            (progn (set-match-data match-data) t)
+          (puppet-match-expansion string-type limit))))))
+
+(defun puppet-match-valid-expansion (limit)
+  "Match a valid expansion before LIMIT.
+
+A valid expansion is a variable expansion in a double-quoted
+string."
+  (puppet-match-expansion ?\" limit))
+
+(defun puppet-match-invalid-expansion (limit)
+  "Match an invalid expansion before LIMIT.
+
+An invalid expansion is a variable expansion in a single-quoted
+string."
+  (puppet-match-expansion ?\' limit))
+
+(defun puppet-syntax-propertize-expansion ()
+  "Propertize a variable expansion.
+
+When inside a string, add the `puppet-expansion-match-data'
+property to the first character of a variable expansion.  The
+value is `(STRING-TYPE . MATCH-DATA)', where STRING-TYPE is a
+single character denoting the type of the surrounding string, and
+MATCH-DATA is the original match data from propertization."
+  (let ((beg (match-beginning 0))
+        (string-state (nth 3 (save-excursion (syntax-ppss)))))
+    (when string-state
+      (put-text-property beg (1+ beg) 'puppet-expansion-match-data
+                         (cons string-state (match-data))))))
+
+(defun puppet-syntax-propertize-function (start end)
+  "Propertize text between START and END.
+
+Used as `syntax-propertize-function' in Puppet Mode."
+  (let ((case-fold-search nil))
+    (goto-char start)
+    (remove-text-properties start end '(puppet-expansion-match-data))
+    (funcall
+     (syntax-propertize-rules
+      ;; Find variable expansions
+      ((rx (group "$"
+                  (or (and "{" (eval (list 'regexp puppet-variable-name-re)) "}")
+                      (eval (list 'regexp puppet-variable-name-re)))))
+       (0 (ignore (puppet-syntax-propertize-expansion)))))
+     start end)))
 
 
 ;;;; Alignment
@@ -715,6 +778,7 @@ for each entry."
   ;; Font locking
   (setq font-lock-defaults '((puppet-font-lock-keywords) nil nil))
   (setq-local font-lock-multiline t)
+  (setq-local syntax-propertize-function #'puppet-syntax-propertize-function)
   ;; Alignment
   (setq align-mode-rules-list puppet-mode-align-rules)
   ;; IMenu
