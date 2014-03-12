@@ -17,10 +17,10 @@ Puppet Mode is an Emacs major mode for Puppet_ manifests.
 Features
 ========
 
-- Syntax highlighting
-- Indentation
-- Tag navigation (aka `imenu`)
-- Validation and linting of manifests
+1. Syntax highlighting
+2. Indentation
+3. Tag navigation (aka `imenu`)
+4. Validation and linting of manifests
 
 Installation
 ============

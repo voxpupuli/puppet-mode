@@ -19,7 +19,7 @@ Reporting issues
 - Check that the issue has not already been reported.
 - Check that the issue has not already been fixed in the latest code.
 - Be clear and precise (do not prose, but name functions and commands exactly).
-- Include the version of Puppet Mode.
+- Include the version of Puppet Mode, as shown by :kbd:`M-x pupept-version`.
 - Open an issue with a clear title and description in grammatically correct,
   complete sentences.
 

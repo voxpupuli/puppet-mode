@@ -10,7 +10,7 @@
 ;; URL: https://github.com/lunaryorn/puppet-mode
 ;; Keywords: languages
 ;; Version: 0.3-cvs
-;; Package-Requires: ((emacs "24.1"))
+;; Package-Requires: ((emacs "24.1") (pkg-info "0.4"))
 
 ;; This file is not part of GNU Emacs.
 
@@ -128,6 +128,26 @@ buffer-local wherever it is set."
   '((t :inherit font-lock-constant-face))
   "Face for regular expression literals in Puppet."
   :group 'puppet)
+
+
+;;;; Version information
+(defun puppet-version (&optional show-version)
+  "Get the Puppet Mode version as string.
+
+If called interactively or if SHOW-VERSION is non-nil, show the
+version in the echo area and the messages buffer.
+
+The returned string includes both, the version from package.el
+and the library version, if both a present and different.
+
+If the version number could not be determined, signal an error,
+if called interactively, or if SHOW-VERSION is non-nil, otherwise
+just return nil."
+  (interactive (list t))
+  (let ((version (pkg-info-version-info 'puppet-mode)))
+    (when show-version
+      (message "Puppet Mode version: %s" version))
+    version))
 
 
 ;;;; Utilities
@@ -388,9 +408,9 @@ of the initial include plus puppet-include-indent."
     (modify-syntax-entry ?\" "\"\"" table)
     ;; C-style comments.  Yes, Puppet has these!
     (modify-syntax-entry ?/ ". 14b" table)
-    (modify-syntax-entry ?* ". 23b"  table)
+    (modify-syntax-entry ?* ". 23b" table)
     (modify-syntax-entry ?#  "<"    table)
-    (modify-syntax-entry ?\n ">#"   table)
+    (modify-syntax-entry ?\n ">"    table)
     (modify-syntax-entry ?\\ "\\"   table)
     (modify-syntax-entry ?$  "'"    table)
     (modify-syntax-entry ?-  "."    table)
