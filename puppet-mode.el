@@ -130,6 +130,14 @@ buffer-local wherever it is set."
   :group 'puppet)
 
 
+;;;; Utilities
+
+(defun puppet-in-string-or-comment-p (&optional pos)
+  "Determine whether POS is inside a string or comment."
+  (let ((state (save-excursion (syntax-ppss pos))))
+    (or (nth 3 state) (nth 4 state))))
+
+
 ;;;; Checking
 
 (defvar-local puppet-last-validate-command nil
@@ -636,9 +644,13 @@ Used as `syntax-propertize-function' in Puppet Mode."
   (interactive)
   (save-excursion
     (save-match-data
-      (let ((beg (search-backward "{")))
-        (forward-list)
-        (align beg (point))))))
+      (let ((beg (search-backward "{" nil 'no-error)))
+        ;; Skip backwards over strings and comments
+        (while (and beg (puppet-in-string-or-comment-p beg))
+          (setq beg (search-backward "{" nil 'no-error)))
+        (when beg
+          (forward-list)
+          (align beg (point)))))))
 
 
 ;;;; Imenu
