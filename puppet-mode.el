@@ -471,7 +471,26 @@ of the initial include plus puppet-include-indent."
      (zero-or-more "::"
                    (any "A-Z")
                    (zero-or-more (any "a-z" "0-9" "_"))))
-    "Regular expression to match a capitalized Puppet resource name."))
+    "Regular expression to match a capitalized Puppet resource name.")
+
+  (defconst puppet-simple-variable-name-re
+    (rx symbol-start (one-or-more (any "A-Z" "a-z" "0-9" "_")) symbol-end)
+    "Regular expression for an unscoped variable name")
+
+  (defconst puppet-variable-name-re
+    (rx symbol-start
+        ;; The optional scope designation
+        (optional
+         (optional (any "a-z")
+                   (zero-or-more (any "A-Z" "a-z" "0-9" "_")))
+         (zero-or-more "::"
+                       (any "a-z")
+                       (zero-or-more (any "A-Z" "a-z" "0-9" "_")))
+         "::")
+        ;; The final variable name
+        (eval (list 'regexp puppet-simple-variable-name-re))
+        symbol-end)
+    "Regular expression for a fully scoped variable name."))
 
 (defvar puppet-font-lock-keywords
   `(
@@ -485,19 +504,8 @@ of the initial include plus puppet-include-indent."
     (,(rx (group (eval (list 'regexp puppet-keywords-re))))
      1 font-lock-keyword-face)
     ;; Variables
-    (,(rx (group "$"
-                 symbol-start
-                 ;; The optional scope designation
-                 (optional
-                  (optional (any "a-z")
-                            (zero-or-more (any "A-Z" "a-z" "0-9" "_")))
-                  (zero-or-more "::"
-                                (any "a-z")
-                                (zero-or-more (any "A-Z" "a-z" "0-9" "_")))
-                  "::")
-                 ;; The final variable name
-                 (one-or-more (any "A-Z" "a-z" "0-9" "_"))
-                 symbol-end)) 1 font-lock-variable-name-face t)
+    (,(rx (group "$" (eval (list 'regexp puppet-variable-name-re))))
+     1 font-lock-variable-name-face t)
     ;; Type declarations
     (,(rx symbol-start (or "class" "define" "node") symbol-end
           (one-or-more space)
@@ -587,9 +595,9 @@ for each entry."
   (let ((case-fold-search nil)
         ;; Variable assignments
         (variables (puppet-imenu-collect-entries
-                    (rx (group "$" symbol-start
-                               (one-or-more (any "A-Z" "a-z" "0-9" "_"))
-                               symbol-end)
+                    (rx (group
+                         "$"
+                         (eval (list 'regexp puppet-simple-variable-name-re)))
                         (zero-or-more space) "=")))
         ;; Resource defaults
         (defaults (puppet-imenu-collect-entries
