@@ -383,7 +383,7 @@ of the initial include plus puppet-include-indent."
 ;;;; Font locking
 
 (defvar puppet-mode-syntax-table
-  (let ((table (make-syntax-table prog-mode-syntax-table)))
+  (let ((table (make-syntax-table)))
     (modify-syntax-entry ?\' "\"'"  table)
     (modify-syntax-entry ?\" "\"\"" table)
     ;; C-style comments.  Yes, Puppet has these!
