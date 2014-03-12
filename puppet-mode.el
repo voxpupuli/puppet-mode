@@ -124,6 +124,11 @@ buffer-local wherever it is set."
   :type 'string
   :group 'puppet)
 
+(defface puppet-regular-expression-literal
+  '((t :inherit font-lock-constant-face))
+  "Face for regular expression literals in Puppet."
+  :group 'puppet)
+
 
 ;;;; Checking
 
@@ -470,6 +475,12 @@ of the initial include plus puppet-include-indent."
 
 (defvar puppet-font-lock-keywords
   `(
+    ;; Regular expression literals
+    (, (rx (group "/"
+                  (zero-or-more
+                   (or (not (any "/" "\\" "\n")) ; Not the end of a regexp
+                       (and "\\" not-newline)))  ; Any escaped character
+                  "/")) 1 'puppet-regular-expression-literal)
     ;; Keywords
     (,(rx (group (eval (list 'regexp puppet-keywords-re))))
      1 font-lock-keyword-face)

@@ -22,6 +22,7 @@ This version is the first release under new maintenance.
   - Fontify built-in meta-parameters
   - Fontify the negation operater
   - Fontify C style comments correctly
+  - #23: Fontify regular expression literals
   - Fix the syntax classification of characters to improve the fontification and
     sexp-navigation
 
