@@ -24,6 +24,8 @@ This version is the first release under new maintenance.
   - Fontify the negation operater
   - Fontify C style comments correctly
   - #23: Fontify regular expression literals
+  - #18: Fontify variable expansions in double-quoted strings
+  - #20: Fontify variable expansions in single-quoted strings
   - Fix the syntax classification of characters to improve the fontification and
     sexp-navigation
 
