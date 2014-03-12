@@ -9,11 +9,12 @@ This version is the first release under new maintenance.
 
 - New features:
 
-  - Imenu support
-  - Jump to classes, defines, variables and resources with :kbd:`C-c C-j`
+  - #13: Imenu support
+  - #13: Jump to classes, defines, variables and resources with :kbd:`C-c
+    C-j`
   - Align parameters in a block with :kbd:`C-c C-a`
-  - Validate, lint and apply Puppet manifests with :kbd:`C-c C-v`, :kbd:`C-c
-    C-l` and :kbd:`C-c C-c`
+  - #11: Validate, lint and apply Puppet manifests with :kbd:`C-c C-v`,
+    :kbd:`C-c C-l` and :kbd:`C-c C-c`
 
 - Improvements:
 
