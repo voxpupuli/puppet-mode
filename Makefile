@@ -1,5 +1,8 @@
+CASK = cask
 EMACS = emacs
 EMACSFLAGS =
+
+export EMACS
 
 SRCS = puppet-mode.el
 OBJECTS = $(SRCS:.el=.elc)
@@ -9,4 +12,4 @@ OBJECTS = $(SRCS:.el=.elc)
 compile: $(OBJECTS)
 
 %.elc : %.el $(PKGDIR)
-	$(EMACS) -Q --batch $(EMACSFLAGS) -f batch-byte-compile $<
+	$(CASK) exec $(EMACS) -Q --batch $(EMACSFLAGS) -f batch-byte-compile $<
