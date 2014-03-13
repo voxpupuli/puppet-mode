@@ -2,8 +2,8 @@
 
 .. role:: kbd(literal)
 
-0.3 (in development)
---------------------
+0.3 (Mar 13, 2014)
+------------------
 
 This version is the first release under new maintenance.
 
