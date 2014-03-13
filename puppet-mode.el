@@ -287,9 +287,7 @@ are available:
      Any variable name without scopes, without leading dollar sign
 
 `variable-name'
-     Any variable name including scopes, without a leading dollar sign
-
-"
+     Any variable name including scopes, without a leading dollar sign"
     (let ((rx-constituents (append puppet-rx-constituents rx-constituents)))
       (cond ((null sexps)
              (error "No regexp"))
