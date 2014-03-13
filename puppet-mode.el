@@ -108,6 +108,12 @@ buffer-local wherever it is set."
   :group 'puppet
   :safe 'integerp)
 
+(defcustom puppet-fontify-variables-in-comments nil
+  "Whether to fontify variable references in comments."
+  :type 'boolean
+  :group 'puppet
+  :safe 'booleanp)
+
 (defcustom puppet-validate-command "puppet parser validate --color=false"
   "Command to validate the syntax of a Puppet manifest."
   :type 'string
@@ -603,54 +609,62 @@ of the initial include plus puppet-include-indent."
      1 font-lock-builtin-face)
     ;; Built-in functions
     (,(puppet-rx builtin-function) 0 font-lock-builtin-face)
-    ;; Variable expansions in strings
+    ;; Variable expansions in strings and comments
     (puppet-match-valid-expansion 0 font-lock-variable-name-face t)
     (puppet-match-invalid-expansion 0 font-lock-warning-face t))
   "Font lock keywords for Puppet Mode.")
 
-(defun puppet-match-expansion (string-type limit)
-  "Match a variable expansion in STRING-TYPE before LIMIT.
+(defun puppet-match-expansion (context limit)
+  "Match a variable expansion in CONTEXT before LIMIT.
 
-STRING-TYPE is a single character denoting the type of string to
-match an expansion in."
-  (let* ((prop 'puppet-expansion-match-data)
+CONTEXT is one of `single-quoted', `double-quoted' or `comment',
+or a list with any of these symbols.  The expansion will only
+match if it is in any given CONTEXT."
+  (when (symbolp context)
+    (setq context (list context)))
+  (let* ((prop 'puppet-expansion)
          (pos (next-single-char-property-change (point) prop nil limit)))
     (when (and pos (> pos (point)))
       (goto-char pos)
-      (let* ((value (get-text-property pos prop))
-             (string-state (car value))
-             (match-data (cdr value)))
-        (if (eq string-state string-type)
-            (progn (set-match-data match-data) t)
-          (puppet-match-expansion string-type limit))))))
+      (let* ((value (get-text-property pos prop)))
+        (if (memq (car value) context)
+            (progn (set-match-data (cdr value)) t)
+          (puppet-match-expansion context limit))))))
 
 (defun puppet-match-valid-expansion (limit)
   "Match a valid expansion before LIMIT.
 
 A valid expansion is a variable expansion in a double-quoted
 string."
-  (puppet-match-expansion ?\" limit))
+  (let ((valid-contexts '(double-quoted)))
+    (when puppet-fontify-variables-in-comments
+      (push 'comment valid-contexts))
+    (puppet-match-expansion valid-contexts limit)))
 
 (defun puppet-match-invalid-expansion (limit)
   "Match an invalid expansion before LIMIT.
 
 An invalid expansion is a variable expansion in a single-quoted
 string."
-  (puppet-match-expansion ?\' limit))
+  (puppet-match-expansion 'single-quoted limit))
 
 (defun puppet-syntax-propertize-expansion ()
   "Propertize a variable expansion.
 
-When inside a string, add the `puppet-expansion-match-data'
-property to the first character of a variable expansion.  The
-value is `(STRING-TYPE . MATCH-DATA)', where STRING-TYPE is a
-single character denoting the type of the surrounding string, and
-MATCH-DATA is the original match data from propertization."
-  (let ((beg (match-beginning 0))
-        (string-state (nth 3 (save-excursion (syntax-ppss)))))
-    (when string-state
-      (put-text-property beg (1+ beg) 'puppet-expansion-match-data
-                         (cons string-state (match-data))))))
+When inside a string, add the `puppet-expansion' property to the
+first character of a variable expansion.  The value is `(CONTEXT
+. MATCH-DATA)', where CONTEXT is one of nil, `single-quoted',
+`double-quoted' or `comment' and denotes the surrounding context
+, and MATCH-DATA is the original match data from propertization."
+  (let* ((beg (match-beginning 0))
+         (state (save-excursion (syntax-ppss)))
+         (context (if (nth 4 state) 'comment
+                    (cl-case (nth 3 state)
+                      (?\' 'single-quoted)
+                      (?\" 'double-quoted)))))
+    (when context
+      (put-text-property beg (1+ beg) 'puppet-expansion
+                         (cons context (match-data))))))
 
 (defun puppet-syntax-propertize-function (start end)
   "Propertize text between START and END.
@@ -658,7 +672,7 @@ MATCH-DATA is the original match data from propertization."
 Used as `syntax-propertize-function' in Puppet Mode."
   (let ((case-fold-search nil))
     (goto-char start)
-    (remove-text-properties start end '(puppet-expansion-match-data))
+    (remove-text-properties start end '(puppet-expansion))
     (funcall
      (syntax-propertize-rules
       ;; Find variable expansions

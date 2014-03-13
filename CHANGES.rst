@@ -26,6 +26,8 @@ This version is the first release under new maintenance.
   - #23: Fontify regular expression literals
   - #18: Fontify variable expansions in double-quoted strings
   - #20: Fontify variable expansions in single-quoted strings
+  - Optionally fontify variable references in comments with
+    `puppet-fontify-variables-in-comments`
   - Fix the syntax classification of characters to improve the fontification and
     sexp-navigation
 
