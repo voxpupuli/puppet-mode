@@ -4,9 +4,11 @@
 ;; Copyright (C) 2013, 2014  Bozhidar Batsov <bozhidar@batsov.com>
 ;; Copyright (C) 2011  Puppet Labs Inc
 
-;; Author: Russ Allbery <rra@stanford.edu>
-;; Maintainer: Sebastian Wiesner <lunaryorn@gmail.com>
+;; Author: Bozhidar Batsov <bozhidar@batsov.com>
+;;     Sebastian Wiesner <lunaryorn@gmail.com>
+;;     Russ Allbery <rra@stanford.edu>
 ;; Maintainer: Bozhidar Batsov <bozhidar@batsov.com>
+;;     Sebastian Wiesner <lunaryorn@gmail.com>
 ;; URL: https://github.com/lunaryorn/puppet-mode
 ;; Keywords: languages
 ;; Version: 0.3-cvs
