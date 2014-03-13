@@ -70,6 +70,8 @@ buffer-local wherever it is set."
 
 
 ;;;; Requirements
+(require 'pkg-info)
+
 (require 'rx)
 (require 'align)
 
