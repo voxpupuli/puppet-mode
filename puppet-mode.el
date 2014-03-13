@@ -72,6 +72,7 @@ buffer-local wherever it is set."
 ;;;; Requirements
 (require 'pkg-info)
 
+(require 'cl-lib)
 (require 'rx)
 (require 'align)
 
@@ -371,6 +372,27 @@ When called interactively, prompt for COMMAND."
                                           puppet-apply-command)))
   (setq puppet-last-apply-command command)
   (puppet-run-check-command command "*Puppet Apply: %s*"))
+
+
+;;;; Navigation
+;; TODO: Check which of these are still needed for SMIE
+
+(defun puppet-beginning-of-defun-function (&optional arg)
+  "Move to the ARG'th beginning of a block."
+  (let* ((arg (or arg 1))
+         (search (if (< arg 0) #'search-forward #'search-backward))
+         (steps (abs arg)))
+    (while (> steps 0)
+      (let ((pos (funcall search "{" nil 'no-error)))
+        ;; Skip over strings and comments
+        (while (and pos (puppet-in-string-or-comment-p pos))
+          (setq pos (funcall search "{" nil 'no-error)))
+        (if pos
+            (cl-decf steps)
+          ;; Drop out of outer loop
+          (setq steps 0))))
+    (when (< arg 0)
+      (backward-char))))
 
 
 ;;;; Indentation code
@@ -830,6 +852,8 @@ for each entry."
   (setq-local comment-end "")
   (setq-local comment-auto-fill-only-comments t)
   (setq comment-column puppet-comment-column)
+  ;; Navigation
+  (setq-local beginning-of-defun-function #'puppet-beginning-of-defun-function)
   ;; Indentation
   (setq-local indent-line-function 'puppet-indent-line)
   (setq indent-tabs-mode puppet-indent-tabs-mode)
