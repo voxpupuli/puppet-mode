@@ -29,6 +29,7 @@ This version is the first release under new maintenance.
   - #20: Fontify variable expansions in single-quoted strings
   - Optionally fontify variable references in comments with
     `puppet-fontify-variables-in-comments`
+  - #25: Fontify special escape sequences in double-quoted strings
   - Fix the syntax classification of characters to improve the fontification and
     sexp-navigation
 

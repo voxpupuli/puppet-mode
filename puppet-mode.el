@@ -138,6 +138,11 @@ buffer-local wherever it is set."
   "Face for regular expression literals in Puppet."
   :group 'puppet)
 
+(defface puppet-escape-sequence
+  '((t :inherit font-lock-constant-face))
+  "Face for escape sequences in double-quoted strings-consed literals in Puppet."
+  :group 'puppet)
+
 
 ;;;; Version information
 (defun puppet-version (&optional show-version)
@@ -276,7 +281,12 @@ Return nil, if there is no special context at POS, or one of
                             ;; The final variable name
                             (one-or-more (any "A-Z" "a-z" "0-9" "_"))
                             symbol-end))
-      )
+      ;; http://docs.puppetlabs.com/puppet/latest/reference/lang_datatypes.html#double-quoted-strings
+      (dq-escape . ,(rx (or line-start (not (any "\\")))
+                        (zero-or-more "\\\\")
+                        ;; We do not include \n and \', because these are
+                        ;; available in single-quoted strings as well
+                        (group "\\" (any ?\" ?$ ?n ?r ?t ?s)))))
     "Additional special sexps for `puppet-rx'")
 
   (defmacro puppet-rx (&rest sexps)
@@ -307,7 +317,10 @@ are available:
      Any variable name without scopes, without leading dollar sign
 
 `variable-name'
-     Any variable name including scopes, without a leading dollar sign"
+     Any variable name including scopes, without a leading dollar sign
+
+`dq-escape'
+     Special escape sequences for double-quoted strings"
     (let ((rx-constituents (append puppet-rx-constituents rx-constituents)))
       (cond ((null sexps)
              (error "No regexp"))
@@ -629,25 +642,28 @@ of the initial include plus puppet-include-indent."
     (,(puppet-rx builtin-function) 0 font-lock-builtin-face)
     ;; Variable expansions in strings and comments
     (puppet-match-valid-expansion 1 font-lock-variable-name-face t)
-    (puppet-match-invalid-expansion 1 font-lock-warning-face t))
+    (puppet-match-invalid-expansion 1 font-lock-warning-face t)
+    ;; Escape sequences in strings
+    (puppet-match-valid-escape 1 'puppet-escape-sequence t)
+    )
   "Font lock keywords for Puppet Mode.")
 
-(defun puppet-match-expansion (context limit)
-  "Match a variable expansion in CONTEXT before LIMIT.
+(defun puppet-match-property (property context limit)
+  "Match a PROPERTY in CONTEXT before LIMIT.
 
-CONTEXT is one of `single-quoted', `double-quoted' or `comment',
-or a list with any of these symbols.  The expansion will only
-match if it is in any given CONTEXT."
+PROPERTY is the text property to look for.  CONTEXT is one of
+`single-quoted', `double-quoted' or `comment', or a list with any
+of these symbols.  The expansion will only match if it is in any
+given CONTEXT."
   (when (symbolp context)
     (setq context (list context)))
-  (let* ((prop 'puppet-expansion)
-         (pos (next-single-char-property-change (point) prop nil limit)))
+  (let* ((pos (next-single-char-property-change (point) property nil limit)))
     (when (and pos (> pos (point)))
       (goto-char pos)
-      (let* ((value (get-text-property pos prop)))
+      (let* ((value (get-text-property pos property)))
         (if (memq (car value) context)
             (progn (set-match-data (cdr value)) t)
-          (puppet-match-expansion context limit))))))
+          (puppet-match-property property context limit))))))
 
 (defun puppet-match-valid-expansion (limit)
   "Match a valid expansion before LIMIT.
@@ -657,27 +673,32 @@ string."
   (let ((valid-contexts '(double-quoted)))
     (when puppet-fontify-variables-in-comments
       (push 'comment valid-contexts))
-    (puppet-match-expansion valid-contexts limit)))
+    (puppet-match-property 'puppet-expansion valid-contexts limit)))
 
 (defun puppet-match-invalid-expansion (limit)
   "Match an invalid expansion before LIMIT.
 
 An invalid expansion is a variable expansion in a single-quoted
 string."
-  (puppet-match-expansion 'single-quoted limit))
+  (puppet-match-property 'puppet-expansion 'single-quoted limit))
 
-(defun puppet-syntax-propertize-expansion ()
-  "Propertize a variable expansion.
+(defun puppet-match-valid-escape (limit)
+  "Match a valid escape sequence before LIMIT."
+  (puppet-match-property 'puppet-escape 'double-quoted limit))
 
-When inside a string, add the `puppet-expansion' property to the
-first character of a variable expansion.  The value is `(CONTEXT
-. MATCH-DATA)', where CONTEXT is one of nil, `single-quoted',
-`double-quoted' or `comment' and denotes the surrounding context
-, and MATCH-DATA is the original match data from propertization."
+(defun puppet-syntax-propertize-match (property)
+  "Propertize a match with PROPERTY.
+
+When in a special syntax context, add PROPERTY to the first
+character of the first group of the current `match-data'.  The
+value of PROPERTY is `(CONTEXT . MATCH-DATA)', where CONTEXT is
+one of nil, `single-quoted', `double-quoted' or `comment' and
+denotes the surrounding context, and MATCH-DATA is the original
+match data from propertization."
   (let* ((beg (match-beginning 1))
          (context (puppet-syntax-context)))
     (when context
-      (put-text-property beg (1+ beg) 'puppet-expansion
+      (put-text-property beg (1+ beg) property
                          (cons context (match-data))))))
 
 (defun puppet-syntax-propertize-function (start end)
@@ -686,14 +707,16 @@ first character of a variable expansion.  The value is `(CONTEXT
 Used as `syntax-propertize-function' in Puppet Mode."
   (let ((case-fold-search nil))
     (goto-char start)
-    (remove-text-properties start end '(puppet-expansion))
+    (remove-text-properties start end '(puppet-expansion puppet-escape))
     (funcall
      (syntax-propertize-rules
-      ;; Find variable expansions
+      ;; Find escape sequences and variable expansions
+      ((puppet-rx dq-escape)
+       (1 (ignore (puppet-syntax-propertize-match 'puppet-escape))))
       ((puppet-rx (or line-start (not (any "\\")))
                   (zero-or-more "\\\\")
                   (group "$" (or (and "{" variable-name "}") variable-name)))
-       (1 (ignore (puppet-syntax-propertize-expansion)))))
+       (1 (ignore (puppet-syntax-propertize-match 'puppet-expansion)))))
      start end)))
 
 
