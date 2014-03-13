@@ -15,7 +15,7 @@ This version is the first release under new maintenance.
   - Align parameters in a block with :kbd:`C-c C-a`
   - #11: Validate, lint and apply Puppet manifests with :kbd:`C-c C-v`,
     :kbd:`C-c C-l` and :kbd:`C-c C-c`
-  - Move across blocks with :kbd:`C-M-a` and `C-M-b`
+  - Move across blocks with :kbd:`C-M-a` and `C-M-e`
 
 - Improvements:
 
