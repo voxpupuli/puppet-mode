@@ -11,7 +11,7 @@
 ;;     Sebastian Wiesner <lunaryorn@gmail.com>
 ;; URL: https://github.com/lunaryorn/puppet-mode
 ;; Keywords: languages
-;; Version: 0.3
+;; Version: 0.4-cvs
 ;; Package-Requires: ((emacs "24.1") (cl-lib "0.5") (pkg-info "0.4"))
 
 ;; This file is not part of GNU Emacs.
