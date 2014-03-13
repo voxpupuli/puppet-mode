@@ -113,7 +113,8 @@ buffer-local wherever it is set."
   "Whether to fontify variable references in comments."
   :type 'boolean
   :group 'puppet
-  :safe 'booleanp)
+  :safe 'booleanp
+  :package-version '(puppet-mode . "0.3"))
 
 (defcustom puppet-validate-command "puppet parser validate --color=false"
   "Command to validate the syntax of a Puppet manifest."
@@ -126,22 +127,26 @@ buffer-local wherever it is set."
    "--log-format \"%{path}:%{linenumber}: %{kind}: %{message} (%{check})\"")
   "Command to lint a Puppet manifest."
   :type 'string
-  :group 'puppet)
+  :group 'puppet
+  :package-version '(puppet-mode . "0.3"))
 
 (defcustom puppet-apply-command "puppet apply --verbose --noop"
   "Command to apply a Puppet manifest."
   :type 'string
-  :group 'puppet)
+  :group 'puppet
+  :package-version '(puppet-mode . "0.3"))
 
 (defface puppet-regular-expression-literal
   '((t :inherit font-lock-constant-face))
   "Face for regular expression literals in Puppet."
-  :group 'puppet)
+  :group 'puppet
+  :package-version '(puppet-mode . "0.3"))
 
 (defface puppet-escape-sequence
   '((t :inherit font-lock-constant-face))
   "Face for escape sequences in double-quoted strings-consed literals in Puppet."
-  :group 'puppet)
+  :group 'puppet
+  :package-version '(puppet-mode . "0.3"))
 
 
 ;;;; Version information
