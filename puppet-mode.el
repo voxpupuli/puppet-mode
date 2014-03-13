@@ -160,6 +160,139 @@ just return nil."
     (or (nth 3 state) (nth 4 state))))
 
 
+;;;; Specialized rx
+
+(eval-when-compile
+  (defconst puppet-rx-constituents
+    `(
+      ;; http://docs.puppetlabs.com/puppet/latest/reference/lang_reserved.html#reserved-words
+      (keyword . ,(rx symbol-start
+                      (or "and" "case" "class" "default" "define" "else" "elsif"
+                          "false" "if" "in" "import" "inherits" "node" "or"
+                          "true" "undef" "unless")
+                      symbol-end))
+      ;; http://docs.puppetlabs.com/references/latest/function.html
+      (builtin-function . ,(rx symbol-start
+                               (or "alert" "collect" "contain"
+                                   "create_resources" "crit" "debug" "defined"
+                                   "each" "emerg" "err" "extlookup" "fail"
+                                   "file" "filter" "fqdn_rand" "generate"
+                                   "hiera" "hiera_array" "hiera_hash"
+                                   "hiera_include" "include" "info"
+                                   "inline_template" "lookup" "map" "md5"
+                                   "notice" "realize" "reduce" "regsubst"
+                                   "require" "search" "select" "sha1"
+                                   "shellquote" "slice" "split" "sprintf" "tag"
+                                   "tagged" "template" "versioncmp" "warning")
+                               symbol-end))
+      ;; http://docs.puppetlabs.com/references/latest/type.html
+      (builtin-type . ,(rx symbol-start
+                           (or "augeas" "computer" "cron" "exec" "file"
+                               "filebucket" "group" "host" "interface" "k5login"
+                               "macauthorization" "mailalias" "maillist" "mcx"
+                               "mount" "nagios_command" "nagios_contact"
+                               "nagios_contactgroup" "nagios_host"
+                               "nagios_hostdependency" "nagios_hostescalation"
+                               "nagios_hostextinfo" "nagios_hostgroup"
+                               "nagios_service" "nagios_servicedependency"
+                               "nagios_serviceescalation" "nagios_serviceextinfo"
+                               "nagios_servicegroup" "nagios_timeperiod" "notify"
+                               "package" "resources" "router" "schedule"
+                               "scheduled_task" "selboolean" "selmodule"
+                               "service" "ssh_authorized_key" "sshkey" "stage"
+                               "tidy" "user" "vlan" "yumrepo" "zfs" "zone"
+                               "zpool")
+                           symbol-end))
+      ;; http://docs.puppetlabs.com/references/stable/metaparameter.html.
+      ;; Strictly speaking, this is no meta parameter, but it's so common that
+      ;; it got a mention in the docs, see
+      ;; http://docs.puppetlabs.com/puppet/latest/reference/lang_resources.html#ensure,
+      ;; so we'll consider it as metaparameter anyway
+      (builtin-metaparam . ,(rx symbol-start
+                                (or "alias" "audit" "before" "loglevel" "noop"
+                                    "notify" "require" "schedule" "stage"
+                                    "subscribe" "tag"
+                                    ;; Because it's so common and important
+                                    "ensure")
+                                symbol-end))
+      ;; http://docs.puppetlabs.com/puppet/latest/reference/lang_reserved.html#classes-and-types
+      (resource-name . ,(rx symbol-start
+                            ;; Optional top-level scope
+                            (optional (any "a-z")
+                                      (zero-or-more (any "a-z" "0-9" "_")))
+                            ;; Nested sub-scopes
+                            (zero-or-more "::"
+                                          (any "a-z")
+                                          (zero-or-more (any "a-z" "0-9" "_")))
+                            symbol-end))
+      (cap-resource-name . ,(rx symbol-start
+                                ;; Optional top-level scope
+                                (optional (any "A-Z")
+                                          (zero-or-more (any "a-z" "0-9" "_")))
+                                ;; Nested sub-scopes
+                                (zero-or-more "::"
+                                              (any "A-Z")
+                                              (zero-or-more (any "a-z" "0-9" "_")))
+                                symbol-end))
+      ;; http://docs.puppetlabs.com/puppet/latest/reference/lang_reserved.html#variables
+      (simple-variable-name . ,(rx symbol-start
+                                   (one-or-more (any "A-Z" "a-z" "0-9" "_"))
+                                   symbol-end))
+      (variable-name . ,(rx symbol-start
+                            ;; The optional scope designation
+                            (optional
+                             (optional (any "a-z")
+                                       (zero-or-more (any "A-Z" "a-z" "0-9" "_")))
+                             (zero-or-more "::"
+                                           (any "a-z")
+                                           (zero-or-more (any "A-Z" "a-z" "0-9" "_")))
+                             "::")
+                            ;; The final variable name
+                            (one-or-more (any "A-Z" "a-z" "0-9" "_"))
+                            symbol-end))
+      )
+    "Additional special sexps for `puppet-rx'")
+
+  (defmacro puppet-rx (&rest sexps)
+    "Specialized `rx' variant for Puppet Mode.
+
+In addition to the standard forms of `rx', the following forms
+are available:
+
+`keyword'
+     Any valid Puppet keyword
+
+`builtin-function'
+     Any built-in Puppet function
+
+`builtin-type'
+     Any built-in Puppet type
+
+`builtin-metaparam'
+     Any built-in meta-parameter, and `ensure'
+
+`resource-name'
+     Any valid resource name, including scopes
+
+`cap-resource-name'
+     Any capitalized resource name, including capitalized scopes
+
+`simple-variable-name'
+     Any variable name without scopes, without leading dollar sign
+
+`variable-name'
+     Any variable name including scopes, without a leading dollar sign
+
+"
+    (let ((rx-constituents (append puppet-rx-constituents rx-constituents)))
+      (cond ((null sexps)
+             (error "No regexp"))
+            ((cdr sexps)
+             (rx-to-string `(and ,@sexps) t))
+            (t
+             (rx-to-string (car sexps) t))))))
+
+
 ;;;; Checking
 
 (defvar-local puppet-last-validate-command nil
@@ -425,103 +558,6 @@ of the initial include plus puppet-include-indent."
     table)
   "Syntax table in use in `puppet-mode' buffers.")
 
-(eval-and-compile
-  ;; Make these available during compilation, for use with `rx'
-
-  (defconst puppet-keywords-re
-    ;; See
-    ;; http://docs.puppetlabs.com/puppet/latest/reference/lang_reserved.html#reserved-words
-    (rx symbol-start
-        (or "and" "case" "class" "default" "define" "else" "elsif" "false" "if"
-            "in" "import" "inherits" "node" "or" "true" "undef" "unless")
-        symbol-end)
-    "Regular expression to match Puppet keywords.")
-
-  (defconst puppet-builtin-functions-re
-    ;; See http://docs.puppetlabs.com/references/latest/function.html
-    (rx symbol-start
-        (or "alert" "collect" "contain" "create_resources" "crit" "debug"
-            "defined" "each" "emerg" "err" "extlookup" "fail" "file" "filter"
-            "fqdn_rand" "generate" "hiera" "hiera_array" "hiera_hash"
-            "hiera_include" "include" "info" "inline_template" "lookup" "map"
-            "md5" "notice" "realize" "reduce" "regsubst" "require" "search"
-            "select" "sha1" "shellquote" "slice" "split" "sprintf" "tag"
-            "tagged" "template" "versioncmp" "warning")
-        symbol-end)
-    "Regular expression to match all builtin functions of Puppet.")
-
-  (defconst puppet-builtin-types-re
-    ;; See http://docs.puppetlabs.com/references/latest/type.html
-    (rx symbol-start
-        (or "augeas" "computer" "cron" "exec" "file" "filebucket"
-            "group" "host" "interface" "k5login" "macauthorization"
-            "mailalias" "maillist" "mcx" "mount" "nagios_command"
-            "nagios_contact" "nagios_contactgroup" "nagios_host"
-            "nagios_hostdependency" "nagios_hostescalation"
-            "nagios_hostextinfo" "nagios_hostgroup" "nagios_service"
-            "nagios_servicedependency" "nagios_serviceescalation"
-            "nagios_serviceextinfo" "nagios_servicegroup"
-            "nagios_timeperiod" "notify" "package" "resources" "router"
-            "schedule" "scheduled_task" "selboolean" "selmodule"
-            "service" "ssh_authorized_key" "sshkey" "stage" "tidy"
-            "user" "vlan" "yumrepo" "zfs" "zone" "zpool")
-        symbol-end)
-    "Regular expression to match all builtin types of Puppet.")
-
-  (defconst puppet-builtin-metaparameters-re
-    ;; See http://docs.puppetlabs.com/references/stable/metaparameter.html
-    (rx symbol-start
-        (or "alias" "audit" "before" "loglevel" "noop" "notify"
-            "require" "schedule" "stage" "subscribe" "tag"
-            ;; Strictly speaking, this is no meta parameter, but it's so
-            ;; common that it got a mention in the docs, see
-            ;; http://docs.puppetlabs.com/puppet/latest/reference/lang_resources.html#ensure,
-            ;; so we'll consider it as metaparameter anyway
-            "ensure")
-        symbol-end)
-    "Regular expression to match all builtin meta parameters of Puppet.")
-
-  (defconst puppet-resource-name-re
-    (rx
-     ;; Optional top-level scope
-     (optional (any "a-z")
-               (zero-or-more (any "a-z" "0-9" "_")))
-     ;; Nested sub-scopes
-     (zero-or-more "::"
-                   (any "a-z")
-                   (zero-or-more (any "a-z" "0-9" "_"))))
-    "Regular expression to match a Puppet resource name.")
-
-  (defconst puppet-capitalized-resource-name-re
-    (rx
-     ;; Optional top-level scope
-     (optional (any "A-Z")
-               (zero-or-more (any "a-z" "0-9" "_")))
-     ;; Nested sub-scopes
-     (zero-or-more "::"
-                   (any "A-Z")
-                   (zero-or-more (any "a-z" "0-9" "_"))))
-    "Regular expression to match a capitalized Puppet resource name.")
-
-  (defconst puppet-simple-variable-name-re
-    (rx symbol-start (one-or-more (any "A-Z" "a-z" "0-9" "_")) symbol-end)
-    "Regular expression for an unscoped variable name")
-
-  (defconst puppet-variable-name-re
-    (rx symbol-start
-        ;; The optional scope designation
-        (optional
-         (optional (any "a-z")
-                   (zero-or-more (any "A-Z" "a-z" "0-9" "_")))
-         (zero-or-more "::"
-                       (any "a-z")
-                       (zero-or-more (any "A-Z" "a-z" "0-9" "_")))
-         "::")
-        ;; The final variable name
-        (eval (list 'regexp puppet-simple-variable-name-re))
-        symbol-end)
-    "Regular expression for a fully scoped variable name."))
-
 (defvar puppet-font-lock-keywords
   `(
     ;; Regular expression literals
@@ -531,56 +567,42 @@ of the initial include plus puppet-include-indent."
                        (and "\\" not-newline)))  ; Any escaped character
                   "/")) 1 'puppet-regular-expression-literal)
     ;; Keywords
-    (,(rx (group (eval (list 'regexp puppet-keywords-re))))
-     1 font-lock-keyword-face)
+    (,(puppet-rx keyword) 0 font-lock-keyword-face)
     ;; Variables
-    (,(rx (group "$" (eval (list 'regexp puppet-variable-name-re))))
-     1 font-lock-variable-name-face t)
+    (,(puppet-rx "$" variable-name) 0 font-lock-variable-name-face)
     ;; Type declarations
-    (,(rx symbol-start (or "class" "define" "node") symbol-end
-          (one-or-more space)
-          symbol-start
-          (group (eval (list 'regexp puppet-resource-name-re)))
-          symbol-end)
+    (,(puppet-rx symbol-start (or "class" "define" "node") symbol-end
+                 (one-or-more space)
+                 (group resource-name))
      1 font-lock-type-face)
     ;; Resource usage, see
     ;; http://docs.puppetlabs.com/puppet/latest/reference/lang_resources.html
-    (,(rx symbol-start
-          (group
-           ;; Virtual and exported resources
-           (repeat 0 2 "@")
-           (eval (list 'regexp puppet-resource-name-re)))
-          symbol-end
-          (zero-or-more space) "{") 1 font-lock-type-face)
+    (,(puppet-rx symbol-start
+                 (group (repeat 0 2 "@") ; Virtual and exported resources
+                        resource-name)
+                 (zero-or-more space) "{")
+     1 font-lock-type-face)
     ;; Resource defaults, see
     ;; http://docs.puppetlabs.com/puppet/latest/reference/lang_defaults.html
-    (,(rx symbol-start
-          (group (eval (list 'regexp puppet-capitalized-resource-name-re)))
-          symbol-end
-          (zero-or-more space) "{") 1 font-lock-type-face)
+    (,(puppet-rx cap-resource-name (zero-or-more space) "{")
+     1 font-lock-type-face)
     ;; Resource references, see
     ;; http://docs.puppetlabs.com/puppet/latest/reference/lang_datatypes.html#resource-references
-    (,(rx symbol-start
-          (group (eval (list 'regexp puppet-capitalized-resource-name-re)))
-          symbol-end
-          (zero-or-more space) "[") 1 font-lock-type-face)
+    (,(puppet-rx cap-resource-name (zero-or-more space) "[")
+     1 font-lock-type-face)
     ;; Resource collectors, see
     ;; http://docs.puppetlabs.com/puppet/latest/reference/lang_collectors.html
-    (,(rx symbol-start
-          (group (eval (list 'regexp puppet-capitalized-resource-name-re)))
-          symbol-end
-          (zero-or-more space)
-          (optional "<")                ; Exported collector
-          "<|") 1 font-lock-type-face)
+    (,(puppet-rx cap-resource-name (zero-or-more space)
+                 (optional "<")         ; Exported collector
+                 "<|")
+     1 font-lock-type-face)
     ;; Negation
     ("!" 0 font-lock-negation-char-face)
     ;; Builtin meta parameters
-    (,(rx (group (eval (list 'regexp puppet-builtin-metaparameters-re)))
-          (zero-or-more space)
-          "=>") 1 font-lock-builtin-face)
-     ;; Built-in functions
-    (,(rx (group (eval (list 'regexp puppet-builtin-functions-re))))
+    (,(puppet-rx (group builtin-metaparam) (zero-or-more space) "=>")
      1 font-lock-builtin-face)
+    ;; Built-in functions
+    (,(puppet-rx builtin-function) 0 font-lock-builtin-face)
     ;; Variable expansions in strings
     (puppet-match-valid-expansion 1 font-lock-variable-name-face t)
     (puppet-match-invalid-expansion 1 font-lock-warning-face t))
@@ -640,9 +662,8 @@ Used as `syntax-propertize-function' in Puppet Mode."
     (funcall
      (syntax-propertize-rules
       ;; Find variable expansions
-      ((rx (group "$"
-                  (or (and "{" (eval (list 'regexp puppet-variable-name-re)) "}")
-                      (eval (list 'regexp puppet-variable-name-re)))))
+      ((puppet-rx (group "$"
+                         (or (and "{" variable-name "}") variable-name)))
        (0 (ignore (puppet-syntax-propertize-expansion)))))
      start end)))
 
@@ -697,50 +718,33 @@ for each entry."
   (let ((case-fold-search nil)
         ;; Variable assignments
         (variables (puppet-imenu-collect-entries
-                    (rx (group
-                         "$"
-                         (eval (list 'regexp puppet-simple-variable-name-re)))
-                        (zero-or-more space) "=")))
+                    (puppet-rx (group "$" simple-variable-name)
+                               (zero-or-more space) "=")))
         ;; Resource defaults
         (defaults (puppet-imenu-collect-entries
-                   (rx symbol-start
-                       (group (eval (list 'regexp puppet-capitalized-resource-name-re)))
-                       symbol-end
-                       (zero-or-more space) "{")))
+                   (puppet-rx cap-resource-name (zero-or-more space) "{")))
         ;; Nodes, classes and defines
         (nodes (puppet-imenu-collect-entries
-                (rx symbol-start "node" symbol-end
-                    (one-or-more space)
-                    symbol-start
-                    (group (eval (list 'regexp puppet-resource-name-re)))
-                    symbol-end)))
+                (puppet-rx symbol-start "node" symbol-end
+                           (one-or-more space) resource-name)))
         (classes (puppet-imenu-collect-entries
-                  (rx symbol-start "class" symbol-end
-                      (one-or-more space)
-                      symbol-start
-                      (group (eval (list 'regexp puppet-resource-name-re)))
-                      symbol-end)))
+                  (puppet-rx symbol-start "class" symbol-end
+                             (one-or-more space) resource-name)))
         (defines (puppet-imenu-collect-entries
-                  (rx symbol-start "define" symbol-end
-                      (one-or-more space)
-                      symbol-start
-                      (group (eval (list 'regexp puppet-resource-name-re)))
-                      symbol-end)))
+                  (puppet-rx symbol-start "define" symbol-end
+                             (one-or-more space) resource-name)))
         resources)
     ;; Resources are a little more complicated since we need to extract the type
     ;; and the name
     (goto-char (point-min))
     (while (re-search-forward
-            (rx symbol-start
-                (group
-                 ;; Virtual and exported resources
-                 (repeat 0 2 "@")
-                 (eval (list 'regexp puppet-resource-name-re)))
-                symbol-end
-                (zero-or-more space) "{"
-                ;; FIXME: Support condensed forms
-                (zero-or-more space)
-                (group (one-or-more not-newline)) ":")
+            (puppet-rx symbol-start
+                       (group (repeat 0 2 "@") ; Virtual and exported resources
+                              resource-name)
+                       (zero-or-more space) "{"
+                       ;; FIXME: Support condensed forms
+                       (zero-or-more space)
+                       (group (one-or-more not-newline)) ":")
             nil 'no-error)
       ;; FIXME: Doesn't work for any condensed forms, see
       ;; http://docs.puppetlabs.com/puppet/latest/reference/lang_resources.html#condensed-forms
