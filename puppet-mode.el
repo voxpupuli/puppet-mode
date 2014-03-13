@@ -160,10 +160,29 @@ just return nil."
 
 ;;;; Utilities
 
+(defun puppet-syntax-context (&optional pos)
+  "Determine the syntax context at POS, defaulting to point.
+
+Return nil, if there is no special context at POS, or one of
+
+`comment'
+     POS is inside a comment
+
+`single-quoted'
+     POS is inside a single-quoted string
+
+`double-quoted'
+     POS is inside a double-quoted string"
+  (let ((state (save-excursion (syntax-ppss pos))))
+    (if (nth 4 state)
+        'comment
+      (cl-case (nth 3 state)
+        (?\' 'single-quoted)
+        (?\" 'double-quoted)))))
+
 (defun puppet-in-string-or-comment-p (&optional pos)
   "Determine whether POS is inside a string or comment."
-  (let ((state (save-excursion (syntax-ppss pos))))
-    (or (nth 3 state) (nth 4 state))))
+  (not (null (puppet-syntax-context pos))))
 
 
 ;;;; Specialized rx
@@ -355,13 +374,6 @@ When called interactively, prompt for COMMAND."
 
 
 ;;;; Indentation code
-(defun puppet-comment-line-p ()
-  "Return non-nil iff this line is a comment."
-  (save-excursion
-    (save-match-data
-      (beginning-of-line)
-      (looking-at (format "\\s-*%s" comment-start)))))
-
 (defun puppet-block-indent ()
   "If point is in a block, return the indentation of the first line of that
 block (the line containing the opening brace).  Used to set the indentation
@@ -483,7 +495,7 @@ of the initial include plus puppet-include-indent."
             (cond
              ;; Comment lines are ignored unless we're at the start of the
              ;; buffer.
-             ((puppet-comment-line-p)
+             ((eq (puppet-syntax-context) 'comment)
               (if (bobp)
                   (setq not-indented nil)))
 
@@ -655,11 +667,7 @@ first character of a variable expansion.  The value is `(CONTEXT
 `double-quoted' or `comment' and denotes the surrounding context
 , and MATCH-DATA is the original match data from propertization."
   (let* ((beg (match-beginning 0))
-         (state (save-excursion (syntax-ppss)))
-         (context (if (nth 4 state) 'comment
-                    (cl-case (nth 3 state)
-                      (?\' 'single-quoted)
-                      (?\" 'double-quoted)))))
+         (context (puppet-syntax-context)))
     (when context
       (put-text-property beg (1+ beg) 'puppet-expansion
                          (cons context (match-data))))))
