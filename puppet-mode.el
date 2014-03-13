@@ -584,15 +584,15 @@ of the initial include plus puppet-include-indent."
      1 font-lock-type-face)
     ;; Resource defaults, see
     ;; http://docs.puppetlabs.com/puppet/latest/reference/lang_defaults.html
-    (,(puppet-rx cap-resource-name (zero-or-more space) "{")
+    (,(puppet-rx (group cap-resource-name) (zero-or-more space) "{")
      1 font-lock-type-face)
     ;; Resource references, see
     ;; http://docs.puppetlabs.com/puppet/latest/reference/lang_datatypes.html#resource-references
-    (,(puppet-rx cap-resource-name (zero-or-more space) "[")
+    (,(puppet-rx (group cap-resource-name) (zero-or-more space) "[")
      1 font-lock-type-face)
     ;; Resource collectors, see
     ;; http://docs.puppetlabs.com/puppet/latest/reference/lang_collectors.html
-    (,(puppet-rx cap-resource-name (zero-or-more space)
+    (,(puppet-rx (group cap-resource-name) (zero-or-more space)
                  (optional "<")         ; Exported collector
                  "<|")
      1 font-lock-type-face)
@@ -604,8 +604,8 @@ of the initial include plus puppet-include-indent."
     ;; Built-in functions
     (,(puppet-rx builtin-function) 0 font-lock-builtin-face)
     ;; Variable expansions in strings
-    (puppet-match-valid-expansion 1 font-lock-variable-name-face t)
-    (puppet-match-invalid-expansion 1 font-lock-warning-face t))
+    (puppet-match-valid-expansion 0 font-lock-variable-name-face t)
+    (puppet-match-invalid-expansion 0 font-lock-warning-face t))
   "Font lock keywords for Puppet Mode.")
 
 (defun puppet-match-expansion (string-type limit)
@@ -662,8 +662,7 @@ Used as `syntax-propertize-function' in Puppet Mode."
     (funcall
      (syntax-propertize-rules
       ;; Find variable expansions
-      ((puppet-rx (group "$"
-                         (or (and "{" variable-name "}") variable-name)))
+      ((puppet-rx "$" (or (and "{" variable-name "}") variable-name))
        (0 (ignore (puppet-syntax-propertize-expansion)))))
      start end)))
 
@@ -820,7 +819,6 @@ for each entry."
   (setq-local paragraph-separate "\\([ \t\f]*\\|#\\)$")
   ;; Font locking
   (setq font-lock-defaults '((puppet-font-lock-keywords) nil nil))
-  (setq-local font-lock-multiline t)
   (setq-local syntax-propertize-function #'puppet-syntax-propertize-function)
   ;; Alignment
   (setq align-mode-rules-list puppet-mode-align-rules)
