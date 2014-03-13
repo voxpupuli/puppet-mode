@@ -112,7 +112,7 @@ buffer-local wherever it is set."
   :safe 'integerp)
 
 (defcustom puppet-fontify-variables-in-comments nil
-  "Whether to fontify variable references in comments."
+  "When non-nil, fontify variable references in comments."
   :type 'boolean
   :group 'puppet
   :safe 'booleanp
