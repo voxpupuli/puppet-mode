@@ -628,8 +628,8 @@ of the initial include plus puppet-include-indent."
     ;; Built-in functions
     (,(puppet-rx builtin-function) 0 font-lock-builtin-face)
     ;; Variable expansions in strings and comments
-    (puppet-match-valid-expansion 0 font-lock-variable-name-face t)
-    (puppet-match-invalid-expansion 0 font-lock-warning-face t))
+    (puppet-match-valid-expansion 1 font-lock-variable-name-face t)
+    (puppet-match-invalid-expansion 1 font-lock-warning-face t))
   "Font lock keywords for Puppet Mode.")
 
 (defun puppet-match-expansion (context limit)
@@ -674,7 +674,7 @@ first character of a variable expansion.  The value is `(CONTEXT
 . MATCH-DATA)', where CONTEXT is one of nil, `single-quoted',
 `double-quoted' or `comment' and denotes the surrounding context
 , and MATCH-DATA is the original match data from propertization."
-  (let* ((beg (match-beginning 0))
+  (let* ((beg (match-beginning 1))
          (context (puppet-syntax-context)))
     (when context
       (put-text-property beg (1+ beg) 'puppet-expansion
@@ -690,8 +690,10 @@ Used as `syntax-propertize-function' in Puppet Mode."
     (funcall
      (syntax-propertize-rules
       ;; Find variable expansions
-      ((puppet-rx "$" (or (and "{" variable-name "}") variable-name))
-       (0 (ignore (puppet-syntax-propertize-expansion)))))
+      ((puppet-rx (or line-start (not (any "\\")))
+                  (zero-or-more "\\\\")
+                  (group "$" (or (and "{" variable-name "}") variable-name)))
+       (1 (ignore (puppet-syntax-propertize-expansion)))))
      start end)))
 
 
