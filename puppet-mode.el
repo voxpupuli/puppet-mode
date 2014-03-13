@@ -834,7 +834,7 @@ for each entry."
   (setq-local comment-end "")
   (setq-local comment-auto-fill-only-comments t)
   (setq comment-column puppet-comment-column)
-  ;; Navigation
+  ;; Navigation (TODO: Will we still need this with SMIE?)
   (setq-local beginning-of-defun-function #'puppet-beginning-of-defun-function)
   ;; Indentation
   (setq-local indent-line-function 'puppet-indent-line)
