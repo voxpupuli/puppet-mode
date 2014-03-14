@@ -99,7 +99,7 @@ buffer-local wherever it is set."
 
 
 ;;;; Requirements
-(require 'pkg-info)
+(declare-function pkg-info-version-info "pkg-info" (library))
 
 (eval-when-compile
   (require 'rx))
