@@ -29,7 +29,10 @@ Features
 1. Syntax highlighting
 2. Indentation and alignment of expressions and statements
 3. Tag navigation (aka `imenu`)
-4. Validation and linting of manifests
+4. Manual validation and linting of manifests (see Flycheck_ for on-the-fly
+   validation and linting)
+
+.. _Flycheck: http://flycheck.readthedocs.org/en/latest/
 
 Installation
 ============
