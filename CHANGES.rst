@@ -5,6 +5,8 @@
 master (in development)
 -----------------------
 
+- Drop cl-lib dependency
+
 0.3 (Mar 13, 2014)
 ------------------
 

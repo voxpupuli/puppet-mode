@@ -12,7 +12,7 @@
 ;; URL: https://github.com/lunaryorn/puppet-mode
 ;; Keywords: languages
 ;; Version: 0.4-cvs
-;; Package-Requires: ((emacs "24.1") (cl-lib "0.5") (pkg-info "0.4"))
+;; Package-Requires: ((emacs "24.1") (pkg-info "0.4"))
 
 ;; This file is not part of GNU Emacs.
 
@@ -103,7 +103,6 @@ buffer-local wherever it is set."
 ;;;; Requirements
 (require 'pkg-info)
 
-(require 'cl-lib)
 (require 'rx)
 (require 'align)
 
@@ -218,7 +217,7 @@ Return nil, if there is no special context at POS, or one of
   (let ((state (save-excursion (syntax-ppss pos))))
     (if (nth 4 state)
         'comment
-      (cl-case (nth 3 state)
+      (pcase (nth 3 state)
         (?\' 'single-quoted)
         (?\" 'double-quoted)))))
 
@@ -437,7 +436,7 @@ When called interactively, prompt for COMMAND."
         (while (and pos (puppet-in-string-or-comment-p pos))
           (setq pos (funcall search "{" nil 'no-error)))
         (if pos
-            (cl-decf steps)
+            (setq steps (1- steps))
           ;; Drop out of outer loop
           (setq steps 0))))
     (when (< arg 0)
