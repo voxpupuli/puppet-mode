@@ -18,7 +18,7 @@ Features
 ========
 
 1. Syntax highlighting
-2. Indentation
+2. Indentation and alignment of expressions and statements
 3. Tag navigation (aka `imenu`)
 4. Validation and linting of manifests
 
