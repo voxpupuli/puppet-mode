@@ -7,9 +7,6 @@
 .. role:: kbd(literal)
    :class: kbd
 
-.. contents:: Table of Contents
-   :local:
-
 Puppet Mode lets you edit Puppet_ 3 manifests with `GNU Emacs`_ 24.
 
 Puppet Mode is a major mode for `GNU Emacs`_ 24 which adds support for the
@@ -19,6 +16,9 @@ explicitly supported anymore, but should mostly work.
 
 This mode needs GNU Emacs 24.  It will **not** work with GNU Emacs 23 and below,
 or with other flavors of Emacs (e.g. XEmacs).
+
+.. contents:: Table of Contents:
+   :local:
 
 .. _Puppet: http://docs.puppetlabs.com/
 .. _GNU Emacs: https://www.gnu.org/software/emacs/
