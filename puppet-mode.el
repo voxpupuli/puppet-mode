@@ -101,7 +101,9 @@ buffer-local wherever it is set."
 ;;;; Requirements
 (require 'pkg-info)
 
-(require 'rx)
+(eval-when-compile
+  (require 'rx))
+
 (require 'align)
 
 
