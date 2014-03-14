@@ -10,17 +10,29 @@
 .. contents:: Table of Contents
    :local:
 
-Puppet Mode is an Emacs major mode for editing Puppet_ manifests.
+Puppet Mode lets you edit Puppet_ 3 manifests with `GNU Emacs`_ 24.
+
+Puppet Mode is a major mode for `GNU Emacs`_ 24 which adds support for the
+Puppet_ language.  Puppet is a system provisioning and configuration tool by
+Puppetlabs Inc.  This mode supports Puppet 3 and later.  Puppet 2 is not
+explicitly supported anymore, but should mostly work.
+
+This mode needs GNU Emacs 24.  It will **not** work with GNU Emacs 23 and below,
+or with other flavors of Emacs (e.g. XEmacs).
 
 .. _Puppet: http://docs.puppetlabs.com/
+.. _GNU Emacs: https://www.gnu.org/software/emacs/
 
 Features
 ========
 
 1. Syntax highlighting
-2. Indentation
+2. Indentation and alignment of expressions and statements
 3. Tag navigation (aka `imenu`)
-4. Validation and linting of manifests
+4. Manual validation and linting of manifests (see Flycheck_ for on-the-fly
+   validation and linting)
+
+.. _Flycheck: http://flycheck.readthedocs.org/en/latest/
 
 Installation
 ============
