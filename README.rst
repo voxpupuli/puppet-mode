@@ -32,6 +32,7 @@ In your Cask_ file:
 
 .. code-block:: lisp
 
+   (source gnu)
    (source melpa)
 
    (depends-on "puppet-mode")
