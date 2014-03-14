@@ -75,8 +75,6 @@
 ;; http://flycheck.readthedocs.org/en/latest/ for on-the-fly validation and
 ;; liniting of Puppet manifests.
 
-;;;;
-
 ;;; Code:
 
 
