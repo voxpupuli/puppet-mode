@@ -10,7 +10,7 @@
 .. contents:: Table of Contents
    :local:
 
-Puppet Mode is an Emacs major mode for Puppet_ manifests.
+Puppet Mode is an Emacs major mode for editing Puppet_ manifests.
 
 .. _Puppet: http://docs.puppetlabs.com/
 
@@ -32,7 +32,6 @@ In your Cask_ file:
 
 .. code-block:: lisp
 
-   (source gnu)
    (source melpa)
 
    (depends-on "puppet-mode")
