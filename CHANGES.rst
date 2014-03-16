@@ -9,6 +9,7 @@ master (in development)
 
   - Fix fontification of variables referenced from top-scope, e.g. ``$::foo``
   - Fix duplicate and misplaced entries in Imenu
+  - Fix order of submenus in Imenu
 
 - Miscellaneous:
 

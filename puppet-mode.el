@@ -848,11 +848,11 @@ for each entry."
             resources))
     (let (index
           ;; Keep this in reversed order, for `push'
-          (parts (list (cons "Variables" (nreverse variables))
-                       (cons "Defaults" (nreverse defaults))
-                       (cons "Definitions" (nreverse defines))
-                       (cons "Classes" (nreverse classes))
-                       (cons "Nodes" (nreverse nodes)))))
+          (parts (list (cons "Variables" variables)
+                       (cons "Defaults" defaults)
+                       (cons "Definitions" defines)
+                       (cons "Classes" classes)
+                       (cons "Nodes" nodes))))
       (dolist (part parts)
         (when (cdr part)
           (push part index)))
