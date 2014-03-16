@@ -90,6 +90,48 @@ package { 'bar':
   install_options => [],
 }"))))
 
+
+;;;; Imenu
+
+(ert-deftest puppet-imenu-create-index/class-with-variable ()
+  (puppet-test-with-temp-buffer
+      "class hello::world {
+  $foo = 'hello'
+}"
+    (should (equal (puppet-imenu-create-index)
+                   '(("Classes" . (("hello::world" . 7)))
+                     ("Variables" . (("$foo" . 24))))))))
+
+(ert-deftest puppet-imenu-create-index/define-with-argument ()
+  (puppet-test-with-temp-buffer
+      "define hello::world($foo = $title) {
+  $bar = 'hello'
+}"
+    (should (equal (puppet-imenu-create-index)
+                   '(("Definitions" . (("hello::world" . 8)))
+                     ("Variables" . (("$foo" . 21)
+                                     ("$bar" . 40))))))))
+
+(ert-deftest puppet-imenu-create-index/node-with-resources ()
+  (puppet-test-with-temp-buffer
+      "node hello-world.example.com {
+  Package {
+    ensure => latest
+  }
+
+  package { $bar: }
+
+  package { 'foo':
+    require => Package[$bar]
+  }
+}"
+    (should (equal (puppet-imenu-create-index)
+                   '(("Nodes" ("hello-world.example.com" . 6))
+                     ("Defaults" ("Package" . 34))
+                     ("package $bar" . 72)
+                     ("package 'foo'" . 93))))))
+
+
 (provide 'puppet-mode-test)
 
 ;; Local Variables:
