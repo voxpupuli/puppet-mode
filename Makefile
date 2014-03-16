@@ -4,6 +4,8 @@ EMACSFLAGS =
 
 export EMACS
 
+PKGDIR := $(shell EMACS=$(EMACS) $(CASK) package-directory)
+
 SRCS = puppet-mode.el
 OBJS = $(SRCS:.el=.elc)
 
@@ -16,3 +18,7 @@ clean:
 
 %.elc : %.el $(PKGDIR)
 	$(CASK) exec $(EMACS) -Q --batch $(EMACSFLAGS) -f batch-byte-compile $<
+
+$(PKGDIR) : Cask
+	$(CASK) install
+	touch $(PKGDIR)
