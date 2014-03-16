@@ -304,16 +304,21 @@ Return nil, if there is no special context at POS, or one of
       (simple-variable-name . ,(rx symbol-start
                                    (one-or-more (any "A-Z" "a-z" "0-9" "_"))
                                    symbol-end))
-      (variable-name . ,(rx symbol-start
+      (variable-name . ,(rx
                             ;; The optional scope designation
                             (optional
-                             (optional (any "a-z")
-                                       (zero-or-more (any "A-Z" "a-z" "0-9" "_")))
+                             (optional symbol-start
+                                       (any "a-z")
+                                       (zero-or-more (any "A-Z" "a-z" "0-9" "_"))
+                                       symbol-end)
                              (zero-or-more "::"
+                                           symbol-start
                                            (any "a-z")
-                                           (zero-or-more (any "A-Z" "a-z" "0-9" "_")))
+                                           (zero-or-more (any "A-Z" "a-z" "0-9" "_"))
+                                           symbol-end)
                              "::")
                             ;; The final variable name
+                            symbol-start
                             (one-or-more (any "A-Z" "a-z" "0-9" "_"))
                             symbol-end))
       ;; http://docs.puppetlabs.com/puppet/latest/reference/lang_datatypes.html#double-quoted-strings

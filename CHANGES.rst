@@ -5,7 +5,13 @@
 master (in development)
 -----------------------
 
-- Drop cl-lib dependency
+- Bug fixes:
+
+  - Fix fontification of variables referenced from top-scope, e.g. ``$::foo``
+
+- Miscellaneous:
+
+  - Drop cl-lib dependency
 
 0.3 (Mar 13, 2014)
 ------------------
