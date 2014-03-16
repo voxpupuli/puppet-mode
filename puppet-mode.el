@@ -920,7 +920,7 @@ for each entry."
   ;; Navigation (TODO: Will we still need this with SMIE?)
   (setq-local beginning-of-defun-function #'puppet-beginning-of-defun-function)
   ;; Indentation
-  (setq-local indent-line-function 'puppet-indent-line)
+  (setq-local indent-line-function #'puppet-indent-line)
   (setq indent-tabs-mode puppet-indent-tabs-mode)
   ;; Paragaphs
   (setq-local paragraph-ignore-fill-prefix t)
