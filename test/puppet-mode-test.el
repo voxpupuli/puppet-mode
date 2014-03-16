@@ -131,6 +131,39 @@ package { 'bar':
                      ("package $bar" . 72)
                      ("package 'foo'" . 93))))))
 
+
+;;;; Minor mode definition
+
+(ert-deftest puppet-mode/movement-setup ()
+  (puppet-test-with-temp-buffer "foo"
+    (should (local-variable-p 'beginning-of-defun-function))
+    (should (equal beginning-of-defun-function
+                   #'puppet-beginning-of-defun-function))))
+
+(ert-deftest puppet-mode/indentation-setup ()
+  (puppet-test-with-temp-buffer "foo"
+    (should (local-variable-p 'indent-line-function))
+    (should (local-variable-p 'indent-tabs-mode))
+    (should (eq indent-line-function 'puppet-indent-line))
+    (should (eq indent-tabs-mode puppet-indent-tabs-mode))))
+
+(ert-deftest puppet-mode/font-lock-setup ()
+  (puppet-test-with-temp-buffer "foo"
+    (should (local-variable-p 'font-lock-defaults))
+    (should (local-variable-p 'syntax-propertize-function))
+    (should (equal font-lock-defaults '((puppet-font-lock-keywords) nil nil)))
+    (should (eq syntax-propertize-function
+                #'puppet-syntax-propertize-function))))
+
+(ert-deftest puppet-mode/alignment-setup ()
+  (puppet-test-with-temp-buffer "foo"
+    (should (local-variable-p 'align-mode-rules-list))
+    (should (equal align-mode-rules-list puppet-mode-align-rules))))
+
+(ert-deftest puppet-mode/imenu-setup ()
+  (puppet-test-with-temp-buffer "foo"
+    (should (local-variable-p 'imenu-create-index-function))
+    (should (equal imenu-create-index-function #'puppet-imenu-create-index))))
 
 (provide 'puppet-mode-test)
 
