@@ -29,7 +29,66 @@
 
 ;;; Code:
 
+(require 'puppet-mode)
+(require 'ert)
 
+
+;;;; Utilties
+
+(defmacro puppet-test-with-temp-buffer (contents &rest body)
+  "Evaluate BODY in a temporary buffer with CONTENTS."
+  (declare (debug t)
+           (indent 1))
+  `(with-temp-buffer
+     (insert ,contents)
+     (goto-char (point-min))
+     (puppet-mode)
+     ,@body))
+
+
+;;;; Alignment tests
+
+(ert-deftest puppet-align-block/one-block ()
+  (puppet-test-with-temp-buffer
+      "
+package { 'foo':
+  ensure => latest,
+  require    => Package['bar'],
+  install_options =>   ['--foo', '--bar']
+}"
+    (search-forward "'foo':")
+    (puppet-align-block)
+    (should (string= (buffer-string) "
+package { 'foo':
+  ensure          => latest,
+  require         => Package['bar'],
+  install_options => ['--foo', '--bar']
+}"))))
+
+(ert-deftest puppet-align-block/stays-within-one-block ()
+  (puppet-test-with-temp-buffer
+      "
+package { 'foo':
+  ensure => latest,
+  require    => Package['bar'],
+  install_options =>   ['--foo', '--bar']
+}
+package { 'bar':
+  ensure    => latest,
+  install_options => [],
+}"
+    (search-forward "'foo':")
+    (puppet-align-block)
+    (should (string= (buffer-string) "
+package { 'foo':
+  ensure          => latest,
+  require         => Package['bar'],
+  install_options => ['--foo', '--bar']
+}
+package { 'bar':
+  ensure    => latest,
+  install_options => [],
+}"))))
 
 (provide 'puppet-mode-test)
 
