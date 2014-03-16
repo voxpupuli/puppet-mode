@@ -309,6 +309,10 @@ Return nil, if there is no special context at POS, or one of
                              (any "A-Z")
                              (zero-or-more (any "a-z" "0-9" "_"))
                              symbol-end))
+      ;; http://docs.puppetlabs.com/puppet/latest/reference/lang_reserved.html#nodes
+      (node-name . ,(rx symbol-start
+                        (one-or-more (any "a-z" "0-9" ?. ?_ ?-))
+                        symbol-end))
       ;; http://docs.puppetlabs.com/puppet/latest/reference/lang_reserved.html#variables
       (simple-variable-name . ,(rx symbol-start
                                    (one-or-more (any "A-Z" "a-z" "0-9" "_"))
@@ -357,6 +361,9 @@ are available:
 
 `cap-resource-name'
      Any capitalized resource name, including capitalized scopes
+
+`node-name'
+     Any valid node name
 
 `simple-variable-name'
      Any variable name without scopes, without leading dollar sign
@@ -652,10 +659,15 @@ of the initial include plus puppet-include-indent."
     (,(puppet-rx keyword) 0 font-lock-keyword-face)
     ;; Variables
     (,(puppet-rx "$" variable-name) 0 font-lock-variable-name-face)
-    ;; Type declarations
-    (,(puppet-rx symbol-start (or "class" "define" "node") symbol-end
+    ;; Class and type declarations
+    (,(puppet-rx symbol-start (or "class" "define") symbol-end
                  (one-or-more space)
                  (group resource-name))
+     1 font-lock-type-face)
+    ;; Node declarations
+    (,(puppet-rx symbol-start "node" symbol-end
+                 (one-or-more space)
+                 (group node-name))
      1 font-lock-type-face)
     ;; Resource usage, see
     ;; http://docs.puppetlabs.com/puppet/latest/reference/lang_resources.html
@@ -820,7 +832,7 @@ for each entry."
         ;; Nodes, classes and defines
         (nodes (puppet-imenu-collect-entries
                 (puppet-rx symbol-start "node" symbol-end
-                           (one-or-more space) (group resource-name))))
+                           (one-or-more space) (group node-name))))
         (classes (puppet-imenu-collect-entries
                   (puppet-rx symbol-start "class" symbol-end
                              (one-or-more space) (group resource-name))))
