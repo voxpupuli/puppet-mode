@@ -282,45 +282,50 @@ Return nil, if there is no special context at POS, or one of
                                     "ensure")
                                 symbol-end))
       ;; http://docs.puppetlabs.com/puppet/latest/reference/lang_reserved.html#classes-and-types
-      (resource-name . ,(rx symbol-start
-                            ;; Optional top-level scope
-                            (optional (any "a-z")
-                                      (zero-or-more (any "a-z" "0-9" "_")))
-                            ;; Nested sub-scopes
-                            (zero-or-more "::"
-                                          (any "a-z")
-                                          (zero-or-more (any "a-z" "0-9" "_")))
-                            symbol-end))
-      (cap-resource-name . ,(rx symbol-start
-                                ;; Optional top-level scope
-                                (optional (any "A-Z")
-                                          (zero-or-more (any "a-z" "0-9" "_")))
-                                ;; Nested sub-scopes
-                                (zero-or-more "::"
-                                              (any "A-Z")
-                                              (zero-or-more (any "a-z" "0-9" "_")))
-                                symbol-end))
+      (resource-name . ,(rx
+                         ;; Optional top-level scope
+                         (optional "::")
+                         (zero-or-more symbol-start
+                                       (any "a-z")
+                                       (zero-or-more (any "a-z" "0-9" "_"))
+                                       symbol-end
+                                       "::")
+                         ;; Nested sub-scopes
+                         symbol-start
+                         (any "a-z")
+                         (zero-or-more (any "a-z" "0-9" "_"))
+                         symbol-end))
+      (cap-resource-name . ,(rx
+                             ;; Top-scope indicator
+                             (optional "::")
+                             (zero-or-more symbol-start
+                                           (any "A-Z")
+                                           (zero-or-more
+                                            (any "a-z" "0-9" "_"))
+                                           symbol-end
+                                           "::")
+                             ;; Nested sub-scopes
+                             symbol-start
+                             (any "A-Z")
+                             (zero-or-more (any "a-z" "0-9" "_"))
+                             symbol-end))
       ;; http://docs.puppetlabs.com/puppet/latest/reference/lang_reserved.html#variables
       (simple-variable-name . ,(rx symbol-start
                                    (one-or-more (any "A-Z" "a-z" "0-9" "_"))
                                    symbol-end))
       (variable-name . ,(rx
-                            ;; The optional scope designation
-                            (optional
-                             (optional symbol-start
+                         ;; The optional scope designation
+                         (optional "::")
+                         (zero-or-more symbol-start
                                        (any "a-z")
-                                       (zero-or-more (any "A-Z" "a-z" "0-9" "_"))
-                                       symbol-end)
-                             (zero-or-more "::"
-                                           symbol-start
-                                           (any "a-z")
-                                           (zero-or-more (any "A-Z" "a-z" "0-9" "_"))
-                                           symbol-end)
-                             "::")
-                            ;; The final variable name
-                            symbol-start
-                            (one-or-more (any "A-Z" "a-z" "0-9" "_"))
-                            symbol-end))
+                                       (zero-or-more
+                                        (any "A-Z" "a-z" "0-9" "_"))
+                                       symbol-end
+                                       "::")
+                         ;; The final variable name
+                         symbol-start
+                         (one-or-more (any "A-Z" "a-z" "0-9" "_"))
+                         symbol-end))
       ;; http://docs.puppetlabs.com/puppet/latest/reference/lang_datatypes.html#double-quoted-strings
       (dq-escape . ,(rx (or line-start (not (any "\\")))
                         (zero-or-more "\\\\")
