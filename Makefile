@@ -7,7 +7,7 @@ export EMACS
 SRCS = puppet-mode.el
 OBJECTS = $(SRCS:.el=.elc)
 
-.PHONY: all
+.PHONY: compile
 
 compile: $(OBJECTS)
 
