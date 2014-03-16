@@ -800,10 +800,10 @@ for each entry."
   (let ((case-fold-search nil)
         entries)
     (while (re-search-forward pattern nil 'no-error)
-      (let ((context (save-excursion (syntax-ppss (match-beginning 0)))))
-        ;; Skip this match if it's inside a string or comment
-        (unless (or (nth 3 context) (nth 4 context))
-          (push (cons (match-string 1) (match-beginning 1)) entries))))
+      (let ((entry (cons (match-string 1) (match-beginning 1))))
+        (unless (puppet-in-string-or-comment-p (match-beginning 0))
+          ;; Skip this match if it's inside a string or comment
+          (push entry entries))))
     (nreverse entries)))
 
 (defun puppet-imenu-create-index ()

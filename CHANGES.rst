@@ -8,6 +8,7 @@ master (in development)
 - Bug fixes:
 
   - Fix fontification of variables referenced from top-scope, e.g. ``$::foo``
+  - Fix duplicate and misplaced entries in Imenu
 
 - Miscellaneous:
 
