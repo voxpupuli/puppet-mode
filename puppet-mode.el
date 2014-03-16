@@ -810,17 +810,18 @@ for each entry."
                                (zero-or-more space) "=")))
         ;; Resource defaults
         (defaults (puppet-imenu-collect-entries
-                   (puppet-rx cap-resource-name (zero-or-more space) "{")))
+                   (puppet-rx (group cap-resource-name)
+                              (zero-or-more space) "{")))
         ;; Nodes, classes and defines
         (nodes (puppet-imenu-collect-entries
                 (puppet-rx symbol-start "node" symbol-end
-                           (one-or-more space) resource-name)))
+                           (one-or-more space) (group resource-name))))
         (classes (puppet-imenu-collect-entries
                   (puppet-rx symbol-start "class" symbol-end
-                             (one-or-more space) resource-name)))
+                             (one-or-more space) (group resource-name))))
         (defines (puppet-imenu-collect-entries
                   (puppet-rx symbol-start "define" symbol-end
-                             (one-or-more space) resource-name)))
+                             (one-or-more space) (group resource-name))))
         resources)
     ;; Resources are a little more complicated since we need to extract the type
     ;; and the name
