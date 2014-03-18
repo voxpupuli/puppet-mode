@@ -466,8 +466,22 @@ When called interactively, prompt for COMMAND."
 block (the line containing the opening brace).  Used to set the indentation
 of the closing brace of a block."
   (save-excursion
-    (beginning-of-defun)
-    (current-indentation)))
+    (save-match-data
+      (let ((opoint (point))
+            (apoint (search-backward "{" nil t)))
+        (when apoint
+          ;; This is a bit of a hack and doesn't allow for strings.  We really
+          ;; want to parse by sexps at some point.
+          (let ((close-braces (count-matches "}" apoint opoint))
+                (open-braces 0))
+            (while (and apoint (> close-braces open-braces))
+              (setq apoint (search-backward "{" nil t))
+              (when apoint
+                (setq close-braces (count-matches "}" apoint opoint))
+                (setq open-braces (1+ open-braces)))))
+          (if apoint
+              (current-indentation)
+            nil))))))
 
 (defun puppet-in-array ()
   "If point is in an array, return the position of the opening '[' of
@@ -795,10 +809,14 @@ Used as `syntax-propertize-function' in Puppet Mode."
   "Align the current block."
   (interactive)
   (save-excursion
-    (beginning-of-defun)
-    (let ((beg (point)))
-      (end-of-defun)
-      (align beg (point)))))
+    (save-match-data
+      (let ((beg (search-backward "{" nil 'no-error)))
+        ;; Skip backwards over strings and comments
+        (while (and beg (puppet-in-string-or-comment-p beg))
+          (setq beg (search-backward "{" nil 'no-error)))
+        (when beg
+          (forward-list)
+          (align beg (point)))))))
 
 
 ;;;; Imenu
