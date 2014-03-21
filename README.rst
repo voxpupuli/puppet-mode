@@ -4,9 +4,6 @@
 
 .. default-role:: literal
 
-.. role:: kbd(literal)
-   :class: kbd
-
 .. image:: https://travis-ci.org/lunaryorn/puppet-mode.svg?branch=master
    :target: https://travis-ci.org/lunaryorn/puppet-mode
 
@@ -40,12 +37,12 @@ Features
 Installation
 ============
 
-From MELPA_ (recommended) or Marmalade_ with :kbd:`M-x package-install RET
+From MELPA_ (recommended) or Marmalade_ with `M-x package-install RET
 puppet-mode`.
 
 In your Cask_ file:
 
-.. code-block:: lisp
+.. code-block:: cl
 
    (source melpa)
 
@@ -63,24 +60,24 @@ manifests with the extension `.pp`.
 
 The following key bindings are available in Puppet Mode:
 
-+---------------+------------------------------------------------------------+
-|:kbd:`C-M-a`   | Move to the beginning of the current block                 |
-+---------------+------------------------------------------------------------+
-|:kbd:`C-M-e`   | Move to the endof the current block                        |
-+---------------+------------------------------------------------------------+
-|:kbd:`C-c C-a` | Align parameters in the current block                      |
-+---------------+------------------------------------------------------------+
-|:kbd:`C-c C-j` | Jump to a `class`, `define`, variable or resource          |
-+---------------+------------------------------------------------------------+
-|:kbd:`C-c C-c` | Apply the current manifest with `puppet apply`             |
-+---------------+------------------------------------------------------------+
-|:kbd:`C-c C-v` | Validate the syntax of the current manifest with `puppet   |
-|               | parser validate`                                           |
-+---------------+------------------------------------------------------------+
-|:kbd:`C-c C-l` | Lint the current manifest with `puppet-lint`               |
-+---------------+------------------------------------------------------------+
++----------+-----------------------------------------------------------------+
+|`C-M-a`   | Move to the beginning of the current block                      |
++----------+-----------------------------------------------------------------+
+|`C-M-e`   | Move to the endof the current block                             |
++----------+-----------------------------------------------------------------+
+|`C-c C-a` | Align parameters in the current block                           |
++----------+-----------------------------------------------------------------+
+|`C-c C-j` | Jump to a `class`, `define`, variable or resource               |
++----------+-----------------------------------------------------------------+
+|`C-c C-c` | Apply the current manifest with `puppet apply`                  |
++----------+-----------------------------------------------------------------+
+|`C-c C-v` | Validate the syntax of the current manifest with `puppet parser |
+|          | validate`                                                       |
++----------+-----------------------------------------------------------------+
+|`C-c C-l` | Lint the current manifest with `puppet-lint`                    |
++----------+-----------------------------------------------------------------+
 
-Use :kbd:`M-x customize-group RET puppet` to customize Puppet Mode.
+Use `M-x customize-group RET puppet` to customize Puppet Mode.
 
 Support
 =======

@@ -1,22 +1,20 @@
 .. default-role:: literal
 
-.. role:: kbd(literal)
-
 master (in development)
 -----------------------
 
 - Improvements:
 
-  - #37: Highlight type arguments to ``contain``, ``include``, and ``require``
+  - #37: Highlight type arguments to `contain`, `include`, and `require`
 
 - Bug fixes:
 
-  - Fix fontification of variables referenced from top-scope, e.g. ``$::foo``
+  - Fix fontification of variables referenced from top-scope, e.g. `$::foo`
   - Fix duplicate and misplaced entries in Imenu
   - Fix order of submenus in Imenu
   - Do not parse node names like type names anymore
   - #38: Improve thing at point and some small highlighting glitches by moving
-    ``:`` into symbol syntax
+    `:` into symbol syntax
 
 - Miscellaneous:
 
@@ -31,12 +29,11 @@ This version is the first release under new maintenance.
 - New features:
 
   - #13: Imenu support
-  - #13: Jump to classes, defines, variables and resources with :kbd:`C-c
-    C-j`
-  - Align parameters in a block with :kbd:`C-c C-a`
-  - #11: Validate, lint and apply Puppet manifests with :kbd:`C-c C-v`,
-    :kbd:`C-c C-l` and :kbd:`C-c C-c`
-  - Move across blocks with :kbd:`C-M-a` and `C-M-e`
+  - #13: Jump to classes, defines, variables and resources with `C-c C-j`
+  - Align parameters in a block with `C-c C-a`
+  - #11: Validate, lint and apply Puppet manifests with `C-c C-v`, `C-c C-l` and
+    `C-c C-c`
+  - Move across blocks with `C-M-a` and `C-M-e`
 
 - Improvements:
 
