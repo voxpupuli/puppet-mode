@@ -15,6 +15,7 @@ master (in development)
 - Miscellaneous:
 
   - Drop cl-lib dependency
+  - #34: Add unit tests for fontification, alignment and Imenu
 
 0.3 (Mar 13, 2014)
 ------------------
