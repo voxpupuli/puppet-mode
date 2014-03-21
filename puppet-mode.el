@@ -642,16 +642,23 @@ of the initial include plus puppet-include-indent."
 
 (defvar puppet-mode-syntax-table
   (let ((table (make-syntax-table)))
+    ;; Our strings
     (modify-syntax-entry ?\' "\"'"  table)
     (modify-syntax-entry ?\" "\"\"" table)
     ;; C-style comments.  Yes, Puppet has these!
     (modify-syntax-entry ?/ ". 14b" table)
     (modify-syntax-entry ?* ". 23b" table)
+    ;; Line comments
     (modify-syntax-entry ?#  "<"    table)
     (modify-syntax-entry ?\n ">"    table)
+    ;; The backslash is our escape character
     (modify-syntax-entry ?\\ "\\"   table)
+    ;; The dollar sign is an expression prefix for variables
     (modify-syntax-entry ?$  "'"    table)
+    ;; In Prog Mode syntax table, dash is a symbol character, but in Puppet it's
+    ;; an operator
     (modify-syntax-entry ?-  "."    table)
+    ;; Our parenthesis, braces and brackets
     (modify-syntax-entry ?\( "()"   table)
     (modify-syntax-entry ?\) ")("   table)
     (modify-syntax-entry ?\{ "(}"   table)
