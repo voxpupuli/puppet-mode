@@ -711,6 +711,13 @@ of the initial include plus puppet-include-indent."
      1 font-lock-builtin-face)
     ;; Built-in functions
     (,(puppet-rx builtin-function) 0 font-lock-builtin-face)
+    ;; Type arguments to some special built-in functions
+    (,(puppet-rx symbol-start
+                 (or "contain" "include" "require")
+                 symbol-end
+                 (one-or-more space)
+                 (group resource-name))
+     1 font-lock-type-face)
     ;; Variable expansions in strings and comments
     (puppet-match-valid-expansion 1 font-lock-variable-name-face t)
     (puppet-match-invalid-expansion 1 font-lock-warning-face t)

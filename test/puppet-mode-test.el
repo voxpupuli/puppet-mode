@@ -235,6 +235,44 @@ class */ bar"
     (should (eq (puppet-test-face-at 1) 'font-lock-builtin-face))
     (should-not (puppet-test-face-at 10))))
 
+(ert-deftest puppet-font-lock-keywords/type-argument-to-contain ()
+  (puppet-test-with-temp-buffer "contain foo::bar"
+    (should (eq (puppet-test-face-at 1) 'font-lock-builtin-face))
+    (should (eq (puppet-test-face-at 7) 'font-lock-builtin-face))
+    (should (eq (puppet-test-face-at 9) 'font-lock-type-face))
+    (should (eq (puppet-test-face-at 12) 'font-lock-type-face))
+    (should (eq (puppet-test-face-at 14) 'font-lock-type-face))
+    (should (eq (puppet-test-face-at 16) 'font-lock-type-face))))
+
+(ert-deftest puppet-font-lock-keywords/string-argument-to-contain ()
+  (puppet-test-with-temp-buffer "contain 'foo::bar'"
+    (should (eq (puppet-test-face-at 1) 'font-lock-builtin-face))
+    (should (eq (puppet-test-face-at 7) 'font-lock-builtin-face))
+    (should (eq (puppet-test-face-at 9) 'font-lock-string-face))
+    (should (eq (puppet-test-face-at 10) 'font-lock-string-face))
+    (should (eq (puppet-test-face-at 13) 'font-lock-string-face))
+    (should (eq (puppet-test-face-at 15) 'font-lock-string-face))
+    (should (eq (puppet-test-face-at 17) 'font-lock-string-face))
+    (should (eq (puppet-test-face-at 18) 'font-lock-string-face))))
+
+(ert-deftest puppet-font-lock-keywords/type-argument-to-include ()
+  (puppet-test-with-temp-buffer "include foo::bar"
+    (should (eq (puppet-test-face-at 1) 'font-lock-builtin-face))
+    (should (eq (puppet-test-face-at 7) 'font-lock-builtin-face))
+    (should (eq (puppet-test-face-at 9) 'font-lock-type-face))
+    (should (eq (puppet-test-face-at 12) 'font-lock-type-face))
+    (should (eq (puppet-test-face-at 14) 'font-lock-type-face))
+    (should (eq (puppet-test-face-at 16) 'font-lock-type-face))))
+
+(ert-deftest puppet-font-lock-keywords/type-argument-to-require ()
+  (puppet-test-with-temp-buffer "require foo::bar"
+    (should (eq (puppet-test-face-at 1) 'font-lock-builtin-face))
+    (should (eq (puppet-test-face-at 7) 'font-lock-builtin-face))
+    (should (eq (puppet-test-face-at 9) 'font-lock-type-face))
+    (should (eq (puppet-test-face-at 12) 'font-lock-type-face))
+    (should (eq (puppet-test-face-at 14) 'font-lock-type-face))
+    (should (eq (puppet-test-face-at 16) 'font-lock-type-face))))
+
 (ert-deftest puppet-font-lock-keywords/variable-expansion-in-sq-string ()
   (puppet-test-with-temp-buffer "'${::foo::bar} yeah'"
     (should (eq (puppet-test-face-at 1) 'font-lock-string-face))

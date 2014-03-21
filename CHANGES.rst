@@ -5,6 +5,10 @@
 master (in development)
 -----------------------
 
+- Improvements:
+
+  - #37: Highlight type arguments to ``contain``, ``include``, and ``require``
+
 - Bug fixes:
 
   - Fix fontification of variables referenced from top-scope, e.g. ``$::foo``
