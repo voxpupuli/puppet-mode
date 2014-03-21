@@ -282,30 +282,24 @@ Return nil, if there is no special context at POS, or one of
                                     "ensure")
                                 symbol-end))
       ;; http://docs.puppetlabs.com/puppet/latest/reference/lang_reserved.html#classes-and-types
-      (resource-name . ,(rx
+      (resource-name . ,(rx symbol-start
                          ;; Optional top-level scope
                          (optional "::")
-                         (zero-or-more symbol-start
-                                       (any "a-z")
+                         (zero-or-more (any "a-z")
                                        (zero-or-more (any "a-z" "0-9" "_"))
-                                       symbol-end
                                        "::")
                          ;; Nested sub-scopes
-                         symbol-start
                          (any "a-z")
                          (zero-or-more (any "a-z" "0-9" "_"))
                          symbol-end))
-      (cap-resource-name . ,(rx
+      (cap-resource-name . ,(rx symbol-start
                              ;; Top-scope indicator
                              (optional "::")
-                             (zero-or-more symbol-start
-                                           (any "A-Z")
+                             (zero-or-more (any "A-Z")
                                            (zero-or-more
                                             (any "a-z" "0-9" "_"))
-                                           symbol-end
                                            "::")
                              ;; Nested sub-scopes
-                             symbol-start
                              (any "A-Z")
                              (zero-or-more (any "a-z" "0-9" "_"))
                              symbol-end))
@@ -317,17 +311,14 @@ Return nil, if there is no special context at POS, or one of
       (simple-variable-name . ,(rx symbol-start
                                    (one-or-more (any "A-Z" "a-z" "0-9" "_"))
                                    symbol-end))
-      (variable-name . ,(rx
+      (variable-name . ,(rx symbol-start
                          ;; The optional scope designation
                          (optional "::")
-                         (zero-or-more symbol-start
-                                       (any "a-z")
+                         (zero-or-more (any "a-z")
                                        (zero-or-more
                                         (any "A-Z" "a-z" "0-9" "_"))
-                                       symbol-end
                                        "::")
                          ;; The final variable name
-                         symbol-start
                          (one-or-more (any "A-Z" "a-z" "0-9" "_"))
                          symbol-end))
       ;; http://docs.puppetlabs.com/puppet/latest/reference/lang_datatypes.html#double-quoted-strings
@@ -655,6 +646,8 @@ of the initial include plus puppet-include-indent."
     (modify-syntax-entry ?\\ "\\"   table)
     ;; The dollar sign is an expression prefix for variables
     (modify-syntax-entry ?$  "'"    table)
+    ;; The colon is a symbol character, denoting the scope.
+    (modify-syntax-entry ?: "_"     table)
     ;; In Prog Mode syntax table, dash is a symbol character, but in Puppet it's
     ;; an operator
     (modify-syntax-entry ?-  "."    table)

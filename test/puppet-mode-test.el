@@ -189,7 +189,9 @@ class */ bar"
 (ert-deftest puppet-font-lock-keywords/resource-default-not-capitalized ()
   (puppet-test-with-temp-buffer "Foo::bar {"
     (should-not (puppet-test-face-at 1))
-    (should-not (puppet-test-face-at 4))))
+    (should-not (puppet-test-face-at 4))
+    (should-not (puppet-test-face-at 6))
+    (should-not (puppet-test-face-at 8))))
 
 (ert-deftest puppet-font-lock-keywords/resource-collector ()
   (puppet-test-with-temp-buffer "Foo::Bar <|"

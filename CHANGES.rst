@@ -11,6 +11,8 @@ master (in development)
   - Fix duplicate and misplaced entries in Imenu
   - Fix order of submenus in Imenu
   - Do not parse node names like type names anymore
+  - #38: Improve thing at point and some small highlighting glitches by moving
+    ``:`` into symbol syntax
 
 - Miscellaneous:
 
