@@ -7,7 +7,7 @@
 .. role:: kbd(literal)
    :class: kbd
 
-.. image:: https://travis-ci.org/lunaryorn/puppet-mode.png
+.. image:: https://travis-ci.org/lunaryorn/puppet-mode.svg?branch=master
    :target: https://travis-ci.org/lunaryorn/puppet-mode
 
 Puppet Mode lets you edit Puppet_ 3 manifests with `GNU Emacs`_ 24.
