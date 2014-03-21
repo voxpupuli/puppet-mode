@@ -664,7 +664,7 @@ of the initial include plus puppet-include-indent."
 (defvar puppet-font-lock-keywords
   `(
     ;; Regular expression literals
-    (, (rx (group "/"
+    (,(rx (group "/"
                   (zero-or-more
                    (or (not (any "/" "\\" "\n")) ; Not the end of a regexp
                        (and "\\" not-newline)))  ; Any escaped character
