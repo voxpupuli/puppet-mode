@@ -104,6 +104,7 @@ buffer-local wherever it is set."
 (eval-when-compile
   (require 'rx))
 
+(require 'smie)
 (require 'align)
 
 
@@ -627,6 +628,166 @@ of the initial include plus puppet-include-indent."
       (if (and cur-indent (> cur-indent 0))
           (indent-line-to cur-indent)
         (indent-line-to 0)))))
+
+;;;; SMIE
+
+(defvar puppet-use-smie t
+  "Whether to use SMIE or not.")
+
+(defconst puppet-smie-token-re
+  (rx (or "==" "=>" "=~" "="
+          "!=" "!~" "!"
+          "+=" "+>" "+"
+          "<<|" "<<" "<=" "<~" "<|" "<-" "<"
+          ">>" ">=" ">"
+          "|>>" "|>"
+          "->" "-"
+          "~>"
+          "/" "*" "%" "," "." ":" "@" ";" "?" "\\"))
+  "All tokens for the Puppet Mode SMIE grammar.")
+
+(defun puppet--smie-forward-token ()
+  "Get the next token."
+  (forward-comment (point-max))
+  (cond
+   ((looking-at puppet-smie-token-re)
+    (goto-char (match-end 0))
+    (match-string-no-properties 0))
+   (t
+    (buffer-substring-no-properties
+     (point)
+     (progn (skip-syntax-forward "w_")
+            (point))))))
+
+(defun puppet--smie-backward-token ()
+  "Get the previous token."
+  (forward-comment (- (point)))
+  (cond
+   ((looking-back puppet-smie-token-re)
+    (goto-char (match-beginning 0))
+    (match-string-no-properties 0))
+   (t
+    (buffer-substring-no-properties
+     (point)
+     (progn (skip-syntax-backward "w_")
+            (point))))))
+
+(defconst puppet-smie-grammar
+  (smie-prec2->grammar
+   (smie-merge-prec2s
+    (smie-bnf->prec2
+     '((id)
+       (stmt_or_decl (resource)
+                     (vresource)
+                     (assignment)
+                     (casestmt)
+                     (ifstmt)
+                     (unlessstmt)
+                     (import)
+                     (fstmt)
+                     (def)
+                     (host)
+                     (node)
+                     (resourceoverride)
+                     (append)
+                     (relship))
+       (resource (id "{" "}")
+                 (id "{" resourceinstances "}")
+                 (id "{" resourceinstances ";" "}")
+                 ;; Resource defaults
+                 (id "{" params "}")
+                 (id "{" params "," "}"))
+       (vresource)
+       (assignment (variable "=" expression)
+                   (arrayaccess "=" expression))
+       (casestmt)
+       (ifstmt)
+       (unlessstmt)
+       (import)
+       (fstmt)
+       (def)
+       (host)
+       (node)
+       (resourceoverride)
+       (append (variable "+=" expression))
+       (relship)
+       (resourceinstances (resourceinstance)
+                          (resourceinstances ";" resourceinstances))
+       (resourceinstance (resourcename ":" params)
+                         (resourcename ":" params ","))
+       (resourcename (selector)
+                     (variable)
+                     (array)
+                     (arrayaccesses)
+                     (id))
+       (array ("[" expressions "]")
+              ("[" expressions "," "]")
+              ("[" "]"))
+       (expressions (expression)
+                    (expressions "," expressions))
+       (expression (rvalue)
+                   (hash)
+                   (expression "in" expression)
+                   (expression "=~" regex)
+                   (expression "!~" regex)
+                   (expression "+" expression)
+                   (expression "-" expression)
+                   (expression "/" expression)
+                   (expression "*" expression)
+                   (expression "%" expression)
+                   (expression "<<" expression)
+                   (expression ">>" expression)
+                   ("-" expression)
+                   (expression "!=" expression)
+                   (expression "==" expression)
+                   (expression ">" expression)
+                   (expression ">=" expression)
+                   (expression "<" expression)
+                   (expression "<=" expression)
+                   ("!" expression)
+                   (expression "and" expression)
+                   (expression "or" expression))
+       (rvalue (selector)
+               (variable)
+               (array)
+               (arrayaccesses)
+               (resourceref)
+               (funcrvalue))
+       (selector (selectlhand "?" svalues))
+       (resourceref)
+       (funcrvalue)
+       (hash ("{" params "}")
+             ("{" params "," "}")
+             ("{" "}"))
+       (params (param)
+               (params "," params))
+       (param (id "=>" expression))
+       (regex
+        ;; TODO: We need lexer support here probably
+        )
+       (arrayaccesses (arrayaccess)
+                      (arrayaccesses "[" expression "]"))
+       (arrayaccess (variable "[" expression "]"))
+       (variable ("$" id)))
+     '((assoc ";"))
+     '((assoc ",")))
+
+    ;; Operator precedence rules
+    (smie-precs->prec2
+     '((right "=")
+       (right "!")
+       (left "in" "=~" "!~")
+       (left "/" "*" "%")
+       (left "-" "+")
+       (left "<<" ">>")
+       (left "==" "!=")
+       (left ">=" "<=" ">" "<")
+       (left "and")
+       (left "or")))))
+  "The SMIE grammar for Puppet Mode.")
+
+(defun puppet-smie-rules (kind token)
+  "Indentation rules for Puppet.")
 
 
 ;;;; Font locking
@@ -946,7 +1107,11 @@ for each entry."
   (setq-local beginning-of-defun-function #'puppet-beginning-of-defun-function)
   ;; Indentation
   (setq-local indent-line-function #'puppet-indent-line)
-  (setq indent-tabs-mode puppet-indent-tabs-mode)
+  (if puppet-use-smie
+      (smie-setup puppet-smie-grammar #'puppet-smie-rules
+                  :forward-token #'puppet--smie-forward-token
+                  :backward-token #'puppet--smie-backward-token)
+    (setq indent-tabs-mode puppet-indent-tabs-mode))
   ;; Paragaphs
   (setq-local paragraph-ignore-fill-prefix t)
   (setq-local paragraph-start "\f\\|[ \t]*$\\|#$")
