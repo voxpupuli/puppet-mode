@@ -639,9 +639,16 @@ of the initial include plus puppet-include-indent."
     (modify-syntax-entry ?\\ "\\" table)
     ;; The dollar sign is an expression prefix for variables
     (modify-syntax-entry ?$ "'" table)
-    ;; In Prog Mode syntax table, dash is a symbol character, but in Puppet it's
-    ;; an operator
-    (modify-syntax-entry ?- "." table)
+    ;; Fix various operators and punctionation.
+    (modify-syntax-entry ?<  "." table)
+    (modify-syntax-entry ?>  "." table)
+    (modify-syntax-entry ?&  "." table)
+    (modify-syntax-entry ?|  "." table)
+    (modify-syntax-entry ?%  "." table)
+    (modify-syntax-entry ?=  "." table)
+    (modify-syntax-entry ?+  "." table)
+    (modify-syntax-entry ?-  "." table)
+    (modify-syntax-entry ?\; "." table)
     ;; Our parenthesis, braces and brackets
     (modify-syntax-entry ?\( "()" table)
     (modify-syntax-entry ?\) ")(" table)

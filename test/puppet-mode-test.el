@@ -120,6 +120,13 @@ class */ bar"
     ;; The operator should not get highlighted
     (should-not (puppet-test-face-at 6))))
 
+(ert-deftest puppet-font-lock-keywords/simple-variable-no-space ()
+  (puppet-test-with-temp-buffer "$foo=bar"
+    (should (eq (puppet-test-face-at 1) 'font-lock-variable-name-face))
+    (should (eq (puppet-test-face-at 4) 'font-lock-variable-name-face))
+    ;; The operator should not get highlighted
+    (should-not (puppet-test-face-at 5))))
+
 (ert-deftest puppet-font-lock-keywords/variable-with-scope ()
   (puppet-test-with-temp-buffer "$foo::bar"
     (should (eq (puppet-test-face-at 1) 'font-lock-variable-name-face))
@@ -231,6 +238,11 @@ class */ bar"
   (puppet-test-with-temp-buffer "alias => foo"
     (should (eq (puppet-test-face-at 1) 'font-lock-builtin-face))
     (should-not (puppet-test-face-at 7))))
+
+(ert-deftest puppet-font-lock-keywords/builtin-metaparameter-no-space ()
+  (puppet-test-with-temp-buffer "alias=>foo"
+    (should (eq (puppet-test-face-at 1) 'font-lock-builtin-face))
+    (should-not (puppet-test-face-at 6))))
 
 (ert-deftest puppet-font-lock-keywords/builtin-function ()
   (puppet-test-with-temp-buffer "template('foo/bar')"
