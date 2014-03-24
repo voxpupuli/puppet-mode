@@ -674,7 +674,7 @@ of the initial include plus puppet-include-indent."
     ;; Class and type declarations
     (,(puppet-rx (symbol (or "class" "define"))
                  (one-or-more space)
-                 (group resource-name))
+                 (group (symbol resource-name)))
      1 font-lock-type-face)
     ;; Node declarations
     (,(puppet-rx (symbol "node")
