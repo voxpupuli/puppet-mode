@@ -134,6 +134,14 @@ class */ bar"
     (should (eq (puppet-test-face-at 2) 'font-lock-variable-name-face))
     (should (eq (puppet-test-face-at 4) 'font-lock-variable-name-face))))
 
+(ert-deftest puppet-font-lock-keywords/variable-before-colon ()
+  (puppet-test-with-temp-buffer "package { $::foo:"
+    (should (eq (puppet-test-face-at 11) 'font-lock-variable-name-face))
+    (should (eq (puppet-test-face-at 12) 'font-lock-variable-name-face))
+    (should (eq (puppet-test-face-at 14) 'font-lock-variable-name-face))
+    (should (eq (puppet-test-face-at 16) 'font-lock-variable-name-face))
+    (should-not (puppet-test-face-at 17))))
+
 (ert-deftest puppet-font-lock-keywords/class ()
   (puppet-test-with-temp-buffer "class foo::bar
 {"

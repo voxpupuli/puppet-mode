@@ -639,8 +639,6 @@ of the initial include plus puppet-include-indent."
     (modify-syntax-entry ?\\ "\\" table)
     ;; The dollar sign is an expression prefix for variables
     (modify-syntax-entry ?$ "'" table)
-    ;; The colon is a symbol character, denoting the scope.
-    (modify-syntax-entry ?: "_" table)
     ;; In Prog Mode syntax table, dash is a symbol character, but in Puppet it's
     ;; an operator
     (modify-syntax-entry ?- "." table)
@@ -769,6 +767,14 @@ match data from propertization."
       (put-text-property beg (1+ beg) property
                          (cons context (match-data))))))
 
+(defun puppet-syntax-propertize-scope-operator (beg end)
+  "Mark all scope operators between BEG and END as symbols."
+  (save-excursion
+    (goto-char beg)
+    (while (search-forward "::" end 'no-error)
+      (put-text-property (match-beginning 0) (match-end 0)
+                         'syntax-table (string-to-syntax "_")))))
+
 (defun puppet-syntax-propertize-function (start end)
   "Propertize text between START and END.
 
@@ -778,14 +784,28 @@ Used as `syntax-propertize-function' in Puppet Mode."
     (remove-text-properties start end '(puppet-expansion puppet-escape))
     (funcall
      (syntax-propertize-rules
-      ;; Find escape sequences and variable expansions
+      ;; Make double colons part of the surrounding symbol.  We can't put the
+      ;; colon into symbol syntax, because the colon can appear as non-symbol
+      ;; character as well (e.g. "package { $foo:"), but we want the
+      ;; double-colon as part of the symbol to make symbol navigation move
+      ;; across it, and to make stuff like `thing-at-point' behave reasonably
+      ((rx "::" symbol-start) (0 "_"))
+      ;; Find escape sequences and variable expansions.
       ((puppet-rx dq-escape)
        (1 (ignore (puppet-syntax-propertize-match 'puppet-escape))))
       ((puppet-rx (or line-start (not (any "\\")))
                   (zero-or-more "\\\\")
-                  (group "$" (or (and "{" (symbol variable-name) "}")
-                                 (symbol variable-name))))
-       (1 (ignore (puppet-syntax-propertize-match 'puppet-expansion)))))
+                  ;; We can't use symbol boundaries here, because
+                  ;; `syntax-propertize-rules' applies all rules at the same
+                  ;; time, so the double-colon scope separator isn't yet part of
+                  ;; the symbol at this point.
+                  (group "$" (or (and "{" variable-name "}") variable-name)))
+       (1 (ignore (progn
+                    ;; Propertize all scope operators in the current variable
+                    (save-match-data
+                      (puppet-syntax-propertize-scope-operator
+                       (match-beginning 0) (match-end 0)))
+                    (puppet-syntax-propertize-match 'puppet-expansion))))))
      start end)))
 
 
