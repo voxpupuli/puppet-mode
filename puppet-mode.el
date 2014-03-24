@@ -640,24 +640,24 @@ of the initial include plus puppet-include-indent."
     (modify-syntax-entry ?/ ". 14b" table)
     (modify-syntax-entry ?* ". 23b" table)
     ;; Line comments
-    (modify-syntax-entry ?#  "<"    table)
-    (modify-syntax-entry ?\n ">"    table)
+    (modify-syntax-entry ?#  "<" table)
+    (modify-syntax-entry ?\n ">" table)
     ;; The backslash is our escape character
-    (modify-syntax-entry ?\\ "\\"   table)
+    (modify-syntax-entry ?\\ "\\" table)
     ;; The dollar sign is an expression prefix for variables
-    (modify-syntax-entry ?$  "'"    table)
+    (modify-syntax-entry ?$ "'" table)
     ;; The colon is a symbol character, denoting the scope.
-    (modify-syntax-entry ?: "_"     table)
+    (modify-syntax-entry ?: "_" table)
     ;; In Prog Mode syntax table, dash is a symbol character, but in Puppet it's
     ;; an operator
-    (modify-syntax-entry ?-  "."    table)
+    (modify-syntax-entry ?- "." table)
     ;; Our parenthesis, braces and brackets
-    (modify-syntax-entry ?\( "()"   table)
-    (modify-syntax-entry ?\) ")("   table)
-    (modify-syntax-entry ?\{ "(}"   table)
-    (modify-syntax-entry ?\} "){"   table)
-    (modify-syntax-entry ?\[ "(]"   table)
-    (modify-syntax-entry ?\] ")["   table)
+    (modify-syntax-entry ?\( "()" table)
+    (modify-syntax-entry ?\) ")(" table)
+    (modify-syntax-entry ?\{ "(}" table)
+    (modify-syntax-entry ?\} "){" table)
+    (modify-syntax-entry ?\[ "(]" table)
+    (modify-syntax-entry ?\] ")[" table)
     table)
   "Syntax table in use in `puppet-mode' buffers.")
 
