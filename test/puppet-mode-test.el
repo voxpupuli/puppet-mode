@@ -61,12 +61,15 @@ buffer."
 ;;;; Font locking
 
 (ert-deftest puppet-mode-syntax-table/fontify-dq-string ()
+  :tags '(fontification syntax-table)
   (should (eq (puppet-test-face-at 8 "$foo = \"bar\"") 'font-lock-string-face)))
 
 (ert-deftest puppet-mode-syntax-table/fontify-sq-string ()
+  :tags '(fontification syntax-table)
   (should (eq (puppet-test-face-at 8 "$foo = 'bar'") 'font-lock-string-face)))
 
 (ert-deftest puppet-mode-syntax-table/fontify-line-comment ()
+  :tags '(fontification syntax-table)
   (puppet-test-with-temp-buffer "# class
 bar"
     (should (eq (puppet-test-face-at 1) 'font-lock-comment-delimiter-face))
@@ -76,6 +79,7 @@ bar"
     (should-not (puppet-test-face-at 9))))
 
 (ert-deftest puppet-mode-syntax-table/fontify-c-style-comment ()
+  :tags '(fontification syntax-table)
   (puppet-test-with-temp-buffer "/*
 class */ bar"
     (should (eq (puppet-test-face-at 1) 'font-lock-comment-face))
@@ -85,6 +89,7 @@ class */ bar"
     (should-not (puppet-test-face-at 13))))
 
 (ert-deftest puppet-font-lock-keywords/regular-expression-literal ()
+  :tags '(fontification font-lock-keywords)
   (puppet-test-with-temp-buffer "$foo =~ / class $foo/ {"
     ;; The opening slash
     (should (eq (puppet-test-face-at 9) 'puppet-regular-expression-literal))
@@ -98,12 +103,14 @@ class */ bar"
     (should-not (puppet-test-face-at 23))))
 
 (ert-deftest puppet-font-lock-keywords/keyword-in-symbol ()
+  :tags '(fontification font-lock-keywords)
   (should-not (puppet-test-face-at 4 "fooclass")))
 
 (ert-deftest puppet-font-lock-keywords/keyword-in-parameter-name ()
   (should-not (puppet-test-face-at 1 "node_foo => bar")))
 
 (ert-deftest puppet-font-lock-keywords/keyword-as-parameter-name ()
+  :tags '(fontification font-lock-keywords)
   ;; We don't highlight parameters in any specific way, so the keyword will get
   ;; highlighted.  The reason is that keywords are keywords in selectors and
   ;; hashes, but variables in resources, and since both statements use the same
@@ -114,6 +121,7 @@ class */ bar"
   (should (eq (puppet-test-face-at 1 "unless => bar") 'font-lock-keyword-face)))
 
 (ert-deftest puppet-font-lock-keywords/simple-variable ()
+  :tags '(fontification font-lock-keywords)
   (puppet-test-with-temp-buffer "$foo = bar"
     (should (eq (puppet-test-face-at 1) 'font-lock-variable-name-face))
     (should (eq (puppet-test-face-at 4) 'font-lock-variable-name-face))
@@ -121,6 +129,7 @@ class */ bar"
     (should-not (puppet-test-face-at 6))))
 
 (ert-deftest puppet-font-lock-keywords/simple-variable-no-space ()
+  :tags '(fontification font-lock-keywords)
   (puppet-test-with-temp-buffer "$foo=bar"
     (should (eq (puppet-test-face-at 1) 'font-lock-variable-name-face))
     (should (eq (puppet-test-face-at 4) 'font-lock-variable-name-face))
@@ -128,6 +137,7 @@ class */ bar"
     (should-not (puppet-test-face-at 5))))
 
 (ert-deftest puppet-font-lock-keywords/variable-with-scope ()
+  :tags '(fontification font-lock-keywords)
   (puppet-test-with-temp-buffer "$foo::bar"
     (should (eq (puppet-test-face-at 1) 'font-lock-variable-name-face))
     (should (eq (puppet-test-face-at 2) 'font-lock-variable-name-face))
@@ -136,12 +146,14 @@ class */ bar"
     (should (eq (puppet-test-face-at 7) 'font-lock-variable-name-face))))
 
 (ert-deftest puppet-font-lock-keywords/variable-in-top-scope ()
+  :tags '(fontification font-lock-keywords)
   (puppet-test-with-temp-buffer "$::foo"
     (should (eq (puppet-test-face-at 1) 'font-lock-variable-name-face))
     (should (eq (puppet-test-face-at 2) 'font-lock-variable-name-face))
     (should (eq (puppet-test-face-at 4) 'font-lock-variable-name-face))))
 
 (ert-deftest puppet-font-lock-keywords/variable-before-colon ()
+  :tags '(fontification font-lock-keywords)
   (puppet-test-with-temp-buffer "package { $::foo:"
     (should (eq (puppet-test-face-at 11) 'font-lock-variable-name-face))
     (should (eq (puppet-test-face-at 12) 'font-lock-variable-name-face))
@@ -150,6 +162,7 @@ class */ bar"
     (should-not (puppet-test-face-at 17))))
 
 (ert-deftest puppet-font-lock-keywords/class ()
+  :tags '(fontification font-lock-keywords)
   (puppet-test-with-temp-buffer "class foo::bar
 {"
     ;; The keyword
@@ -164,6 +177,7 @@ class */ bar"
     (should-not (puppet-test-face-at 16))))
 
 (ert-deftest puppet-font-lock-keywords/define ()
+  :tags '(fontification font-lock-keywords)
   (puppet-test-with-temp-buffer "define foo::bar($foo) {"
     ;; The keyword
     (should (eq (puppet-test-face-at 1) 'font-lock-keyword-face))
@@ -180,6 +194,7 @@ class */ bar"
     (should-not (puppet-test-face-at 21))))
 
 (ert-deftest puppet-font-lock-keywords/node ()
+  :tags '(fontification font-lock-keywords)
   (puppet-test-with-temp-buffer "node puppet.example.com {"
     (should (eq (puppet-test-face-at 1) 'font-lock-keyword-face))
     (should (eq (puppet-test-face-at 6) 'font-lock-type-face))
@@ -188,6 +203,7 @@ class */ bar"
     (should-not (puppet-test-face-at 25))))
 
 (ert-deftest puppet-font-lock-keywords/resource ()
+  :tags '(fontification font-lock-keywords)
   (puppet-test-with-temp-buffer "foo::bar {"
     (should (eq (puppet-test-face-at 1) 'font-lock-type-face))
     (should (eq (puppet-test-face-at 4) 'font-lock-type-face))
@@ -195,6 +211,7 @@ class */ bar"
     (should-not (puppet-test-face-at 10))))
 
 (ert-deftest puppet-font-lock-keywords/resource-default ()
+  :tags '(fontification font-lock-keywords)
   (puppet-test-with-temp-buffer "Foo::Bar {"
     (should (eq (puppet-test-face-at 1) 'font-lock-type-face))
     (should (eq (puppet-test-face-at 4) 'font-lock-type-face))
@@ -202,6 +219,7 @@ class */ bar"
     (should-not (puppet-test-face-at 10))))
 
 (ert-deftest puppet-font-lock-keywords/resource-default-not-capitalized ()
+  :tags '(fontification font-lock-keywords)
   (puppet-test-with-temp-buffer "Foo::bar {"
     (should-not (puppet-test-face-at 1))
     (should-not (puppet-test-face-at 4))
@@ -209,6 +227,7 @@ class */ bar"
     (should-not (puppet-test-face-at 8))))
 
 (ert-deftest puppet-font-lock-keywords/resource-collector ()
+  :tags '(fontification font-lock-keywords)
   (puppet-test-with-temp-buffer "Foo::Bar <|"
     (should (eq (puppet-test-face-at 1) 'font-lock-type-face))
     (should (eq (puppet-test-face-at 4) 'font-lock-type-face))
@@ -216,6 +235,7 @@ class */ bar"
     (should-not (puppet-test-face-at 10))))
 
 (ert-deftest puppet-font-lock-keywords/exported-resource-collector ()
+  :tags '(fontification font-lock-keywords)
   (puppet-test-with-temp-buffer "Foo::Bar <<|"
     (should (eq (puppet-test-face-at 1) 'font-lock-type-face))
     (should (eq (puppet-test-face-at 4) 'font-lock-type-face))
@@ -224,6 +244,7 @@ class */ bar"
     (should-not (puppet-test-face-at 11))))
 
 (ert-deftest puppet-font-lock-keywords/resource-collector-not-capitalized ()
+  :tags '(fontification font-lock-keywords)
   (puppet-test-with-temp-buffer "Foo::bar <<|"
     (should-not (puppet-test-face-at 1))
     (should-not (puppet-test-face-at 4))
@@ -232,30 +253,36 @@ class */ bar"
     (should-not (puppet-test-face-at 11))))
 
 (ert-deftest puppet-font-lock-keywords/negation ()
+  :tags '(fontification font-lock-keywords)
   (should (eq (puppet-test-face-at 1 "!$foo") 'font-lock-negation-char-face)))
 
 (ert-deftest puppet-font-lock-keywords/builtin-metaparameter ()
+  :tags '(fontification font-lock-keywords)
   (puppet-test-with-temp-buffer "alias => foo"
     (should (eq (puppet-test-face-at 1) 'font-lock-builtin-face))
     (should-not (puppet-test-face-at 7))))
 
 (ert-deftest puppet-font-lock-keywords/builtin-metaparameter-no-space ()
+  :tags '(fontification font-lock-keywords)
   (puppet-test-with-temp-buffer "alias=>foo"
     (should (eq (puppet-test-face-at 1) 'font-lock-builtin-face))
     (should-not (puppet-test-face-at 6))))
 
 (ert-deftest puppet-font-lock-keywords/builtin-function ()
+  :tags '(fontification font-lock-keywords)
   (puppet-test-with-temp-buffer "template('foo/bar')"
     (should (eq (puppet-test-face-at 1) 'font-lock-builtin-face))
     (should-not (puppet-test-face-at 9))
     (should (eq (puppet-test-face-at 10) 'font-lock-string-face))))
 
 (ert-deftest puppet-font-lock-keywords/builtin-function-in-parameter-name ()
+  :tags '(fontification font-lock-keywords)
   (puppet-test-with-temp-buffer "require => foo"
     (should (eq (puppet-test-face-at 1) 'font-lock-builtin-face))
     (should-not (puppet-test-face-at 10))))
 
 (ert-deftest puppet-font-lock-keywords/type-argument-to-contain ()
+  :tags '(fontification font-lock-keywords)
   (puppet-test-with-temp-buffer "contain foo::bar"
     (should (eq (puppet-test-face-at 1) 'font-lock-builtin-face))
     (should (eq (puppet-test-face-at 7) 'font-lock-builtin-face))
@@ -265,6 +292,7 @@ class */ bar"
     (should (eq (puppet-test-face-at 16) 'font-lock-type-face))))
 
 (ert-deftest puppet-font-lock-keywords/string-argument-to-contain ()
+  :tags '(fontification font-lock-keywords)
   (puppet-test-with-temp-buffer "contain 'foo::bar'"
     (should (eq (puppet-test-face-at 1) 'font-lock-builtin-face))
     (should (eq (puppet-test-face-at 7) 'font-lock-builtin-face))
@@ -276,6 +304,7 @@ class */ bar"
     (should (eq (puppet-test-face-at 18) 'font-lock-string-face))))
 
 (ert-deftest puppet-font-lock-keywords/type-argument-to-include ()
+  :tags '(fontification font-lock-keywords)
   (puppet-test-with-temp-buffer "include foo::bar"
     (should (eq (puppet-test-face-at 1) 'font-lock-builtin-face))
     (should (eq (puppet-test-face-at 7) 'font-lock-builtin-face))
@@ -285,6 +314,7 @@ class */ bar"
     (should (eq (puppet-test-face-at 16) 'font-lock-type-face))))
 
 (ert-deftest puppet-font-lock-keywords/type-argument-to-require ()
+  :tags '(fontification font-lock-keywords)
   (puppet-test-with-temp-buffer "require foo::bar"
     (should (eq (puppet-test-face-at 1) 'font-lock-builtin-face))
     (should (eq (puppet-test-face-at 7) 'font-lock-builtin-face))
@@ -294,6 +324,7 @@ class */ bar"
     (should (eq (puppet-test-face-at 16) 'font-lock-type-face))))
 
 (ert-deftest puppet-font-lock-keywords/variable-expansion-in-sq-string ()
+  :tags '(fontification font-lock-keywords)
   (puppet-test-with-temp-buffer "'${::foo::bar} yeah'"
     (should (eq (puppet-test-face-at 1) 'font-lock-string-face))
     (should (eq (puppet-test-face-at 2) 'font-lock-warning-face))
@@ -304,6 +335,7 @@ class */ bar"
     (should (eq (puppet-test-face-at 16) 'font-lock-string-face))))
 
 (ert-deftest puppet-font-lock-keywords/variable-expansion-in-dq-string ()
+  :tags '(fontification font-lock-keywords)
   (puppet-test-with-temp-buffer "\"${::foo::bar} yeah\""
     (should (eq (puppet-test-face-at 1) 'font-lock-string-face))
     (should (eq (puppet-test-face-at 2) 'font-lock-variable-name-face))
@@ -314,6 +346,7 @@ class */ bar"
     (should (eq (puppet-test-face-at 16) 'font-lock-string-face))))
 
 (ert-deftest puppet-font-lock-keywords/variable-expansion-in-comment-disabled ()
+  :tags '(fontification font-lock-keywords)
   (let ((puppet-fontify-variables-in-comments nil))
     (puppet-test-with-temp-buffer "# $foo bar"
       (should (eq (puppet-test-face-at 1) 'font-lock-comment-delimiter-face))
@@ -322,6 +355,7 @@ class */ bar"
       (should (eq (puppet-test-face-at 8) 'font-lock-comment-face)))))
 
 (ert-deftest puppet-font-lock-keywords/variable-expansion-in-comment-enabled ()
+  :tags '(fontification font-lock-keywords)
   (let ((puppet-fontify-variables-in-comments t))
     (puppet-test-with-temp-buffer "# $foo bar"
       (should (eq (puppet-test-face-at 1) 'font-lock-comment-delimiter-face))
@@ -330,6 +364,7 @@ class */ bar"
       (should (eq (puppet-test-face-at 8) 'font-lock-comment-face)))))
 
 (ert-deftest puppet-font-lock-keywords/escape-in-dq-string ()
+  :tags '(fontification font-lock-keywords)
   (puppet-test-with-temp-buffer "\"foo\\n\""
     (should (eq (puppet-test-face-at 1) 'font-lock-string-face))
     (should (eq (puppet-test-face-at 5) 'puppet-escape-sequence))
@@ -340,6 +375,7 @@ class */ bar"
 ;;;; Alignment tests
 
 (ert-deftest puppet-align-block/one-block ()
+  :tags '(alignment)
   (puppet-test-with-temp-buffer
       "
 package { 'foo':
@@ -357,6 +393,7 @@ package { 'foo':
 }"))))
 
 (ert-deftest puppet-align-block/stays-within-one-block ()
+  :tags '(alignment)
   (puppet-test-with-temp-buffer
       "
 package { 'foo':
@@ -385,6 +422,7 @@ package { 'bar':
 ;;;; Imenu
 
 (ert-deftest puppet-imenu-create-index/class-with-variable ()
+  :tags '(imenu)
   (puppet-test-with-temp-buffer
       "class hello::world {
   $foo = 'hello'
@@ -404,6 +442,7 @@ package { 'bar':
                                      ("$bar" . 40))))))))
 
 (ert-deftest puppet-imenu-create-index/node-with-resources ()
+  :tags '(imenu)
   (puppet-test-with-temp-buffer
       "node hello-world.example.com {
   Package {
@@ -423,15 +462,17 @@ package { 'bar':
                      ("package 'foo'" . 93))))))
 
 
-;;;; Minor mode definition
+;;;; Major mode definition
 
 (ert-deftest puppet-mode/movement-setup ()
+  :tags '(major-mode)
   (puppet-test-with-temp-buffer "foo"
     (should (local-variable-p 'beginning-of-defun-function))
     (should (equal beginning-of-defun-function
                    #'puppet-beginning-of-defun-function))))
 
 (ert-deftest puppet-mode/indentation-setup ()
+  :tags '(major-mode)
   (puppet-test-with-temp-buffer "foo"
     (should (local-variable-p 'indent-line-function))
     (should (local-variable-p 'indent-tabs-mode))
@@ -439,6 +480,7 @@ package { 'bar':
     (should (eq indent-tabs-mode puppet-indent-tabs-mode))))
 
 (ert-deftest puppet-mode/font-lock-setup ()
+  :tags '(major-mode)
   (puppet-test-with-temp-buffer "foo"
     (should (local-variable-p 'font-lock-defaults))
     (should (local-variable-p 'syntax-propertize-function))
@@ -447,11 +489,13 @@ package { 'bar':
                 #'puppet-syntax-propertize-function))))
 
 (ert-deftest puppet-mode/alignment-setup ()
+  :tags '(major-mode)
   (puppet-test-with-temp-buffer "foo"
     (should (local-variable-p 'align-mode-rules-list))
     (should (equal align-mode-rules-list puppet-mode-align-rules))))
 
 (ert-deftest puppet-mode/imenu-setup ()
+  :tags '(major-mode)
   (puppet-test-with-temp-buffer "foo"
     (should (local-variable-p 'imenu-create-index-function))
     (should (equal imenu-create-index-function #'puppet-imenu-create-index))))
