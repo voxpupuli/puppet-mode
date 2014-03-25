@@ -824,13 +824,19 @@ Used as `syntax-propertize-function' in Puppet Mode."
                   (group "/")
                   (zero-or-more space)
                   (or ":" "=>"))
-       (0 (ignore (puppet-syntax-propertize-match 'puppet-regexp-literal)))
+       ;; We propertize the body of the regexp literal, not its delimiters, to
+       ;; make sure that font lock keywords kick in when the literal gets moved
+       ;; with point on separator.  The separator is propertized by syntactic
+       ;; font lock (since we marked it as string delimiter), so font lock
+       ;; keywords will start in the body of the literal.  If we'd propertize
+       ;; the separator, font lock keywords would miss the property
+       (0 (ignore (puppet-syntax-propertize-match 'puppet-regexp-literal 2)))
        (1 "\"/") (3 "\"/"))
       ((puppet-rx (or "=~" "!~" (symbol "node")) (zero-or-more space)
                   (group "/")
                   (group regexp-literal)
                   (group "/"))
-       (0 (ignore (puppet-syntax-propertize-match 'puppet-regexp-literal)))
+       (0 (ignore (puppet-syntax-propertize-match 'puppet-regexp-literal 2)))
        (1 "\"/") (3 "\"/"))
       ;; Find escape sequences and variable expansions.
       ((puppet-rx dq-escape)
