@@ -831,13 +831,13 @@ Used as `syntax-propertize-function' in Puppet Mode."
        ;; keywords will start in the body of the literal.  If we'd propertize
        ;; the separator, font lock keywords would miss the property
        (0 (ignore (puppet-syntax-propertize-match 'puppet-regexp-literal 2)))
-       (1 "\"/") (3 "\"/"))
+       (1 "|") (3 "|"))
       ((puppet-rx (or "=~" "!~" (symbol "node")) (zero-or-more space)
                   (group "/")
                   (group regexp-literal)
                   (group "/"))
        (0 (ignore (puppet-syntax-propertize-match 'puppet-regexp-literal 2)))
-       (1 "\"/") (3 "\"/"))
+       (1 "|") (3 "|"))
       ;; Find escape sequences and variable expansions.
       ((puppet-rx dq-escape)
        (1 (ignore (puppet-syntax-propertize-match 'puppet-escape))))
