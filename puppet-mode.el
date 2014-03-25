@@ -722,16 +722,19 @@ of the initial include plus puppet-include-indent."
     (puppet-match-invalid-expansion 1 font-lock-warning-face t)
     ;; Escape sequences in strings
     (puppet-match-valid-escape 1 'puppet-escape-sequence t)
-    )
+    ;; Regexp literals
+    (puppet-match-regexp-literal (1 'puppet-regular-expression-literal t)
+                                 (2 'puppet-regular-expression-literal t)
+                                 (3 'puppet-regular-expression-literal t)))
   "Font lock keywords for Puppet Mode.")
 
 (defun puppet-match-property (property context limit)
   "Match a PROPERTY in CONTEXT before LIMIT.
 
 PROPERTY is the text property to look for.  CONTEXT is one of
-`single-quoted', `double-quoted' or `comment', or a list with any
-of these symbols.  The expansion will only match if it is in any
-given CONTEXT."
+`single-quoted', `double-quoted', `comment' or nil, or a list
+with any of these symbols.  The expansion will only match if it
+is in any given CONTEXT.  nil means no specific syntactic context."
   (when (symbolp context)
     (setq context (list context)))
   (let* ((pos (next-single-char-property-change (point) property nil limit)))
@@ -762,6 +765,10 @@ string."
 (defun puppet-match-valid-escape (limit)
   "Match a valid escape sequence before LIMIT."
   (puppet-match-property 'puppet-escape 'double-quoted limit))
+
+(defun puppet-match-regexp-literal (limit)
+  "Match a regular expression literal before LIMIT."
+  (puppet-match-property 'puppet-regexp-literal nil limit))
 
 (defun puppet-syntax-propertize-match (property &optional group)
   "Propertize a match with PROPERTY at GROUP's beginning.
