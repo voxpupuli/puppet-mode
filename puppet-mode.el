@@ -734,7 +734,7 @@ given CONTEXT."
     (when (and pos (> pos (point)))
       (goto-char pos)
       (let* ((value (get-text-property pos property)))
-        (if (memq (car value) context)
+        (if (and value (memq (car value) context))
             (progn (set-match-data (cdr value)) t)
           (puppet-match-property property context limit))))))
 
