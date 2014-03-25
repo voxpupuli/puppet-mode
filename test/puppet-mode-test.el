@@ -41,8 +41,9 @@
            (indent 1))
   `(with-temp-buffer
      (insert ,content)
-     (goto-char (point-min))
      (puppet-mode)
+     (font-lock-fontify-buffer)
+     (goto-char (point-min))
      ,@body))
 
 (defun puppet-test-face-at (pos &optional content)
@@ -52,10 +53,35 @@ If CONTENT is not given, return the face at POS in the current
 buffer."
   (if content
       (puppet-test-with-temp-buffer content
-        (font-lock-fontify-buffer)
         (get-text-property pos 'face))
-    (font-lock-fontify-buffer)
     (get-text-property pos 'face)))
+
+(defconst puppet-test-syntax-classes
+  [whitespace punctuation word symbol open-paren close-paren expression-prefix
+              string-quote paired-delim escape character-quote comment-start
+              comment-end inherit generic-comment generic-string]
+  "Readable symbols for syntax classes.
+
+Each symbol in this vector corresponding to the syntax code of
+its index.")
+
+(defun puppet-test-syntax-at (pos)
+  "Get the syntax at POS.
+
+Get the syntax class symbol at POS, or nil if there is no syntax a
+POS."
+  (let ((code (syntax-class (syntax-after pos))))
+    (aref puppet-test-syntax-classes code)))
+
+
+;;;; Navigation
+
+(ert-deftest puppet-syntax-propertize-function/forward-sexp-moves-across-regexp-literals ()
+  :tags '(navigation syntax-properties)
+  (puppet-test-with-temp-buffer "$foo =~ / (class|node) $foo/ {"
+    (search-forward "=~")               ; Point is before opening / now
+    (forward-sexp)
+    (should (looking-at " {"))))
 
 
 ;;;; Font locking
@@ -88,19 +114,94 @@ class */ bar"
     (should (eq (puppet-test-face-at 11) 'font-lock-comment-face))
     (should-not (puppet-test-face-at 13))))
 
-(ert-deftest puppet-font-lock-keywords/regular-expression-literal ()
+(ert-deftest puppet-syntax-propertize-function/regular-expression-literal-match-op ()
+  :tags '(syntax-table syntax-properties)
+  (puppet-test-with-temp-buffer "$foo =~ / class $foo/ {"
+    (should (eq (puppet-test-syntax-at 9) 'generic-string))
+    (should (eq (puppet-test-syntax-at 21) 'generic-string))))
+
+(ert-deftest puppet-syntax-propertize-function/regular-expression-literal-no-match-op ()
+  :tags '(syntax-table syntax-properties)
+  (puppet-test-with-temp-buffer "$foo !~ / class $foo/ {"
+    (should (eq (puppet-test-syntax-at 9) 'generic-string))
+    (should (eq (puppet-test-syntax-at 21) 'generic-string))))
+
+(ert-deftest puppet-syntax-propertize-function/regular-expression-literal-node ()
+  :tags '(syntax-table syntax-properties)
+  (puppet-test-with-temp-buffer "node / class $foo/ {"
+    (should (eq (puppet-test-syntax-at 6) 'generic-string))
+    (should (eq (puppet-test-syntax-at 6) 'generic-string))))
+
+(ert-deftest puppet-syntax-propertize-function/regular-expression-literal-selector ()
+  :tags '(syntax-table syntax-properties)
+  (puppet-test-with-temp-buffer "/ class $foo/=>"
+    (should (eq (puppet-test-syntax-at 1) 'generic-string))
+    (should (eq (puppet-test-syntax-at 13) 'generic-string))))
+
+(ert-deftest puppet-syntax-propertize-function/regular-expression-case ()
+  :tags '(syntax-table syntax-properties)
+  (puppet-test-with-temp-buffer "/ class $foo/:"
+    (should (eq (puppet-test-syntax-at 1) 'generic-string))
+    (should (eq (puppet-test-syntax-at 13) 'generic-string))))
+
+(ert-deftest puppet-syntax-propertize-function/invalid-regular-expression ()
+  :tags '(syntax-table syntax-properties)
+  (puppet-test-with-temp-buffer "$foo = / class $foo/"
+    (should (eq (puppet-test-syntax-at 8) 'punctuation))
+    (should (eq (puppet-test-syntax-at 20) 'punctuation))))
+
+(ert-deftest puppet-font-lock-keywords/regular-expression-literal-match-op ()
   :tags '(fontification font-lock-keywords)
   (puppet-test-with-temp-buffer "$foo =~ / class $foo/ {"
-    ;; The opening slash
     (should (eq (puppet-test-face-at 9) 'puppet-regular-expression-literal))
-    ;; A keyword inside a regexp literal
     (should (eq (puppet-test-face-at 11) 'puppet-regular-expression-literal))
-    ;; A variable inside a regexp literal
     (should (eq (puppet-test-face-at 17) 'puppet-regular-expression-literal))
-    ;; The closing delimiter
     (should (eq (puppet-test-face-at 21) 'puppet-regular-expression-literal))
-    ;; The subsequent brace
     (should-not (puppet-test-face-at 23))))
+
+(ert-deftest puppet-font-lock-keywords/regular-expression-literal-no-match-op ()
+  :tags '(fontification font-lock-keywords)
+  (puppet-test-with-temp-buffer "$foo !~ / class $foo/ {"
+    (should (eq (puppet-test-face-at 9) 'puppet-regular-expression-literal))
+    (should (eq (puppet-test-face-at 11) 'puppet-regular-expression-literal))
+    (should (eq (puppet-test-face-at 17) 'puppet-regular-expression-literal))
+    (should (eq (puppet-test-face-at 21) 'puppet-regular-expression-literal))
+    (should-not (puppet-test-face-at 23))))
+
+(ert-deftest puppet-font-lock-keywords/regular-expression-literal-node ()
+  :tags '(fontification font-lock-keywords)
+  (puppet-test-with-temp-buffer "node / class $foo/ {"
+    (should (eq (puppet-test-face-at 6) 'puppet-regular-expression-literal))
+    (should (eq (puppet-test-face-at 8) 'puppet-regular-expression-literal))
+    (should (eq (puppet-test-face-at 14) 'puppet-regular-expression-literal))
+    (should (eq (puppet-test-face-at 18) 'puppet-regular-expression-literal))
+    (should-not (puppet-test-face-at 20))))
+
+(ert-deftest puppet-font-lock-keywords/regular-expression-literal-selector ()
+  :tags '(fontification font-lock-keywords)
+  (puppet-test-with-temp-buffer "/ class $foo/=>"
+    (should (eq (puppet-test-face-at 1) 'puppet-regular-expression-literal))
+    (should (eq (puppet-test-face-at 3) 'puppet-regular-expression-literal))
+    (should (eq (puppet-test-face-at 9) 'puppet-regular-expression-literal))
+    (should (eq (puppet-test-face-at 13) 'puppet-regular-expression-literal))
+    (should-not (puppet-test-face-at 14))))
+
+(ert-deftest puppet-font-lock-keywords/regular-expression-case ()
+  :tags '(fontification font-lock-keywords)
+  (puppet-test-with-temp-buffer "/ class $foo/:"
+    (should (eq (puppet-test-face-at 1) 'puppet-regular-expression-literal))
+    (should (eq (puppet-test-face-at 3) 'puppet-regular-expression-literal))
+    (should (eq (puppet-test-face-at 9) 'puppet-regular-expression-literal))
+    (should (eq (puppet-test-face-at 13) 'puppet-regular-expression-literal))
+    (should-not (puppet-test-face-at 14))))
+
+(ert-deftest puppet-font-lock-keywords/invalid-regular-expression ()
+  :tags '(fontification font-lock-keywords)
+  (puppet-test-with-temp-buffer "$foo = / class $foo/"
+    (should-not (puppet-test-face-at 8))
+    (should (eq (puppet-test-face-at 10) 'font-lock-keyword-face))
+    (should (eq (puppet-test-face-at 16) 'font-lock-variable-name-face))
+    (should-not (puppet-test-face-at 20))))
 
 (ert-deftest puppet-font-lock-keywords/keyword-in-symbol ()
   :tags '(fontification font-lock-keywords)
