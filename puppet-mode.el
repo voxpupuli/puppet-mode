@@ -236,6 +236,13 @@ Return nil, if there is no special context at POS, or one of
 
   (defconst puppet-rx-constituents
     `((symbol puppet-rx-symbol 0 nil)
+      ;; http://docs.puppetlabs.com/puppet/3/reference/lang_datatypes.html#regular-expressions
+      (regexp-literal . ,(rx (zero-or-more
+                              (or
+                               ;; Not the end of a regexp
+                               (not (any "/" "\\" "\n"))
+                               ;; Any escaped character
+                               (and "\\" not-newline)))))
       ;; http://docs.puppetlabs.com/puppet/latest/reference/lang_reserved.html#reserved-words
       (keyword . ,(rx (or "and" "case" "class" "default" "define" "else" "elsif"
                           "false" "if" "in" "import" "inherits" "node" "or"
@@ -327,6 +334,9 @@ are available:
 
 `(symbol SEXP …)'
      Match SEXPs inside symbol boundaries only
+
+`regexp-literal'
+     A Puppet regexp literal, *without* surrounding slashes
 
 `keyword'
      Any valid Puppet keyword
