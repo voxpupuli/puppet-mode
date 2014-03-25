@@ -769,18 +769,20 @@ one of nil, `single-quoted', `double-quoted' or `comment' and
 denotes the surrounding context, and MATCH-DATA is the original
 match data from propertization."
   (let* ((beg (match-beginning 1))
-         (context (puppet-syntax-context)))
+         ;; Syntax functions can modify the match data, so we must preserve it
+         (context (save-match-data (puppet-syntax-context))))
     (when context
       (put-text-property beg (1+ beg) property
                          (cons context (match-data))))))
 
 (defun puppet-syntax-propertize-scope-operator (beg end)
   "Mark all scope operators between BEG and END as symbols."
-  (save-excursion
-    (goto-char beg)
-    (while (search-forward "::" end 'no-error)
-      (put-text-property (match-beginning 0) (match-end 0)
-                         'syntax-table (string-to-syntax "_")))))
+  (save-match-data
+    (save-excursion
+      (goto-char beg)
+      (while (search-forward "::" end 'no-error)
+        (put-text-property (match-beginning 0) (match-end 0)
+                           'syntax-table (string-to-syntax "_"))))))
 
 (defun puppet-syntax-propertize-function (start end)
   "Propertize text between START and END.
@@ -808,11 +810,10 @@ Used as `syntax-propertize-function' in Puppet Mode."
                   ;; the symbol at this point.
                   (group "$" (or (and "{" variable-name "}") variable-name)))
        (1 (ignore (progn
+                    (puppet-syntax-propertize-match 'puppet-expansion)
                     ;; Propertize all scope operators in the current variable
-                    (save-match-data
-                      (puppet-syntax-propertize-scope-operator
-                       (match-beginning 0) (match-end 0)))
-                    (puppet-syntax-propertize-match 'puppet-expansion))))))
+                    (puppet-syntax-propertize-scope-operator
+                     (match-beginning 0) (match-end 0)))))))
      start end)))
 
 
