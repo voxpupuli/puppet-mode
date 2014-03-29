@@ -6,6 +6,9 @@ master (in development)
 - Improvements:
 
   - #37: Highlight type arguments to `contain`, `include`, and `require`
+  - #39: Highlight regular expression literals in valid contexts only
+  - #39: `forward-sexp` and friends treat regular expression literals as a
+    single expression now
 
 - Bug fixes:
 
