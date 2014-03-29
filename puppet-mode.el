@@ -236,6 +236,13 @@ Return nil, if there is no special context at POS, or one of
 
   (defconst puppet-rx-constituents
     `((symbol puppet-rx-symbol 0 nil)
+      ;; http://docs.puppetlabs.com/puppet/3/reference/lang_datatypes.html#regular-expressions
+      (regexp-literal . ,(rx (zero-or-more
+                              (or
+                               ;; Not the end of a regexp
+                               (not (any "/" "\\" "\n"))
+                               ;; Any escaped character
+                               (and "\\" not-newline)))))
       ;; http://docs.puppetlabs.com/puppet/latest/reference/lang_reserved.html#reserved-words
       (keyword . ,(rx (or "and" "case" "class" "default" "define" "else" "elsif"
                           "false" "if" "in" "import" "inherits" "node" "or"
@@ -327,6 +334,9 @@ are available:
 
 `(symbol SEXP …)'
      Match SEXPs inside symbol boundaries only
+
+`regexp-literal'
+     A Puppet regexp literal, *without* surrounding slashes
 
 `keyword'
      Any valid Puppet keyword
@@ -661,12 +671,6 @@ of the initial include plus puppet-include-indent."
 
 (defvar puppet-font-lock-keywords
   `(
-    ;; Regular expression literals
-    (,(rx (group "/"
-                  (zero-or-more
-                   (or (not (any "/" "\\" "\n")) ; Not the end of a regexp
-                       (and "\\" not-newline)))  ; Any escaped character
-                  "/")) 1 'puppet-regular-expression-literal)
     ;; Keywords
     (,(puppet-rx (symbol keyword)) 0 font-lock-keyword-face)
     ;; Variables
@@ -718,16 +722,19 @@ of the initial include plus puppet-include-indent."
     (puppet-match-invalid-expansion 1 font-lock-warning-face t)
     ;; Escape sequences in strings
     (puppet-match-valid-escape 1 'puppet-escape-sequence t)
-    )
+    ;; Regexp literals
+    (puppet-match-regexp-literal (1 'puppet-regular-expression-literal t)
+                                 (2 'puppet-regular-expression-literal t)
+                                 (3 'puppet-regular-expression-literal t)))
   "Font lock keywords for Puppet Mode.")
 
 (defun puppet-match-property (property context limit)
   "Match a PROPERTY in CONTEXT before LIMIT.
 
 PROPERTY is the text property to look for.  CONTEXT is one of
-`single-quoted', `double-quoted' or `comment', or a list with any
-of these symbols.  The expansion will only match if it is in any
-given CONTEXT."
+`single-quoted', `double-quoted', `comment' or nil, or a list
+with any of these symbols.  The expansion will only match if it
+is in any given CONTEXT.  nil means no specific syntactic context."
   (when (symbolp context)
     (setq context (list context)))
   (let* ((pos (next-single-char-property-change (point) property nil limit)))
@@ -759,21 +766,26 @@ string."
   "Match a valid escape sequence before LIMIT."
   (puppet-match-property 'puppet-escape 'double-quoted limit))
 
-(defun puppet-syntax-propertize-match (property)
-  "Propertize a match with PROPERTY.
+(defun puppet-match-regexp-literal (limit)
+  "Match a regular expression literal before LIMIT."
+  (puppet-match-property 'puppet-regexp-literal nil limit))
+
+(defun puppet-syntax-propertize-match (property &optional group)
+  "Propertize a match with PROPERTY at GROUP's beginning.
 
 When in a special syntax context, add PROPERTY to the first
-character of the first group of the current `match-data'.  The
-value of PROPERTY is `(CONTEXT . MATCH-DATA)', where CONTEXT is
-one of nil, `single-quoted', `double-quoted' or `comment' and
+character of the given GROUP of the current `match-data'.  GROUP
+defaults to the first group.
+
+The value of PROPERTY is `(CONTEXT . MATCH-DATA)', where CONTEXT
+is one of nil, `single-quoted', `double-quoted' or `comment' and
 denotes the surrounding context, and MATCH-DATA is the original
 match data from propertization."
-  (let* ((beg (match-beginning 1))
+  (let* ((beg (match-beginning (or group 1)))
          ;; Syntax functions can modify the match data, so we must preserve it
          (context (save-match-data (puppet-syntax-context))))
-    (when context
-      (put-text-property beg (1+ beg) property
-                         (cons context (match-data))))))
+    (put-text-property beg (1+ beg) property
+                       (cons context (match-data)))))
 
 (defun puppet-syntax-propertize-scope-operator (beg end)
   "Mark all scope operators between BEG and END as symbols."
@@ -790,7 +802,9 @@ match data from propertization."
 Used as `syntax-propertize-function' in Puppet Mode."
   (let ((case-fold-search nil))
     (goto-char start)
-    (remove-text-properties start end '(puppet-expansion puppet-escape))
+    (remove-text-properties start end '(puppet-expansion
+                                        puppet-escape
+                                        puppet-regexp-literal))
     (funcall
      (syntax-propertize-rules
       ;; Make double colons part of the surrounding symbol.  We can't put the
@@ -799,6 +813,31 @@ Used as `syntax-propertize-function' in Puppet Mode."
       ;; double-colon as part of the symbol to make symbol navigation move
       ;; across it, and to make stuff like `thing-at-point' behave reasonably
       ((rx "::" symbol-start) (0 "_"))
+      ;; Mark regular expression literals in proper contexts (nodes, cases,
+      ;; selectors and match operators) as strings, to make them play nicely
+      ;; with sexp navigation and SMIE.  Also propertize them for use in font
+      ;; lock keywords, since we want to apply our own
+      ;; puppet-regular-expression-literal face instead of the generic string
+      ;; face.
+      ((puppet-rx (group "/")
+                  (group regexp-literal)
+                  (group "/")
+                  (zero-or-more space)
+                  (or ":" "=>"))
+       ;; We propertize the body of the regexp literal, not its delimiters, to
+       ;; make sure that font lock keywords kick in when the literal gets moved
+       ;; with point on separator.  The separator is propertized by syntactic
+       ;; font lock (since we marked it as string delimiter), so font lock
+       ;; keywords will start in the body of the literal.  If we'd propertize
+       ;; the separator, font lock keywords would miss the property
+       (0 (ignore (puppet-syntax-propertize-match 'puppet-regexp-literal 2)))
+       (1 "|") (3 "|"))
+      ((puppet-rx (or "=~" "!~" (symbol "node")) (zero-or-more space)
+                  (group "/")
+                  (group regexp-literal)
+                  (group "/"))
+       (0 (ignore (puppet-syntax-propertize-match 'puppet-regexp-literal 2)))
+       (1 "|") (3 "|"))
       ;; Find escape sequences and variable expansions.
       ((puppet-rx dq-escape)
        (1 (ignore (puppet-syntax-propertize-match 'puppet-escape))))
