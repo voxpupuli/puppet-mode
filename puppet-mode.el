@@ -78,7 +78,7 @@
 ;;; Code:
 
 
-;;;; Compatibility
+;;; Compatibility
 (eval-and-compile
   ;; `defvar-local' for Emacs 24.2 and below
   (unless (fboundp 'defvar-local)
@@ -98,7 +98,7 @@ buffer-local wherever it is set."
       `(set (make-local-variable ',var) ,val))))
 
 
-;;;; Requirements
+;;; Requirements
 (declare-function pkg-info-version-info "pkg-info" (library))
 
 (eval-when-compile
@@ -107,7 +107,7 @@ buffer-local wherever it is set."
 (require 'align)
 
 
-;;;; Customization
+;;; Customization
 (defgroup puppet nil
   "Puppet mastering in Emacs"
   :prefix "puppet-"
@@ -179,7 +179,7 @@ buffer-local wherever it is set."
   :package-version '(puppet-mode . "0.3"))
 
 
-;;;; Version information
+;;; Version information
 (defun puppet-version (&optional show-version)
   "Get the Puppet Mode version as string.
 
@@ -199,7 +199,7 @@ just return nil."
     version))
 
 
-;;;; Utilities
+;;; Utilities
 
 (defun puppet-syntax-context (&optional pos)
   "Determine the syntax context at POS, defaulting to point.
@@ -226,7 +226,7 @@ Return nil, if there is no special context at POS, or one of
   (not (null (puppet-syntax-context pos))))
 
 
-;;;; Specialized rx
+;;; Specialized rx
 
 (eval-when-compile
   (defun puppet-rx-symbol (form)
@@ -376,7 +376,7 @@ are available:
              (rx-to-string (car sexps) t))))))
 
 
-;;;; Checking
+;;; Checking
 
 (defvar-local puppet-last-validate-command nil
   "The last command used for validation.")
@@ -433,7 +433,7 @@ When called interactively, prompt for COMMAND."
   (puppet-run-check-command command "*Puppet Apply: %s*"))
 
 
-;;;; Navigation
+;;; Navigation
 ;; TODO: Check which of these are still needed for SMIE
 
 (defun puppet-beginning-of-defun-function (&optional arg)
@@ -454,7 +454,7 @@ When called interactively, prompt for COMMAND."
       (backward-char))))
 
 
-;;;; Indentation code
+;;; Indentation code
 (defun puppet-block-indent ()
   "If point is in a block, return the indentation of the first line of that
 block (the line containing the opening brace).  Used to set the indentation
@@ -632,7 +632,7 @@ of the initial include plus puppet-include-indent."
         (indent-line-to 0)))))
 
 
-;;;; Font locking
+;;; Font locking
 
 (defvar puppet-mode-syntax-table
   (let ((table (make-syntax-table)))
@@ -856,7 +856,7 @@ Used as `syntax-propertize-function' in Puppet Mode."
      start end)))
 
 
-;;;; Alignment
+;;; Alignment
 
 ;; Configure alignment
 (add-to-list 'align-sq-string-modes 'puppet-mode)
@@ -884,7 +884,7 @@ Used as `syntax-propertize-function' in Puppet Mode."
           (align beg (point)))))))
 
 
-;;;; Imenu
+;;; Imenu
 
 (defun puppet-imenu-collect-entries (pattern)
   "Collect all index entries matching PATTERN.
@@ -956,7 +956,7 @@ for each entry."
       (append index (nreverse resources)))))
 
 
-;;;; Major mode definition
+;;; Major mode definition
 
 (defvar puppet-mode-map
   (let ((map (make-sparse-keymap)))
