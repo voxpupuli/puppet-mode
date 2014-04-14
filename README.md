@@ -1,6 +1,7 @@
 Puppet Mode
 ===========
 
+[![License GPL 3][badge-license]][copying]
 [![travis][badge-travis]][travis]
 
 Puppet Mode lets you edit [Puppet][] 3 manifests with [GNU Emacs][] 24.
@@ -82,6 +83,8 @@ PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 
 See [`COPYING`][copying] for the complete license.
 
+[badge-license]: https://img.shields.io/badge/license-GPL_3-green.svg
+[COPYING]: https://github.com/lunaryorn/puppet-mode/blob/master/COPYING
 [travis]: https://travis-ci.org/lunaryorn/puppet-mode
 [badge-travis]: https://travis-ci.org/lunaryorn/puppet-mode.svg?branch=master
 [Puppet]: http://docs.puppetlabs.com/
@@ -92,4 +95,3 @@ See [`COPYING`][copying] for the complete license.
 [Cask]: http://cask.github.io/
 [Issue tracker]: https://github.com/lunaryorn/puppet-mode/issues
 [Github]: https://github.com/lunaryorn/puppet-mode
-[COPYING]: https://github.com/lunaryorn/puppet-mode/blob/master/COPYING
