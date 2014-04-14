@@ -1,59 +1,50 @@
-=========================
- Contribution guidelines
-=========================
-
-.. default-role:: literal
-
-.. role:: kbd(literal)
+Contribution guidelines
+=======================
 
 If you discover issues, have ideas for improvements or new features, or want to
-contribute a new module, please report them to the `issue tracker`_ of the
+contribute a new module, please report them to the [issue tracker][] of the
 repository or submit a pull request. Please, try to follow these guidelines when
 you do so.
 
-.. _issue tracker: https://github.com/lunaryorn/puppet-mode/issues
-
 Reporting issues
-================
+----------------
 
 - Check that the issue has not already been reported.
 - Check that the issue has not already been fixed in the latest code.
 - Be clear and precise (do not prose, but name functions and commands exactly).
-- Include the version of Puppet Mode, as shown by :kbd:`M-x pupept-version`.
+- Include the version of Puppet Mode, as shown by <kbd>M-x
+  puppet-version</kbd>
 - Open an issue with a clear title and description in grammatically correct,
   complete sentences.
 
 Contributing code
-=================
+-----------------
 
 Contributions of code, either as pull requests or as patches, are *very*
 welcome, but please respect the following guidelines.
 
-General
--------
+### General
 
 - Write good and *complete* code.
 - Provide use cases and rationale for new features.
 
-Code style
-----------
+### Code style
 
 - Generally, use the same coding style and spacing.
 - Do not use tabs for indentation.
 - Add docstrings for every declaration.
 - Make sure your code does not emit byte compiler warnings.
-- Make sure your code does not have docstring issues, with :kbd:`M-x
-  checkdoc-buffer`, or :kbd:`C-c ? d` if `checkdoc-mode` is enabled
+- Make sure your code does not have docstring issues, with <kbd>M-x
+  checkdoc-buffer</kbd>, or <kbd>C-c ? d</kbd> if `checkdoc-mode` is enabled
 
-It's recommended that you use Flycheck_ to avoid byte compiler and checkdoc
+It's recommended that you use [Flycheck][] to avoid byte compiler and checkdoc
 warnings.
-
-.. _Flycheck: http://flycheck.readthedocs.org
 
 Commit messages
 ---------------
 
-Write commit messages according to `Tim Pope's guidelines`_. In short:
+Write commit messages according to [Tim Pope's guidelines][guidelines]. In
+short:
 
 - Start with a capitalized, short (50 characters or less) summary, followed by a
   blank line.
@@ -66,7 +57,7 @@ Write commit messages according to `Tim Pope's guidelines`_. In short:
   You may use ``*emphasis*`` or ``_underline_`` though, following conventions
   established on mailing lists.
 
-This is a model commit message::
+This is a model commit message:
 
     Capitalized, short (50 chars or less) summary
 
@@ -90,7 +81,7 @@ This is a model commit message::
 
     - Use a hanging indent
 
-`Git Commit Mode`_ and Magit_ provide a major mode for Git commit messages,
+[Git Commit Mode][] and [Magit][] provide a major mode for Git commit messages,
 which helps you to comply to these guidelines.
 
 Pull requests
@@ -100,10 +91,12 @@ Pull requests
 - Do **not** open new pull requests, when asked to improve your patch.  Instead,
   amend your commits with `git rebase -i`, and then update the pull request with
   `git push --force`
-- Open a `pull request`_ that relates to but one subject with a clear title and
+- Open a [pull request][] that relates to but one subject with a clear title and
   description in grammatically correct, complete sentences.
 
-.. _Tim Pope's guidelines: http://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html
-.. _Git Commit Mode: https://github.com/magit/git-modes/
-.. _Magit: https://github.com/magit/magit/
-.. _pull request: https://help.github.com/articles/using-pull-requests
+[issue tracker]: https://github.com/lunaryorn/puppet-mode/issues
+[Flycheck]: http://flycheck.readthedocs.org
+[guidelines]: http://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html
+[Git Commit Mode]: https://github.com/magit/git-modes/
+[Magit]: https://github.com/magit/magit/
+[pull request]: https://help.github.com/articles/using-pull-requests

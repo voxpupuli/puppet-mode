@@ -1,4 +1,5 @@
-.. default-role:: literal
+Changes
+=======
 
 master (in development)
 -----------------------
@@ -32,11 +33,12 @@ This version is the first release under new maintenance.
 - New features:
 
   - #13: Imenu support
-  - #13: Jump to classes, defines, variables and resources with `C-c C-j`
-  - Align parameters in a block with `C-c C-a`
-  - #11: Validate, lint and apply Puppet manifests with `C-c C-v`, `C-c C-l` and
-    `C-c C-c`
-  - Move across blocks with `C-M-a` and `C-M-e`
+  - #13: Jump to classes, defines, variables and resources with <kbd>C-c
+    C-j</kbd>
+  - Align parameters in a block with <kbd>C-c C-a</kbd>
+  - #11: Validate, lint and apply Puppet manifests with <kbd>C-c C-v</kbd>,
+    <kbd>C-c C-l</kbd> and <kbd>C-c C-c</kbd>
+  - Move across blocks with <kbd>C-M-a</kbd> and <kbd>C-M-e</kbd>
 
 - Improvements:
 
