@@ -31,7 +31,7 @@ puppet-mode</kbd>.
 
 In your [`Cask`][cask] file:
 
-```cl
+```el
 (source melpa)
 
 (depends-on "puppet-mode")
