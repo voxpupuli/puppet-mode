@@ -397,9 +397,9 @@ are available:
 
 (defun puppet-read-command (prompt previous-command default-command)
   "Read a command from minibuffer with PROMPT."
-  (let* ((remote-prefix (file-remote-p (buffer-file-name)))
-         (filename (or (substring (buffer-file-name) (length remote-prefix))
-                       "")))
+  (let* ((buffer-file-name (or (buffer-file-name) ""))
+         (filename (or (file-remote-p buffer-file-name 'localname)
+                       buffer-file-name)))
     (read-string prompt (or previous-command
                             (concat default-command " "
                                     (shell-quote-argument filename))))))
