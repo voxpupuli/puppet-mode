@@ -9,7 +9,10 @@ master (in development)
   - #37: Highlight type arguments to `contain`, `include`, and `require`
   - #39: Highlight regular expression literals in valid contexts only
   - #39: `forward-sexp` and friends treat regular expression literals as a
-    single expression now
+  single expression now
+  - Automatic interpolation of variables in double quoted strings.
+  - New interactive command `puppet-toggle-string-quotes` bound to <kbd>C-c C-'</kbd>.
+  - New interactive command `puppet-clear-string` bound to <kbd>C-c C-;</kbd>.
 
 - Bug fixes:
 

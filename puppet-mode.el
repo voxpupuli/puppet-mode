@@ -886,6 +886,83 @@ Used as `syntax-propertize-function' in Puppet Mode."
           (align beg (point)))))))
 
 
+;;; Dealing with strings
+(defun puppet-looking-around (back at)
+  "Check if looking backwards at BACK and forward at AT."
+  (and (looking-at-p at) (looking-back back)))
+
+(defun puppet-string-at-point-p ()
+  "Check if cursor is at a string or not."
+  (puppet-string-region))
+
+(defun puppet-string-region ()
+  "Return region for string at point."
+  (let ((orig-point (point)) (regex "'\\(\\(\\\\'\\)\\|[^']\\)*'\\|\"\\(\\(\\\\\"\\)\\|[^\"]\\)*\"") beg end)
+    (save-excursion
+      (goto-char (line-beginning-position))
+      (while (and (re-search-forward regex (line-end-position) t) (not (and beg end)))
+        (let ((match-beg (match-beginning 0)) (match-end (match-end 0)))
+          (when (and
+                 (> orig-point match-beg)
+                 (< orig-point match-end))
+            (setq beg match-beg)
+            (setq end match-end))))
+      (and beg end (list beg end)))))
+
+(defun puppet-interpolate ()
+  "Interpolate with $() in some places."
+  (interactive)
+  (if (and mark-active (equal (point) (region-end)))
+      (exchange-point-and-mark))
+  (insert "$")
+  (when (or
+         (puppet-looking-around "\"[^\"\n]*" "[^\"\n]*\"")
+         (puppet-looking-around "`[^`\n]*"   "[^`\n]*`")
+         (puppet-looking-around "%([^(\n]*"  "[^)\n]*)"))
+    (cond (mark-active
+           (goto-char (region-beginning))
+           (insert "{")
+           (goto-char (region-end))
+           (insert "}"))
+          (t
+           (insert "{}")
+           (forward-char -1)))))
+
+(defun puppet-toggle-string-quotes ()
+  "Toggle string literal quoting between single and double."
+  (interactive)
+  (when (puppet-string-at-point-p)
+    (let* ((region (puppet-string-region))
+           (min (nth 0 region))
+           (max (nth 1 region))
+           (string-quote (puppet--inverse-string-quote (buffer-substring-no-properties min (1+ min))))
+           (content
+            (buffer-substring-no-properties (1+ min) (1- max))))
+      (setq content
+            (if (equal string-quote "\"")
+                (replace-regexp-in-string "\\\\\"" "\"" (replace-regexp-in-string "\\([^\\\\]\\)'" "\\1\\\\'" content))
+              (replace-regexp-in-string "\\\\\'" "'" (replace-regexp-in-string "\\([^\\\\]\\)\"" "\\1\\\\\"" content))))
+      (let ((orig-point (point)))
+        (delete-region min max)
+        (insert
+         (format "%s%s%s" string-quote content string-quote))
+        (goto-char orig-point)))))
+
+(defun puppet--inverse-string-quote (string-quote)
+  "Get the inverse string quoting for STRING-QUOTE."
+  (if (equal string-quote "\"") "'" "\""))
+
+(defun puppet-clear-string ()
+  "Clear string at point."
+  (interactive)
+  (when (puppet-string-at-point-p)
+    (let* ((region (puppet-string-region))
+           (min (nth 0 region))
+           (max (nth 1 region)))
+      (delete-region (+ min 1) (- max 1)))))
+
+
+
 ;;; Imenu
 
 (defun puppet-imenu-collect-entries (pattern)
@@ -964,6 +1041,9 @@ for each entry."
   (let ((map (make-sparse-keymap)))
     ;; Editing
     (define-key map (kbd "C-c C-a") #'puppet-align-block)
+    (define-key map (kbd "C-c C-'") #'puppet-toggle-string-quotes)
+    (define-key map (kbd "C-c C-;") #'puppet-clear-string)
+    (define-key map (kbd "$") #'puppet-interpolate)
     ;; Navigation
     (define-key map (kbd "C-c C-j") #'imenu)
     ;; Apply manifests
@@ -977,6 +1057,10 @@ for each entry."
         :help "Puppet-specific Features"
         ["Align the current block" puppet-align-block
          :help "Align parameters in the current block"]
+        ["Clear string" puppet-clear-string
+         :help "Clear the string at point"]
+        ["Toggle string quotes" puppet-toggle-string-quotes
+         :help "Toggle the string at point quotes between single and double"]
         "-"
         ["Jump to resource/variable" imenu
          :help "Jump to a resource or variable"]

@@ -50,6 +50,8 @@ Key                | Command
 <kbd>C-M-a</kbd>   | Move to the beginning of the current block
 <kbd>C-M-e</kbd>   | Move to the end of the current block
 <kbd>C-c C-a</kbd> | Align parameters in the current block
+<kbd>C-c C-'</kbd> | Toggle string quoting between single and double
+<kbd>C-c C-;</kbd> | Blank the string at point
 <kbd>C-c C-j</kbd> | Jump to a `class`, `define`, variable or resource
 <kbd>C-c C-c</kbd> | Apply the current manifest in dry-run mode
 <kbd>C-c C-v</kbd> | Validate the syntax of the current manifest
