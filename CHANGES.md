@@ -14,10 +14,10 @@ master (in development)
 
 - Improvements:
 
-    - #37: Highlight type arguments to `contain`, `include`, and `require`
-    - #39: Highlight regular expression literals in valid contexts only
-    - #39: `forward-sexp` and friends treat regular expression literals as a
-      single expression now
+    - Highlight type arguments to `contain`, `include`, and `require` [GH-37]
+    - Highlight regular expression literals in valid contexts only [GH-39]
+    - `forward-sexp` and friends treat regular expression literals as a single
+      expression now [GH-39]
 
 - Bug fixes:
 
@@ -25,15 +25,15 @@ master (in development)
     - Fix duplicate and misplaced entries in Imenu
     - Fix order of submenus in Imenu
     - Do not parse node names like type names anymore
-    - #38: Improve thing at point and some small highlighting glitches by moving
-      `:` into symbol syntax
-    - #46: Pass proper local file names to commands that run remotely
-    - #46: Remember the last `apply` command per buffer
+    - Improve thing at point and some small highlighting glitches by moving `:`
+      into symbol syntax [GH-38]
+    - Pass proper local file names to commands that run remotely [GH-46]
+    - Remember the last `apply` command per buffer [GH-46]
 
 - Miscellaneous:
 
     - Drop cl-lib dependency
-    - #34: Add unit tests for fontification, alignment and Imenu
+    - Add unit tests for fontification, alignment and Imenu [GH-34]
 
 0.3 (Mar 13, 2014)
 ------------------
@@ -42,12 +42,12 @@ This version is the first release under new maintenance.
 
 - New features:
 
-    - #13: Imenu support
-    - #13: Jump to classes, defines, variables and resources with <kbd>C-c
-      C-j</kbd>
+    - Imenu support [GH-13]
+    - Jump to classes, defines, variables and resources with <kbd>C-c C-j</kbd>
+      [GH-13]
     - Align parameters in a block with <kbd>C-c C-a</kbd>
-    - #11: Validate, lint and apply Puppet manifests with <kbd>C-c C-v</kbd>,
-      <kbd>C-c C-l</kbd> and <kbd>C-c C-c</kbd>
+    - Validate, lint and apply Puppet manifests with <kbd>C-c C-v</kbd>,
+      <kbd>C-c C-l</kbd> and <kbd>C-c C-c</kbd> [GH-11]
     - Move across blocks with <kbd>C-M-a</kbd> and <kbd>C-M-e</kbd>
 
 - Improvements:
@@ -57,12 +57,12 @@ This version is the first release under new maintenance.
     - Fontify built-in meta-parameters
     - Fontify the negation operater
     - Fontify C style comments correctly
-    - #23: Fontify regular expression literals
-    - #18: Fontify variable expansions in double-quoted strings
-    - #20: Fontify variable expansions in single-quoted strings
+    - Fontify regular expression literals [GH-23]
+    - Fontify variable expansions in double-quoted strings [GH-18]
+    - Fontify variable expansions in single-quoted strings [GH-20]
     - Optionally fontify variable references in comments with
       `puppet-fontify-variables-in-comments`
-    - #25: Fontify special escape sequences in double-quoted strings
+    - Fontify special escape sequences in double-quoted strings [GH-25]
     - Fix the syntax classification of characters to improve the fontification
       and sexp-navigation
 
