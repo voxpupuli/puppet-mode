@@ -384,9 +384,7 @@ are available:
 (defvar-local puppet-last-lint-command nil
   "The last command used for linting.")
 
-;; This variable is intentionally not buffer-local, since you typically only
-;; apply top-level manifests, but not class or type definitions.
-(defvar puppet-last-apply-command nil
+(defvar-local puppet-last-apply-command nil
   "The last command used to apply a manifest.")
 
 (defun puppet-run-check-command (command buffer-name-template)
