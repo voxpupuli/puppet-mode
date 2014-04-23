@@ -907,16 +907,20 @@ Used as `syntax-propertize-function' in Puppet Mode."
             (setq end match-end))))
       (and beg end (list beg end)))))
 
-(defun puppet-interpolate ()
-  "Interpolate with $() in some places."
-  (interactive)
+(defun puppet-interpolate (suppress)
+  "Interpolate with $() in some places.
+
+With a prefix argument SUPPRESS it simply inserts $."
+  (interactive "P")
   (if (and mark-active (equal (point) (region-end)))
       (exchange-point-and-mark))
   (insert "$")
-  (when (or
-         (puppet-looking-around "\"[^\"\n]*" "[^\"\n]*\"")
-         (puppet-looking-around "`[^`\n]*"   "[^`\n]*`")
-         (puppet-looking-around "%([^(\n]*"  "[^)\n]*)"))
+  (when (and
+         (not suppress)
+         (or
+          (puppet-looking-around "\"[^\"\n]*" "[^\"\n]*\"")
+          (puppet-looking-around "`[^`\n]*"   "[^`\n]*`")
+          (puppet-looking-around "%([^(\n]*"  "[^)\n]*)")))
     (cond (mark-active
            (goto-char (region-beginning))
            (insert "{")
