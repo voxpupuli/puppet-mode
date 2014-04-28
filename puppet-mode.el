@@ -908,7 +908,7 @@ Used as `syntax-propertize-function' in Puppet Mode."
       (and beg end (list beg end)))))
 
 (defun puppet-interpolate (suppress)
-  "Interpolate with $() in some places.
+  "Interpolate with ${} in double quoted strings.
 
 With a prefix argument SUPPRESS it simply inserts $."
   (interactive "P")
