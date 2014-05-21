@@ -26,7 +26,7 @@ Features
 Installation
 ------------
 
-From [MELPA][] (recommended) or [Marmalade][] with <kbd>M-x package-install RET
+From [MELPA][] or [MELPA Stable][] with <kbd>M-x package-install RET
 puppet-mode</kbd>.
 
 In your [`Cask`][cask] file:
@@ -93,7 +93,7 @@ See [`COPYING`][copying] for the complete license.
 [GNU Emacs]: https://www.gnu.org/software/emacs/
 [Flycheck]: http://flycheck.readthedocs.org/en/latest/
 [MELPA]: http://melpa.milkbox.net/
-[Marmalade]: http://marmalade-repo.org/
+[MELPA Stable]: http://melpa-stable.milkbox.net/
 [Cask]: http://cask.github.io/
 [Issue tracker]: https://github.com/lunaryorn/puppet-mode/issues
 [Github]: https://github.com/lunaryorn/puppet-mode
