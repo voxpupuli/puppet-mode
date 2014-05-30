@@ -33,7 +33,7 @@
 (require 'ert)
 
 
-;;;; Utilties
+;;;; Utilities
 
 (defmacro puppet-test-with-temp-buffer (content &rest body)
   "Evaluate BODY in a temporary buffer with CONTENTS."
