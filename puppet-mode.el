@@ -1,14 +1,14 @@
 ;;; puppet-mode.el --- Major mode for Puppet manifests  -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2013, 2014  Sebastian Wiesner <lunaryorn@gmail.com>
+;; Copyright (C) 2013, 2014  Sebastian Wiesner <swiesner@lunaryorn.com>
 ;; Copyright (C) 2013, 2014  Bozhidar Batsov <bozhidar@batsov.com>
 ;; Copyright (C) 2011  Puppet Labs Inc
 
 ;; Author: Bozhidar Batsov <bozhidar@batsov.com>
-;;     Sebastian Wiesner <lunaryorn@gmail.com>
+;;     Sebastian Wiesner <swiesner@lunaryorn.com>
 ;;     Russ Allbery <rra@stanford.edu>
 ;; Maintainer: Bozhidar Batsov <bozhidar@batsov.com>
-;;     Sebastian Wiesner <lunaryorn@gmail.com>
+;;     Sebastian Wiesner <swiesner@lunaryorn.com>
 ;; URL: https://github.com/lunaryorn/puppet-mode
 ;; Keywords: languages
 ;; Version: 0.4-cvs
