@@ -783,7 +783,7 @@ denotes the surrounding context, and MATCH-DATA is the original
 match data from propertization."
   (let* ((beg (match-beginning (or group 1)))
          ;; Syntax functions can modify the match data, so we must preserve it
-         (context (save-match-data (puppet-syntax-context))))
+         (context (save-match-data (puppet-syntax-context beg))))
     (put-text-property beg (1+ beg) property
                        (cons context (match-data)))))
 
