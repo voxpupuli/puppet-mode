@@ -218,8 +218,8 @@ Return nil, if there is no special context at POS, or one of
     (if (nth 4 state)
         'comment
       (pcase (nth 3 state)
-        (?\' 'single-quoted)
-        (?\" 'double-quoted)))))
+        (`?\' 'single-quoted)
+        (`?\" 'double-quoted)))))
 
 (defun puppet-in-string-or-comment-p (&optional pos)
   "Determine whether POS is inside a string or comment."
