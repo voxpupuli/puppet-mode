@@ -1082,7 +1082,7 @@ for each entry."
 
 \\{puppet-mode-map}"
   ;; Misc variables
-  (setq-local require-final-newline t)
+  (setq-local require-final-newline mode-require-final-newline)
   ;; Comment setup
   (setq-local comment-start "# ")
   (setq-local comment-start-skip "#+ *")
