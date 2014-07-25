@@ -1081,8 +1081,6 @@ for each entry."
   "Major mode for editing Puppet manifests.
 
 \\{puppet-mode-map}"
-  ;; Misc variables
-  (setq-local require-final-newline t)
   ;; Comment setup
   (setq-local comment-start "# ")
   (setq-local comment-start-skip "#+ *")
