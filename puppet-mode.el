@@ -867,7 +867,8 @@ Used as `syntax-propertize-function' in Puppet Mode."
   '((puppet-resource-arrow
      (regexp . "\\(\\s-*\\)=>\\(\\s-*\\)")
      (group  . (1 2))
-     (modes  . '(puppet-mode))))
+     (modes  . '(puppet-mode))
+     (separate . entire)))
   "Align rules for Puppet Mode.")
 
 (defun puppet-align-block ()
