@@ -283,8 +283,16 @@ Return nil, if there is no special context at POS, or one of
       (builtin-metaparam . ,(rx (or "alias" "audit" "before" "loglevel" "noop"
                                     "notify" "require" "schedule" "stage"
                                     "subscribe" "tag"
+                                    "name" "owner" "group" "mode" "source" "content"
+                                    "path" "command" "refreshonly"
+                                    "enable" "hasrestart" "hasstatus"
+                                    "home" "password" "message" "withpath" "provider"
+                                    "comment" "managehome" "membership"
+                                    "command" "hour" "minute" "weekday" "month"
+                                    "monthday" "recurse" "target"
                                     ;; Because it's so common and important
                                     "ensure")))
+
       ;; http://docs.puppetlabs.com/puppet/latest/reference/lang_reserved.html#classes-and-types
       (resource-name . ,(rx
                          ;; Optional top-level scope
@@ -1108,6 +1116,113 @@ for each entry."
 
 ;;;###autoload
 (add-to-list 'auto-mode-alist '("\\.pp\\'" . puppet-mode))
+
+;; this are only the mostly used puppet code keywords
+;; ( sorted by the order they are used in a puppet class )
+(setq puppet-kwdList
+      '(
+       ;; header
+       "class "
+       "define "
+
+       "include "
+       "inherits "
+
+       ;; types
+       "file { "
+       "package { "
+       "cron { "
+       "exec { "
+       "user { "
+       "sshkey {"
+       "tidy {"
+       ;; "notify {" - conflicts with the option
+       ;;"group { "
+       "service { "
+
+       ;; options
+       "ensure => "
+       "name => "
+       "owner => "
+       "group => "
+       "mode => "
+       "require => "
+       "notify => "
+       "hasrestart => "
+       "hasstatus => "
+       "enable => "
+       "path => "
+       "home => "
+       "password => "
+       "message => "
+       "withpath => "
+       "provider => "
+       "comment => "
+       "managehome => "
+       "membership => "
+       "command => "
+       "hour => "
+       "minute => "
+       "weekday => "
+       "month => "
+       "monthday => "
+       "recurse => "
+       "content => "
+       "target => "
+       "alias => "
+       "audit => "
+       "before => "
+       "loglevel => "
+       "noop => "
+       "notify => "
+       "require => "
+       "schedule => "
+       "stage => "
+       "subscribe => "
+       "tag => "
+
+       ;; values
+       "present,"
+       "absent,"
+       "running,"
+       "stopped,"
+       "installed,"
+       "true,"
+       "false,"
+       "undef,"
+       ))
+
+(global-set-key (kbd "C-q") 'puppet-complete-symbol)
+
+(defun puppet-complete-symbol ()
+  "Perform keyword completion on word before cursor."
+  (interactive)
+  (let ((posEnd (point))
+        (meat (thing-at-point 'symbol))
+        maxMatchResult)
+
+    ;; when nil, set it to empty string, so user can see all lang's keywords.
+    ;; if not done, try-completion on nil result lisp error.
+    (when (not meat) (setq meat ""))
+    (setq maxMatchResult (try-completion meat puppet-kwdList))
+
+    (cond ((eq maxMatchResult t))
+          ((null maxMatchResult)
+           (message "Can't find completion for “%s”" meat)
+           (ding))
+          ((not (string= meat maxMatchResult))
+           (delete-region (- posEnd (length meat)) posEnd)
+           (insert maxMatchResult))
+          (t (message "Making completion list…")
+             (with-output-to-temp-buffer "*Completions*"
+               (display-completion-list
+                (all-completions meat puppet-kwdList)
+                meat))
+             (message "Making completion list…%s" "done")))
+    )
+  )
+
+(define-key global-map (kbd "RET") 'newline-and-indent)
 
 (provide 'puppet-mode)
 
