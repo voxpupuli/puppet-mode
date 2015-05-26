@@ -57,7 +57,7 @@ Key                | Command
 <kbd>C-c C-c</kbd> | Apply the current manifest in dry-run mode
 <kbd>C-c C-v</kbd> | Validate the syntax of the current manifest
 <kbd>C-c C-l</kbd> | Check the current manifest for semantic issues
-<kbd>C-q</kbd> | Complete common puppet expressions
+<kbd>C-M-i or M-TAB</kbd> | Complete common puppet expressions
 
 
 Use `M-x customize-group RET puppet` to customize Puppet Mode.
