@@ -638,15 +638,30 @@ of the initial include plus puppet-include-indent."
 (defvar puppet-smie-verbose nil)
 
 (defun puppet--smie-forward-token ()
-  (smie-default-forward-token))
+  (let ((tok (smie-default-forward-token)))
+    (if (string-equal tok ":")
+        ;; distinguish between "resource { title: param => value }"
+        ;; and "case expr { title: { include klass } }""
+        (save-excursion
+          (forward-comment (point-max))
+          (if (looking-at "{")
+              "case-:"
+            "resource-:"))
+      tok)))
 
 (defun puppet--smie-backward-token ()
-  (smie-default-backward-token))
+  (let ((tok (smie-default-backward-token)))
+    (if (string-equal tok ":")
+        (save-excursion (puppet--smie-forward-token))
+      tok)))
 
 (defconst puppet-smie-grammar
   (smie-prec2->grammar
    (smie-bnf->prec2
-    '((id)))))
+    '((id)
+      ;; minimal grammar to get SMIE ask about (:after resource-:) indentation
+      (resource ("{" id "resource-:" id "}"))
+      ))))
 
 (defun puppet-smie-rules (kind token)
   "Indentation rules for Puppet."
@@ -661,7 +676,12 @@ of the initial include plus puppet-include-indent."
 
   (pcase (cons kind token)
     (`(:elem . basic) puppet-indent-level)
-    (`(:list-intro . ,_) t)))
+    (`(:list-intro . ,_) t)
+    ;; prevent resource title from anchoring the params indentation
+    (`(:after . "resource-:")
+       (smie-indent-backward-token)
+       (smie-indent-backward-token)
+       (smie-rule-parent puppet-indent-level))))
 
 
 ;;; Font locking
