@@ -601,6 +601,81 @@ package { 'bar':
     (should (local-variable-p 'imenu-create-index-function))
     (should (equal imenu-create-index-function #'puppet-imenu-create-index))))
 
+
+;;;; Indentation
+
+(defmacro flycheck-ert-with-temp-buffer (&rest body)
+  "Eval BODY within a temporary buffer.
+Like `with-temp-buffer', but resets the modification state of the
+temporary buffer to make sure that it is properly killed even if
+it has a backing file and is modified."
+  (declare (indent 0))
+  `(with-temp-buffer
+     (unwind-protect
+         ,(macroexp-progn body)
+       ;; Reset modification state of the buffer, and unlink it from its backing
+       ;; file, if any, because Emacs refuses to kill modified buffers with
+       ;; backing files, even if they are temporary.
+       (set-buffer-modified-p nil)
+       (set-visited-file-name nil 'no-query))))
+
+(defmacro flycheck-ert-with-file-buffer (file-name &rest body)
+  "Create a buffer from FILE-NAME and eval BODY.
+BODY is evaluated with `current-buffer' being a buffer with the
+contents FILE-NAME."
+  (declare (indent 1))
+  `(let ((file-name ,file-name))
+     (unless (file-exists-p file-name)
+       (error "%s does not exist" file-name))
+     (flycheck-ert-with-temp-buffer
+       (insert-file-contents file-name 'visit)
+       (set-visited-file-name file-name 'no-query)
+       (cd (file-name-directory file-name))
+       ;; Mark the buffer as not modified, because we just loaded the file up to
+       ;; now.
+       (set-buffer-modified-p nil)
+       ,@body)))
+
+(defmacro puppet-def-indent-test (filename &rest rest)
+  (let ((testname (intern (format "puppet-mode/%s"
+                                  (file-name-base filename))))
+        (failname (format "%s-failed" filename)))
+    `(ert-deftest ,testname ()
+       :tags '(indentation)
+       ,@rest
+       (flycheck-ert-with-file-buffer
+           (expand-file-name ,filename "test")
+         (puppet-mode)
+         (shut-up
+          (indent-region (point-min) (point-max)))
+         (when (buffer-modified-p)
+           ;; showing a diff here would be nice
+           (shut-up
+            (write-region (point-min) (point-max) ,failname))
+           (ert-fail ,filename))
+         ))))
+
+;; (dolist (name (directory-files "test" nil "indent.*\\.pp\\'"))
+;;   (puppet-def-indent-test name))
+
+(puppet-def-indent-test "indent-case.pp")
+(puppet-def-indent-test "indent-define.pp")
+(puppet-def-indent-test "indent-if.pp")
+(puppet-def-indent-test "indent-node.pp")
+(puppet-def-indent-test "indent-resource.pp")
+;; select examples from https://docs.puppetlabs.com/guides/style_guide.html
+(puppet-def-indent-test "indent-style-guide1.pp")
+(puppet-def-indent-test "indent-style-guide2.pp")
+(puppet-def-indent-test "indent-style-guide3.pp")
+(puppet-def-indent-test "indent-style-guide4.pp")
+(puppet-def-indent-test "indent-style-guide5.pp")
+(puppet-def-indent-test "indent-style-guide6.pp")
+;; https://projects.puppetlabs.com/issues/5403
+(puppet-def-indent-test "indent-puppetlabs5403-1.pp")
+(puppet-def-indent-test "indent-puppetlabs5403-2.pp")
+;; https://github.com/relud/puppet-lint-strict_indent-check/blob/master/spec/fixtures/pass/1.pp
+(puppet-def-indent-test "indent-puppet-lint-strict-1.pp")
+
 (provide 'puppet-mode-test)
 
 ;; Local Variables:

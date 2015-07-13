@@ -3,3 +3,6 @@
 
 # Cask directory
 /.cask/
+
+# Indentation test failures
+/test/indent-*.pp-failed
