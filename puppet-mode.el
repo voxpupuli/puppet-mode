@@ -679,9 +679,9 @@ of the initial include plus puppet-include-indent."
     (`(:list-intro . ,_) t)
     ;; prevent resource title from anchoring the params indentation
     (`(:after . "resource-:")
-       (smie-indent-backward-token)
-       (smie-indent-backward-token)
-       (smie-rule-parent puppet-indent-level))))
+     (smie-backward-sexp)          ; skip the title(s)
+     (smie-indent-backward-token)  ; skip the {
+     (smie-rule-parent puppet-indent-level))))
 
 
 ;;; Font locking
