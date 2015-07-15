@@ -677,6 +677,7 @@ of the initial include plus puppet-include-indent."
   (pcase (cons kind token)
     (`(:elem . basic) puppet-indent-level)
     (`(:list-intro . ,_) t)
+    (`(:before . "{") (smie-rule-parent))
     ;; prevent resource title from anchoring the params indentation
     (`(:after . "resource-:")
      (smie-backward-sexp)          ; skip the title(s)
