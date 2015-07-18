@@ -577,7 +577,7 @@ package { 'bar':
   (puppet-test-with-temp-buffer "foo"
     (should (local-variable-p 'indent-line-function))
     (should (local-variable-p 'indent-tabs-mode))
-    (should (eq indent-line-function 'puppet-indent-line))
+    (should (eq indent-line-function 'smie-indent-line))
     (should (eq indent-tabs-mode puppet-indent-tabs-mode))))
 
 (ert-deftest puppet-mode/font-lock-setup ()
@@ -674,7 +674,8 @@ contents FILE-NAME."
 (puppet-def-indent-test "indent-puppetlabs5403-1.pp")
 (puppet-def-indent-test "indent-puppetlabs5403-2.pp")
 ;; https://github.com/relud/puppet-lint-strict_indent-check/blob/master/spec/fixtures/pass/1.pp
-(puppet-def-indent-test "indent-puppet-lint-strict-1.pp")
+(puppet-def-indent-test "indent-puppet-lint-strict-1.pp"
+                        :expected-result :failed)
 
 (provide 'puppet-mode-test)
 

@@ -105,6 +105,7 @@ buffer-local wherever it is set."
   (require 'rx))
 
 (require 'align)
+(require 'smie)
 
 
 ;;; Customization
@@ -632,6 +633,37 @@ of the initial include plus puppet-include-indent."
         (indent-line-to 0)))))
 
 
+;;;; SMIE
+
+(defvar puppet-smie-verbose nil)
+
+(defun puppet--smie-forward-token ()
+  (smie-default-forward-token))
+
+(defun puppet--smie-backward-token ()
+  (smie-default-backward-token))
+
+(defconst puppet-smie-grammar
+  (smie-prec2->grammar
+   (smie-bnf->prec2
+    '((id)))))
+
+(defun puppet-smie-rules (kind token)
+  "Indentation rules for Puppet."
+  (when puppet-smie-verbose
+    (save-excursion
+      (let ((prev (smie-indent-backward-token))
+            (next (smie-indent-forward-token)))
+        (message "kind=%S token=%S prev=%S next=%S parent=%S"
+                 kind token
+                 prev next
+                 (ignore-errors smie--parent)))))
+
+  (pcase (cons kind token)
+    (`(:elem . basic) puppet-indent-level)
+    (`(:list-intro . ,_) t)))
+
+
 ;;; Font locking
 
 (defvar puppet-mode-syntax-table
@@ -1092,7 +1124,9 @@ for each entry."
   ;; Navigation (TODO: Will we still need this with SMIE?)
   (setq-local beginning-of-defun-function #'puppet-beginning-of-defun-function)
   ;; Indentation
-  (setq-local indent-line-function #'puppet-indent-line)
+  (smie-setup puppet-smie-grammar #'puppet-smie-rules
+              :forward-token #'puppet--smie-forward-token
+              :backward-token #'puppet--smie-backward-token)
   (setq indent-tabs-mode puppet-indent-tabs-mode)
   ;; Paragaphs
   (setq-local paragraph-ignore-fill-prefix t)
