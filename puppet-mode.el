@@ -560,31 +560,27 @@ of the initial include plus puppet-include-indent."
               ;; opening bracket.
               (progn
                 (goto-char array-start)
-                (setq cur-indent (current-indentation))
-                )
-            (progn
-              (goto-char array-start)
-              (forward-char 1)
+                (setq cur-indent (current-indentation)))
 
-              ;; If the point is at the end of the line, use normal indentation.
-              ;;
-              ;; For example:
-              ;; exec { 'foo':
-              ;;   creates => [
-              ;;     'foo',
-              ;;     'bar',
-              ;;   ]
-              ;; }
-              ;;
-              (if (eolp)
-                  (progn
-                    (setq cur-indent (+ (current-indentation) puppet-indent-level)))
-                ;; Otherwise, attempt to align as described above.
-                (progn
-                  (re-search-forward "\\S-")
-                  (forward-char -1)
-                  (setq cur-indent (current-column))
-                  ))))))
+            (goto-char array-start)
+            (forward-char 1)
+
+            ;; If the point is at the end of the line, use normal indentation.
+            ;;
+            ;; For example:
+            ;; exec { 'foo':
+            ;;   creates => [
+            ;;     'foo',
+            ;;     'bar',
+            ;;   ]
+            ;; }
+            ;;
+            (if (eolp)
+                (setq cur-indent (+ (current-indentation) puppet-indent-level))
+              ;; Otherwise, attempt to align as described above.
+              (re-search-forward "\\S-")
+              (forward-char -1)
+              (setq cur-indent (current-column))))))
        (include-start
         (setq cur-indent include-start))
        ((and (looking-at "^\\s-*},?\\s-*$") block-indent)
