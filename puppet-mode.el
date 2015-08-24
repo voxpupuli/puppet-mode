@@ -1112,73 +1112,64 @@ for each entry."
   ;; Alignment
   (setq align-mode-rules-list puppet-mode-align-rules)
   ;; IMenu
-  (setq imenu-create-index-function #'puppet-imenu-create-index))
+  (setq imenu-create-index-function #'puppet-imenu-create-index)
+  ;; Syntax completion
+  (add-hook 'completion-at-point-functions
+            #'puppet-complete-symbol nil 'local))
 
 ;;;###autoload
 (add-to-list 'auto-mode-alist '("\\.pp\\'" . puppet-mode))
 
 ;; this are only the mostly used puppet code keywords
 ;; ( sorted by the order they are used in a puppet class )
-(setq puppet-kwdList
+(setq puppet-keyword
       '(
        ;; header
-       "class" "define"
-       "include" "inherits"
+       "class " "define "
+       "include " "inherits "
        ;; types
-       "file" "package"
-       "cron" "exec"
-       "user" "sshkey"
-       "tidy" "notify"
-       "group" "service"
+       "file " "package "
+       "cron " "exec "
+       "user " "sshkey "
+       "tidy " "notify "
+       "group " "service "
        ;; options
-       "ensure" "name" "owner" "group"
-       "mode" "require" "notify" "hasrestart"
-       "hasstatus" "enable" "path" "home"
-       "password" "message" "withpath" "provider"
-       "comment" "managehome" "membership" "command"
-       "hour" "minute" "weekday" "month"
-       "monthday" "recurse" "content" "target"
-       "alias" "audit" "before" "loglevel"
-       "noop" "notify" "require" "schedule"
-       "stage" "subscribe" "tag"
+       "ensure " "name " "owner " "group "
+       "mode " "require " "notify " "hasrestart "
+       "hasstatus " "enable " "path " "home "
+       "password " "message " "withpath " "provider "
+       "comment " "managehome " "membership " "command "
+       "hour " "minute " "weekday " "month "
+       "monthday " "recurse " "content " "target "
+       "alias " "audit " "before " "loglevel "
+       "noop " "notify " "require " "schedule "
+       "stage " "subscribe " "tag "
        ;; values
-       "present" "absent"
-       "running" "stopped"
-       "installed" "true"
-       "false" "undef"
+       "present " "absent "
+       "running " "stopped "
+       "installed " "true "
+       "false " "undef "
        ))
-
-(add-to-list 'completion-at-point-functions 'puppet-complete-symbol)
 
 (defun puppet-complete-symbol ()
   "Perform keyword completion on word before cursor."
   (interactive)
-  (let ((posEnd (point))
-        (meat (thing-at-point 'symbol))
-        maxMatchResult)
+  (let ((meat (thing-at-point 'symbol)))
 
-    ;; when nil, set it to empty string, so user can see all lang's keywords.
+    ;; when nil, set it to empty string
     ;; if not done, try-completion on nil result lisp error.
     (when (not meat) (setq meat ""))
-    (setq maxMatchResult (try-completion meat puppet-kwdList))
+    (setq pos-start (- (point) (length meat)))
+    (setq match-result (try-completion meat puppet-keyword))
+    (setq pos-end (+ pos-start (length match-result)))
 
-    (cond ((eq maxMatchResult t))
-          ((null maxMatchResult)
-           (message "Can't find completion for “%s”" meat)
-           (ding))
-          ((not (string= meat maxMatchResult))
-           (delete-region (- posEnd (length meat)) posEnd)
-           (insert maxMatchResult))
-          (t (message "Making completion list…")
-             (with-output-to-temp-buffer "*Completions*"
-               (display-completion-list
-                (all-completions meat puppet-kwdList)
-                meat))
-             (message "Making completion list…%s" "done")))
-    )
-  )
-
-(define-key global-map (kbd "RET") 'newline-and-indent)
+    ;; if match-result is true return
+    ;; else return nil
+    (cond ((eq match-result t))
+          ((null match-result)
+           nil)
+          ((not (string= meat match-result))
+           (list pos-start pos-end (list match-result) :exclusive 'no)))))
 
 (provide 'puppet-mode)
 
