@@ -588,6 +588,19 @@ of the initial include plus puppet-include-indent."
         ;; comma and we're at the inner block, so we should indent it matching
         ;; the indentation of the opening brace of the block.
         (setq cur-indent block-indent))
+
+       ;; Class argument list ends with a closing paren and needs to be
+       ;; indented to the level of the class token.
+       ((looking-at "^\s+\).*?{\s*$")
+        ;; Find the indentation level of the opening line.
+        (let ((prev-class-indentation nil))
+          (save-excursion
+            (while (not prev-class-indentation)
+              (forward-line -1)
+              (when (looking-at "\s?class\s+.*?\($")
+                (setq prev-class-indentation (current-indentation)))))
+          (setq cur-indent prev-class-indentation))
+        (setq not-indented nil))
        (t
         ;; Otherwise, we did not start on a block-ending-only line.
         (save-excursion
@@ -603,7 +616,7 @@ of the initial include plus puppet-include-indent."
 
              ;; Brace or paren on a line by itself will already be indented to
              ;; the right level, so we can cheat and stop there.
-             ((looking-at "^\\s-*[\)}]\\s-*")
+             ((looking-at "^\\s-*[\)}]\\s-*\s?$")
               (setq cur-indent (current-indentation))
               (setq not-indented nil))
 
