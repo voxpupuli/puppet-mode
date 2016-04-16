@@ -563,6 +563,91 @@ package { 'bar':
                      ("package 'foo'" . 93))))))
 
 
+;;;; Indentation
+
+(ert-deftest puppet-indent-line/class ()
+  (puppet-test-with-temp-buffer
+      "class test (
+$foo = $title,
+  ) {
+$bar = 'hello'
+}"
+    (indent-region (point-min) (point-max))
+    (should (string= (buffer-string)
+                     "class test (
+  $foo = $title,
+) {
+  $bar = 'hello'
+}"
+))))
+
+(ert-deftest puppet-indent-line/class-inherits ()
+  (puppet-test-with-temp-buffer
+      "class test (
+$foo = $title,
+  ) inherits ::something::someting:dark::side {
+$bar = 'hello'
+}"
+    (indent-region (point-min) (point-max))
+    (should (string= (buffer-string)
+                     "class test (
+  $foo = $title,
+) inherits ::something::someting:dark::side {
+  $bar = 'hello'
+}"
+))))
+
+(ert-deftest puppet-indent-line/class-no-parameters ()
+  (puppet-test-with-temp-buffer
+      "class test () {
+$bar = 'hello'
+}"
+    (indent-region (point-min) (point-max))
+    (should (string= (buffer-string)
+                     "class test () {
+  $bar = 'hello'
+}"
+))))
+
+(ert-deftest puppet-indent-line/class-no-parameters-2 ()
+  (puppet-test-with-temp-buffer
+      "class foobar {
+class { 'test':
+omg => 'omg',
+lol => {
+asd => 'asd',
+fgh => 'fgh',
+}
+}
+}
+"
+    (indent-region (point-min) (point-max))
+    (should (string= (buffer-string)
+                     "class foobar {
+  class { 'test':
+    omg => 'omg',
+    lol => {
+      asd => 'asd',
+      fgh => 'fgh',
+    }
+  }
+}
+"
+))))
+
+(ert-deftest puppet-indent-line/class-no-parameters-inherits ()
+  (puppet-test-with-temp-buffer
+      "class test () inherits ::something::someting:dark::side {
+$bar = 'hello'
+}"
+    (indent-region (point-min) (point-max))
+    (should (string= (buffer-string)
+                     "class test () inherits ::something::someting:dark::side {
+  $bar = 'hello'
+}"
+))))
+
+
 ;;;; Major mode definition
 
 (ert-deftest puppet-mode/movement-setup ()
