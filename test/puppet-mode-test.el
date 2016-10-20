@@ -1,12 +1,12 @@
 ;;; puppet-mode-test.el --- Puppet Mode: Unit test suite  -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2013, 2014  Sebastian Wiesner <swiesner@lunaryorn.com>
+;; Copyright (C) 2013-2014, 2016  Sebastian Wiesner <swiesner@lunaryorn.com>
 ;; Copyright (C) 2013, 2014  Bozhidar Batsov <bozhidar@batsov.com>
 
 ;; Author: Sebastian Wiesner <swiesner@lunaryorn.com>
 ;; Maintainer: Bozhidar Batsov <bozhidar@batsov.com>
 ;;     Sebastian Wiesner <swiesner@lunaryorn.com>
-;; URL: https://github.com/lunaryorn/puppet-mode
+;; URL: https://github.com/voxpupuli/puppet-mode
 
 ;; This file is not part of GNU Emacs.
 
@@ -218,7 +218,7 @@ class */ bar"
   ;; arrow-style syntax for key-value pairs, it's impossible to get highlighting
   ;; right without looking at the surrounding syntactic context, which is way
   ;; too much of an effort for too little gain.  See
-  ;; https://github.com/lunaryorn/puppet-mode/issues/36 for details
+  ;; https://github.com/voxpupuli/puppet-mode/issues/36 for details
   (should (eq (puppet-test-face-at 1 "unless => bar") 'font-lock-keyword-face)))
 
 (ert-deftest puppet-font-lock-keywords/simple-variable ()

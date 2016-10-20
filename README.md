@@ -86,14 +86,14 @@ PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 See [`COPYING`][copying] for the complete license.
 
 [badge-license]: https://img.shields.io/badge/license-GPL_3-green.svg
-[COPYING]: https://github.com/lunaryorn/puppet-mode/blob/master/COPYING
-[travis]: https://travis-ci.org/lunaryorn/puppet-mode
-[badge-travis]: https://travis-ci.org/lunaryorn/puppet-mode.svg?branch=master
+[COPYING]: https://github.com/voxpupuli/puppet-mode/blob/master/COPYING
+[travis]: https://travis-ci.org/voxpupuli/puppet-mode
+[badge-travis]: https://travis-ci.org/voxpupuli/puppet-mode.svg?branch=master
 [Puppet]: http://docs.puppetlabs.com/
 [GNU Emacs]: https://www.gnu.org/software/emacs/
 [Flycheck]: http://flycheck.readthedocs.org/en/latest/
 [MELPA]: http://melpa.milkbox.net/
 [MELPA Stable]: http://melpa-stable.milkbox.net/
 [Cask]: http://cask.github.io/
-[Issue tracker]: https://github.com/lunaryorn/puppet-mode/issues
-[Github]: https://github.com/lunaryorn/puppet-mode
+[Issue tracker]: https://github.com/voxpupuli/puppet-mode/issues
+[Github]: https://github.com/voxpupuli/puppet-mode

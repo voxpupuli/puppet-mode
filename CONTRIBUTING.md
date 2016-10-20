@@ -94,7 +94,7 @@ Pull requests
 - Open a [pull request][] that relates to but one subject with a clear title and
   description in grammatically correct, complete sentences.
 
-[issue tracker]: https://github.com/lunaryorn/puppet-mode/issues
+[issue tracker]: https://github.com/voxpupuli/puppet-mode/issues
 [Flycheck]: http://flycheck.readthedocs.org
 [guidelines]: http://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html
 [Git Commit Mode]: https://github.com/magit/git-modes/

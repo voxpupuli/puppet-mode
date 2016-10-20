@@ -1,12 +1,12 @@
 ;;; test-helper.el --- Puppet Mode: Non-interactive unit-test setup  -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2014  Sebastian Wiesner <swiesner@lunaryorn.com>
+;; Copyright (C) 2014, 2016  Sebastian Wiesner <swiesner@lunaryorn.com>
 ;; Copyright (C) 2014  Bozhidar Batsov <bozhidar@batsov.com>
 
 ;; Author: Sebastian Wiesner <swiesner@lunaryorn.com>
 ;; Maintainer: Bozhidar Batsov <bozhidar@batsov.com>
 ;;     Sebastian Wiesner <swiesner@lunaryorn.com>
-;; URL: https://github.com/lunaryorn/puppet-mode
+;; URL: https://github.com/voxpupuli/puppet-mode
 
 ;; This file is not part of GNU Emacs.
 
