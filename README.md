@@ -92,8 +92,8 @@ See [`COPYING`][copying] for the complete license.
 [Puppet]: http://docs.puppetlabs.com/
 [GNU Emacs]: https://www.gnu.org/software/emacs/
 [Flycheck]: http://wwww.flycheck.org
-[MELPA]: http://melpa.milkbox.net/
-[MELPA Stable]: http://melpa-stable.milkbox.net/
+[MELPA]: https://melpa.org/
+[MELPA Stable]: https://stable.melpa.org
 [Cask]: http://cask.github.io/
 [Issue tracker]: https://github.com/voxpupuli/puppet-mode/issues
 [Github]: https://github.com/voxpupuli/puppet-mode
