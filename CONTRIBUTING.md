@@ -95,7 +95,7 @@ Pull requests
   description in grammatically correct, complete sentences.
 
 [issue tracker]: https://github.com/voxpupuli/puppet-mode/issues
-[Flycheck]: http://flycheck.readthedocs.org
+[Flycheck]: http://www.flycheck.org
 [guidelines]: http://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html
 [Git Commit Mode]: https://github.com/magit/git-modes/
 [Magit]: https://github.com/magit/magit/

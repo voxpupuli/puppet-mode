@@ -71,9 +71,9 @@
 ;; with `puppet-lint' on C-c C-l.  Apply the current buffer with `puppet-apply'
 ;; on C-c C-c.
 
-;; Flymake: Flymake support is _not_ provided. See Flycheck at
-;; http://flycheck.readthedocs.org/en/latest/ for on-the-fly validation and
-;; liniting of Puppet manifests.
+;; Syntax checking: Flymake support is _not_ provided.  See Flycheck at
+;; http://www.flycheck.org for on-the-fly validation and liniting of Puppet
+;; manifests.
 
 ;;; Code:
 

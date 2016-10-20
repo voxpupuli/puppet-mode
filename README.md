@@ -91,7 +91,7 @@ See [`COPYING`][copying] for the complete license.
 [badge-travis]: https://travis-ci.org/voxpupuli/puppet-mode.svg?branch=master
 [Puppet]: http://docs.puppetlabs.com/
 [GNU Emacs]: https://www.gnu.org/software/emacs/
-[Flycheck]: http://flycheck.readthedocs.org/en/latest/
+[Flycheck]: http://wwww.flycheck.org
 [MELPA]: http://melpa.milkbox.net/
 [MELPA Stable]: http://melpa-stable.milkbox.net/
 [Cask]: http://cask.github.io/
