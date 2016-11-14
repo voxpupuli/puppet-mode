@@ -519,6 +519,33 @@ package { 'bar':
   install_options => [],
 }"))))
 
+(ert-deftest puppet-align-block/nested-blocks ()
+  :tags '(alignment)
+  :expected-result :failed
+  (puppet-test-with-temp-buffer
+      "
+package { 'foo':
+  ensure => latest,
+  require    => Package['bar'],
+  install_options =>   ['--foo', '--bar'],
+  foo => {
+    bar => 'qux',
+    quxc => 'bar',
+  }
+}"
+    (search-forward "'foo':")
+    (puppet-align-block)
+    (should (string= (buffer-string) "
+package { 'foo':
+  ensure          => latest,
+  require         => Package['bar'],
+  install_options => ['--foo', '--bar'],
+  foo             => {
+    bar  => 'qux',
+    quxc => 'bar',
+  }
+}"))))
+
 
 ;;;; Imenu
 
