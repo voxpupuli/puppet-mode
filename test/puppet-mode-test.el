@@ -546,6 +546,22 @@ package { 'foo':
   }
 }"))))
 
+(ert-deftest puppet-align-block/ignores-commented-out-lines ()
+  :tags '(alignment)
+  (puppet-test-with-temp-buffer
+      "
+package { 'foo':
+  ensure  => latest,
+  # require => Package['bar'],
+}"
+    (search-forward "'foo':")
+    (puppet-align-block)
+    (should (string= (buffer-string) "
+package { 'foo':
+  ensure => latest,
+  # require => Package['bar'],
+}"))))
+
 
 ;;;; Imenu
 

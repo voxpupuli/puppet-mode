@@ -962,6 +962,12 @@ Used as `syntax-propertize-function' in Puppet Mode."
      (separate . entire)))
   "Align rules for Puppet Mode.")
 
+(defconst puppet-mode-align-exclude-rules
+  '((puppet-comment
+     (regexp . "^\\s-*\#\\(.*\\)")
+     (modes . '(puppet-mode))))
+  "Rules for excluding lines from alignment for Puppet Mode.")
+
 (defun puppet-align-block ()
   "Align the current block."
   (interactive)
@@ -1206,6 +1212,7 @@ for each entry."
   (setq-local syntax-propertize-function #'puppet-syntax-propertize-function)
   ;; Alignment
   (setq align-mode-rules-list puppet-mode-align-rules)
+  (setq align-mode-exclude-rules-list puppet-mode-align-exclude-rules)
   ;; IMenu
   (setq imenu-create-index-function #'puppet-imenu-create-index))
 
