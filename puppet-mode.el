@@ -987,7 +987,7 @@ Used as `syntax-propertize-function' in Puppet Mode."
 ;;; Dealing with strings
 (defun puppet-looking-around (back at)
   "Check if looking backwards at BACK and forward at AT."
-  (and (looking-at-p at) (looking-back back)))
+  (and (looking-at-p at) (looking-back back nil)))
 
 (defun puppet-string-at-point-p ()
   "Check if cursor is at a string or not."
