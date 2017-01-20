@@ -105,6 +105,8 @@ buffer-local wherever it is set."
   (require 'rx))
 
 (require 'align)
+(require 'ansi-color)
+(require 'comint)
 
 
 ;;; Customization
