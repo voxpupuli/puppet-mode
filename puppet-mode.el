@@ -342,8 +342,16 @@ Return nil, if there is no special context at POS, or one of
       (builtin-metaparam . ,(rx (or "alias" "audit" "before" "loglevel" "noop"
                                     "notify" "require" "schedule" "stage"
                                     "subscribe" "tag"
+                                    "name" "owner" "group" "mode" "source" "content"
+                                    "path" "command" "refreshonly"
+                                    "enable" "hasrestart" "hasstatus"
+                                    "home" "password" "message" "withpath" "provider"
+                                    "comment" "managehome" "membership"
+                                    "command" "hour" "minute" "weekday" "month"
+                                    "monthday" "recurse" "target"
                                     ;; Because it's so common and important
                                     "ensure")))
+
       ;; http://docs.puppetlabs.com/puppet/latest/reference/lang_reserved.html#classes-and-types
       (resource-name . ,(rx
                          ;; Optional top-level scope
@@ -1216,10 +1224,64 @@ for each entry."
   (setq align-mode-rules-list puppet-mode-align-rules)
   (setq align-mode-exclude-rules-list puppet-mode-align-exclude-rules)
   ;; IMenu
-  (setq imenu-create-index-function #'puppet-imenu-create-index))
+  (setq imenu-create-index-function #'puppet-imenu-create-index)
+  ;; Syntax completion
+  (add-hook 'completion-at-point-functions
+            #'puppet-complete-symbol nil 'local))
 
 ;;;###autoload
 (add-to-list 'auto-mode-alist '("\\.pp\\'" . puppet-mode))
+
+;; this are only the mostly used puppet code keywords
+;; ( sorted by the order they are used in a puppet class )
+(setq puppet-keyword
+      '(
+       ;; header
+       "class " "define "
+       "include " "inherits "
+       ;; types
+       "file " "package "
+       "cron " "exec "
+       "user " "sshkey "
+       "tidy " "notify "
+       "group " "service "
+       ;; options
+       "ensure " "name " "owner " "group "
+       "mode " "require " "notify " "hasrestart "
+       "hasstatus " "enable " "path " "home "
+       "password " "message " "withpath " "provider "
+       "comment " "managehome " "membership " "command "
+       "hour " "minute " "weekday " "month "
+       "monthday " "recurse " "content " "target "
+       "alias " "audit " "before " "loglevel "
+       "noop " "notify " "require " "schedule "
+       "stage " "subscribe " "tag "
+       ;; values
+       "present " "absent "
+       "running " "stopped "
+       "installed " "true "
+       "false " "undef "
+       ))
+
+(defun puppet-complete-symbol ()
+  "Perform keyword completion on word before cursor."
+  (interactive)
+  (let ((meat (thing-at-point 'symbol)))
+
+    ;; when nil, set it to empty string
+    ;; if not done, try-completion on nil result lisp error.
+    (when (not meat) (setq meat ""))
+    (setq pos-start (- (point) (length meat)))
+    (setq match-result (try-completion meat puppet-keyword))
+    (setq pos-end (+ pos-start (length match-result)))
+
+    ;; if match-result is true return
+    ;; else return nil
+    (cond ((eq match-result t))
+          ((null match-result)
+           nil)
+          ((not (string= meat match-result))
+           (list pos-start pos-end (list match-result) :exclusive 'no)))))
 
 (provide 'puppet-mode)
 

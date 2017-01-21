@@ -22,6 +22,7 @@ Features
 3. Tag navigation (aka `imenu`)
 4. Manual validation and linting of manifests (see [Flycheck][] for on-the-fly
    validation and linting)
+5. Syntax completion
 
 Installation
 ------------
