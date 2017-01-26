@@ -690,6 +690,28 @@ $bar = 'hello'
 }"
 ))))
 
+(ert-deftest puppet-indent-line/extra-indent-after-colon ()
+  (puppet-test-with-temp-buffer
+      "
+class foo {
+# no extra indent after this:
+bar {
+'extra indent after this':
+foo => 'bar';
+}
+}"
+    (indent-region (point-min) (point-max))
+    (should (string= (buffer-string)
+      "
+class foo {
+  # no extra indent after this:
+  bar {
+    'extra indent after this':
+      foo => 'bar';
+  }
+}"
+))))
+
 
 ;;;; Major mode definition
 
