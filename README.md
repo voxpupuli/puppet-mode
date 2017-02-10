@@ -22,6 +22,7 @@ Features
 3. Tag navigation (aka `imenu`)
 4. Manual validation and linting of manifests (see [Flycheck][] for on-the-fly
    validation and linting)
+5. Integration with [Puppet Debugger][]
 
 Installation
 ------------
@@ -56,7 +57,15 @@ Key                | Command
 <kbd>C-c C-c</kbd> | Apply the current manifest in dry-run mode
 <kbd>C-c C-v</kbd> | Validate the syntax of the current manifest
 <kbd>C-c C-l</kbd> | Check the current manifest for semantic issues
+<kbd>C-c C-z</kbd> | Launch a puppet-debugger REPL
+<kbd>C-c C-r</kbd> | Send the currently marked region to the REPL
+<kbd>C-c C-b</kbd> | Send the current buffer to the REPL
 
+
+For the integration with puppet-debugger to work, the puppet-debugger gem needs
+to be installed and available in your `$PATH`.
+See [the instructions][puppet debugger install instructions] on
+puppet-debugger's repository on how to install it.
 
 Use `M-x customize-group RET puppet` to customize Puppet Mode.
 
@@ -92,8 +101,10 @@ See [`COPYING`][copying] for the complete license.
 [Puppet]: http://docs.puppetlabs.com/
 [GNU Emacs]: https://www.gnu.org/software/emacs/
 [Flycheck]: http://wwww.flycheck.org
+[Puppet Debugger]: https://github.com/nwops/puppet-debugger
 [MELPA]: https://melpa.org/
 [MELPA Stable]: https://stable.melpa.org
 [Cask]: http://cask.github.io/
+[puppet debugger install instructions]: https://github.com/nwops/puppet-debugger/#installation
 [Issue tracker]: https://github.com/voxpupuli/puppet-mode/issues
 [Github]: https://github.com/voxpupuli/puppet-mode
