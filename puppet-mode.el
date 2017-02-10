@@ -168,7 +168,7 @@ buffer-local wherever it is set."
   :group 'puppet
   :package-version '(puppet-mode . "0.3"))
 
-(defcustom puppet-repl-command "prepl"
+(defcustom puppet-repl-command "pdb"
   "The Puppet REPL command used to interact with code."
   :type 'string
   :group 'puppet
