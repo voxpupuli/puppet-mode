@@ -279,6 +279,7 @@ Return nil, if there is no special context at POS, or one of
     (set-buffer
      (apply 'make-comint "Puppet-REPL"
             puppet-repl-command
+            nil
             puppet-repl-args))
     ;; Workaround for ansi colors
     (add-hook 'comint-preoutput-filter-functions 'puppet-comint-filter nil t))
