@@ -168,7 +168,7 @@ buffer-local wherever it is set."
   :group 'puppet
   :package-version '(puppet-mode . "0.3"))
 
-(defcustom puppet-repl-command "pdb"
+(defcustom puppet-repl-command "puppet debugger"
   "The Puppet REPL command used to interact with code."
   :type 'string
   :group 'puppet
@@ -275,12 +275,19 @@ Return nil, if there is no special context at POS, or one of
   "Launch a Puppet REPL using `puppet-repl-command' as an inferior mode."
   (interactive)
 
+  ;; the command (at least for now) is 'puppet debugger'
+  ;; but really it is 'puppet' with args 'debugger' + puppet-repl-args
+  ;; Even if it changes, we need to not break on multi-word commands
   (unless (comint-check-proc puppet-repl-buffer)
-    (set-buffer
-     (apply 'make-comint "Puppet-REPL"
-            puppet-repl-command
-            nil
-            puppet-repl-args))
+    (let* ((command-list (split-string puppet-repl-command))
+           (real-puppet-repl-command (car command-list))
+           (real-puppet-repl-args (append (cdr command-list)
+                                          puppet-repl-args)))
+      (set-buffer
+       (apply 'make-comint "Puppet-REPL"
+              real-puppet-repl-command
+              nil
+              real-puppet-repl-args)))
     ;; Workaround for ansi colors
     (add-hook 'comint-preoutput-filter-functions 'puppet-comint-filter nil t))
 
