@@ -681,9 +681,10 @@ of the initial include plus puppet-include-indent."
               (if (bobp)
                   (setq not-indented nil)))
 
-             ;; Brace or paren on a line by itself will already be indented to
-             ;; the right level, so we can cheat and stop there.
-             ((looking-at "^\\s-*[\)}]\\s-*\s?$")
+             ;; Brace (possibly followed by a comma) or paren on a
+             ;; line by itself will already be indented to the right
+             ;; level, so we can cheat and stop there.
+             ((looking-at "^\\s-*[\)}],?\\s-*\s?$")
               (setq cur-indent (current-indentation))
               (setq not-indented nil))
 
