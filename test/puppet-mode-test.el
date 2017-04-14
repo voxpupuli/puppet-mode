@@ -712,6 +712,36 @@ class foo {
 }"
 ))))
 
+(ert-deftest puppet-indent-line/nested-hash ()
+  (puppet-test-with-temp-buffer
+      "
+class foo {
+$x = {
+'foo' => {
+'bar' => 1,
+},
+'spam' => {
+'eggs' => 1,
+},
+}
+}
+"
+    (indent-region (point-min) (point-max))
+    (should (string= (buffer-string)
+                     "
+class foo {
+  $x = {
+    'foo' => {
+      'bar' => 1,
+    },
+    'spam' => {
+      'eggs' => 1,
+    },
+  }
+}
+"
+))))
+
 
 ;;;; Major mode definition
 
