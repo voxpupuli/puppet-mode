@@ -658,7 +658,7 @@ of the initial include plus puppet-include-indent."
 
        ;; Class argument list ends with a closing paren and needs to be
        ;; indented to the level of the class token.
-       ((looking-at "^\s+\).*?{\s*$")
+       ((looking-at "^\s*\).*?{\s*$")
         ;; Find the indentation level of the opening line.
         (let ((prev-class-indentation nil))
           (save-excursion

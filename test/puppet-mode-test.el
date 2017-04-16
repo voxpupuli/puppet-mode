@@ -690,6 +690,38 @@ $bar = 'hello'
 }"
 ))))
 
+(ert-deftest puppet-indent-line/class-paramaters-no-inherits ()
+  (puppet-test-with-temp-buffer
+      "
+class foo (
+String $foo,
+) {
+}"
+    (indent-region (point-min) (point-max))
+    (should (string= (buffer-string)
+      "
+class foo (
+  String $foo,
+) {
+}"
+))))
+
+(ert-deftest puppet-indent-line/class-paramaters-inherits ()
+  (puppet-test-with-temp-buffer
+      "
+class foo::bar (
+String $foo,
+) inherits foo {
+}"
+    (indent-region (point-min) (point-max))
+    (should (string= (buffer-string)
+      "
+class foo::bar (
+  String $foo,
+) inherits foo {
+}"
+))))
+
 (ert-deftest puppet-indent-line/extra-indent-after-colon ()
   (puppet-test-with-temp-buffer
       "
