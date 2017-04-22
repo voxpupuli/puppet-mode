@@ -991,14 +991,10 @@ Used as `syntax-propertize-function' in Puppet Mode."
   "Align the current block."
   (interactive)
   (save-excursion
-    (save-match-data
-      (let ((beg (search-backward "{" nil 'no-error)))
-        ;; Skip backwards over strings and comments
-        (while (and beg (puppet-in-string-or-comment-p beg))
-          (setq beg (search-backward "{" nil 'no-error)))
-        (when beg
-          (forward-list)
-          (align beg (point)))))))
+    (backward-up-list)
+    (let ((beg (point)))
+      (forward-list)
+      (align beg (point)))))
 
 
 ;;; Dealing with strings
