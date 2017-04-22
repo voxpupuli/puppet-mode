@@ -978,7 +978,11 @@ Used as `syntax-propertize-function' in Puppet Mode."
   "Align rules for Puppet Mode.")
 
 (defconst puppet-mode-align-exclude-rules
-  '((puppet-comment
+  '((puppet-nested
+     (regexp . "\\s-*=>\\s-*\\({[^}]*}\\)")
+     (modes  . '(puppet-mode))
+     (separate . entire))
+    (puppet-comment
      (regexp . "^\\s-*\#\\(.*\\)")
      (modes . '(puppet-mode))))
   "Rules for excluding lines from alignment for Puppet Mode.")
