@@ -561,6 +561,32 @@ package { 'foo':
   # require => Package['bar'],
 }"))))
 
+(ert-deftest puppet-align-block/skip-previous-nested-block ()
+  :tags '(alignment)
+   (puppet-test-with-temp-buffer
+      "
+class foo {
+  $x = {
+    'a'=>1,
+    'foo'=>{
+      'apples'=>1,
+    },
+    'metafalica'=>1,
+  }
+}"
+    (search-forward "'metafalica'")
+    (puppet-align-block)
+    (should (string= (buffer-string) "
+class foo {
+  $x = {
+    'a'          => 1,
+    'foo'        => {
+      'apples'=>1,
+    },
+    'metafalica' => 1,
+  }
+}"))))
+
 
 ;;;; Imenu
 
