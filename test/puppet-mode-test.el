@@ -519,9 +519,8 @@ package { 'bar':
   install_options => [],
 }"))))
 
-(ert-deftest puppet-align-block/nested-blocks ()
+(ert-deftest puppet-align-block/skip-nested-blocks ()
   :tags '(alignment)
-  :expected-result :failed
   (puppet-test-with-temp-buffer
       "
 package { 'foo':
@@ -541,7 +540,7 @@ package { 'foo':
   require         => Package['bar'],
   install_options => ['--foo', '--bar'],
   foo             => {
-    bar  => 'qux',
+    bar => 'qux',
     quxc => 'bar',
   }
 }"))))
