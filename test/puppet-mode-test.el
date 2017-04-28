@@ -801,6 +801,44 @@ class foo::bar (
 }"
 ))))
 
+(ert-deftest puppet-indent-line/define ()
+  (puppet-test-with-temp-buffer
+      "
+define foo::bar (
+$foo = $title,
+) {
+$bar = 'hello'
+}"
+    (indent-region (point-min) (point-max))
+    (should (string= (buffer-string)
+                     "
+define foo::bar (
+  $foo = $title,
+) {
+  $bar = 'hello'
+}"
+))))
+
+(ert-deftest puppet-indent-line/define-lonely-opening-paren ()
+  (puppet-test-with-temp-buffer
+      "
+define foo::bar
+(
+$foo = $title,
+) {
+$bar = 'hello'
+}"
+    (indent-region (point-min) (point-max))
+    (should (string= (buffer-string)
+                     "
+define foo::bar
+(
+  $foo = $title,
+) {
+  $bar = 'hello'
+}"
+))))
+
 (ert-deftest puppet-indent-line/extra-indent-after-colon ()
   (puppet-test-with-temp-buffer
       "

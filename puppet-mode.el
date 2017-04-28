@@ -664,15 +664,9 @@ of the initial include plus puppet-include-indent."
        ;; Class argument list ends with a closing paren and needs to be
        ;; indented to the level of the class token.
        ((looking-at "^\s*\).*?{\s*$")
-        ;; Find the indentation level of the opening line.
-        (let ((prev-class-indentation nil))
-          (save-excursion
-            (while (not prev-class-indentation)
-              (forward-line -1)
-              (when (looking-at "\s?class\s+.*?\($")
-                (setq prev-class-indentation (current-indentation)))))
-          (setq cur-indent prev-class-indentation))
-        (setq not-indented nil))
+        (save-excursion
+          (goto-char (puppet-in-argument-list))
+          (setq cur-indent (current-indentation))))
        (t
         ;; Otherwise, we did not start on a block-ending-only line.
         (save-excursion
