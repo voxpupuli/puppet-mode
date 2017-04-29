@@ -549,19 +549,13 @@ of the closing brace of a block."
 that array, else return nil."
   (save-excursion
     (save-match-data
-      (let ((opoint (point))
-            (apoint (search-backward "[" nil t)))
-        (when apoint
-          ;; This is a bit of a hack and doesn't allow for strings.  We really
-          ;; want to parse by sexps at some point.
-          (let ((close-brackets (count-matches "]" apoint opoint))
-                (open-brackets 0))
-            (while (and apoint (> close-brackets open-brackets))
-              (setq apoint (search-backward "[" nil t))
-              (when apoint
-                (setq close-brackets (count-matches "]" apoint opoint))
-                (setq open-brackets (1+ open-brackets)))))
-          apoint)))))
+      (condition-case nil
+          (progn
+            (backward-up-list)
+            (if (looking-at "\\[")
+                (point)
+              nil))
+        (scan-error nil)))))
 
 (defun puppet-in-include ()
   "If point is in a continued list of include statements, return the position

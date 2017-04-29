@@ -633,6 +633,33 @@ class foo {
 
 ;;;; Indentation
 
+(ert-deftest puppet-in-array/simple ()
+  (puppet-test-with-temp-buffer
+      "\
+[
+1,
+]"
+    (forward-line 1)
+    (should (= (puppet-in-array) 1))))
+
+(ert-deftest puppet-in-array/nested-before ()
+  (puppet-test-with-temp-buffer
+      "\
+[ [2,],
+1,
+]"
+    (forward-line 1)
+    (should (= (puppet-in-array) 1))))
+
+(ert-deftest puppet-in-array/ignore-comment ()
+  (puppet-test-with-temp-buffer
+      "\
+# [
+1,
+# ]"
+    (forward-line 1)
+    (should (not (puppet-in-array)))))
+
 (ert-deftest puppet-indent-line/class ()
   (puppet-test-with-temp-buffer
       "class test (
