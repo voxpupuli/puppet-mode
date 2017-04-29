@@ -544,15 +544,26 @@ of the closing brace of a block."
               (current-indentation)
             nil))))))
 
+(defun puppet-in-argument-list ()
+  "If point is in an argument list, return the position of the opening '('.
+If point is not in an argument list, return nil."
+  (puppet--in-listlike "("))
+
 (defun puppet-in-array ()
   "If point is in an array, return the position of the opening '[' of
 that array, else return nil."
+  (puppet--in-listlike "\\["))
+
+(defun puppet--in-listlike (openstring)
+  "If point is in a listlike, return the position of the opening character of
+it, else return nil.
+OPENSTRING is a regexp string matching the opening character."
   (save-excursion
     (save-match-data
       (condition-case nil
           (progn
             (backward-up-list)
-            (if (looking-at "\\[")
+            (if (looking-at openstring)
                 (point)
               nil))
         (scan-error nil)))))

@@ -660,6 +660,33 @@ class foo {
     (forward-line 1)
     (should (not (puppet-in-array)))))
 
+(ert-deftest puppet-in-argument-list/simple ()
+  (puppet-test-with-temp-buffer
+      "\
+foo(
+1,
+)"
+    (forward-line 1)
+    (should (= (puppet-in-argument-list) 4))))
+
+(ert-deftest puppet-in-argument-list/nested-before ()
+  (puppet-test-with-temp-buffer
+      "\
+foo(foo(2),
+1,
+)"
+    (forward-line 1)
+    (should (= (puppet-in-argument-list) 4))))
+
+(ert-deftest puppet-in-argument-list/ignore-comment ()
+  (puppet-test-with-temp-buffer
+      "\
+# foo(
+1,
+# )"
+    (forward-line 1)
+    (should (not (puppet-in-argument-list)))))
+
 (ert-deftest puppet-indent-line/class ()
   (puppet-test-with-temp-buffer
       "class test (
