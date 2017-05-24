@@ -959,6 +959,38 @@ class openvpn::config {
 "
 ))))
 
+
+(ert-deftest puppet-indent-line/arrow-after-block ()
+  (puppet-test-with-temp-buffer
+   "
+class foo {
+file { '/tmp/testdir':
+ensure => directory,
+} ->
+file { '/tmp/testdir/somefile1':
+ensure => file,
+} ~>
+file { '/tmp/testdir/somefile2':
+ensure => file,
+}
+}
+"
+   (indent-region (point-min) (point-max))
+   (should (string= (buffer-string)
+                    "
+class foo {
+  file { '/tmp/testdir':
+    ensure => directory,
+  } ->
+  file { '/tmp/testdir/somefile1':
+    ensure => file,
+  } ~>
+  file { '/tmp/testdir/somefile2':
+    ensure => file,
+  }
+}
+"))))
+
 
 ;;;; Major mode definition
 
