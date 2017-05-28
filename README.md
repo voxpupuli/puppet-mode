@@ -80,6 +80,19 @@ Contribute
 - [Issue tracker][]
 - [Github][]
 
+
+### Running tests ###
+
+To run all tests in the `test/puppet-mode-test.el` file, you can use the
+following command:
+
+```sh
+emacs -batch -l ert -l test/test-helper.el -l test/puppet-mode-test.el -f ert-run-tests-batch-and-exit
+```
+
+To run them interactively (within emacs), do `M-x ert RET RET` in the
+`puppet-mode-test.el` buffer.
+
 License
 -------
 
