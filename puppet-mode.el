@@ -1200,6 +1200,10 @@ for each entry."
     map)
   "Key map for Puppet Mode buffers.")
 
+
+;; Emacs versions <24 don't have prog-mode.
+(unless (fboundp 'prog-mode) (defalias 'prog-mode 'fundamental-mode))
+
 ;;;###autoload
 (define-derived-mode puppet-mode prog-mode "Puppet" ()
   "Major mode for editing Puppet manifests.
