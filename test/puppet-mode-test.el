@@ -633,6 +633,60 @@ class foo {
 
 ;;;; Indentation
 
+(ert-deftest puppet-in-array/simple ()
+  (puppet-test-with-temp-buffer
+      "\
+[
+1,
+]"
+    (forward-line 1)
+    (should (= (puppet-in-array) 1))))
+
+(ert-deftest puppet-in-array/nested-before ()
+  (puppet-test-with-temp-buffer
+      "\
+[ [2,],
+1,
+]"
+    (forward-line 1)
+    (should (= (puppet-in-array) 1))))
+
+(ert-deftest puppet-in-array/ignore-comment ()
+  (puppet-test-with-temp-buffer
+      "\
+# [
+1,
+# ]"
+    (forward-line 1)
+    (should (not (puppet-in-array)))))
+
+(ert-deftest puppet-in-argument-list/simple ()
+  (puppet-test-with-temp-buffer
+      "\
+foo(
+1,
+)"
+    (forward-line 1)
+    (should (= (puppet-in-argument-list) 4))))
+
+(ert-deftest puppet-in-argument-list/nested-before ()
+  (puppet-test-with-temp-buffer
+      "\
+foo(foo(2),
+1,
+)"
+    (forward-line 1)
+    (should (= (puppet-in-argument-list) 4))))
+
+(ert-deftest puppet-in-argument-list/ignore-comment ()
+  (puppet-test-with-temp-buffer
+      "\
+# foo(
+1,
+# )"
+    (forward-line 1)
+    (should (not (puppet-in-argument-list)))))
+
 (ert-deftest puppet-indent-line/class ()
   (puppet-test-with-temp-buffer
       "class test (
@@ -744,6 +798,44 @@ String $foo,
 class foo::bar (
   String $foo,
 ) inherits foo {
+}"
+))))
+
+(ert-deftest puppet-indent-line/define ()
+  (puppet-test-with-temp-buffer
+      "
+define foo::bar (
+$foo = $title,
+) {
+$bar = 'hello'
+}"
+    (indent-region (point-min) (point-max))
+    (should (string= (buffer-string)
+                     "
+define foo::bar (
+  $foo = $title,
+) {
+  $bar = 'hello'
+}"
+))))
+
+(ert-deftest puppet-indent-line/define-lonely-opening-paren ()
+  (puppet-test-with-temp-buffer
+      "
+define foo::bar
+(
+$foo = $title,
+) {
+$bar = 'hello'
+}"
+    (indent-region (point-min) (point-max))
+    (should (string= (buffer-string)
+                     "
+define foo::bar
+(
+  $foo = $title,
+) {
+  $bar = 'hello'
 }"
 ))))
 

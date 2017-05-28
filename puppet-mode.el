@@ -544,24 +544,29 @@ of the closing brace of a block."
               (current-indentation)
             nil))))))
 
+(defun puppet-in-argument-list ()
+  "If point is in an argument list, return the position of the opening '('.
+If point is not in an argument list, return nil."
+  (puppet--in-listlike "("))
+
 (defun puppet-in-array ()
   "If point is in an array, return the position of the opening '[' of
 that array, else return nil."
+  (puppet--in-listlike "\\["))
+
+(defun puppet--in-listlike (openstring)
+  "If point is in a listlike, return the position of the opening character of
+it, else return nil.
+OPENSTRING is a regexp string matching the opening character."
   (save-excursion
     (save-match-data
-      (let ((opoint (point))
-            (apoint (search-backward "[" nil t)))
-        (when apoint
-          ;; This is a bit of a hack and doesn't allow for strings.  We really
-          ;; want to parse by sexps at some point.
-          (let ((close-brackets (count-matches "]" apoint opoint))
-                (open-brackets 0))
-            (while (and apoint (> close-brackets open-brackets))
-              (setq apoint (search-backward "[" nil t))
-              (when apoint
-                (setq close-brackets (count-matches "]" apoint opoint))
-                (setq open-brackets (1+ open-brackets)))))
-          apoint)))))
+      (condition-case nil
+          (progn
+            (backward-up-list)
+            (if (looking-at openstring)
+                (point)
+              nil))
+        (scan-error nil)))))
 
 (defun puppet-in-include ()
   "If point is in a continued list of include statements, return the position
@@ -659,15 +664,9 @@ of the initial include plus puppet-include-indent."
        ;; Class argument list ends with a closing paren and needs to be
        ;; indented to the level of the class token.
        ((looking-at "^\s*\).*?{\s*$")
-        ;; Find the indentation level of the opening line.
-        (let ((prev-class-indentation nil))
-          (save-excursion
-            (while (not prev-class-indentation)
-              (forward-line -1)
-              (when (looking-at "\s?class\s+.*?\($")
-                (setq prev-class-indentation (current-indentation)))))
-          (setq cur-indent prev-class-indentation))
-        (setq not-indented nil))
+        (save-excursion
+          (goto-char (puppet-in-argument-list))
+          (setq cur-indent (current-indentation))))
        (t
         ;; Otherwise, we did not start on a block-ending-only line.
         (save-excursion
