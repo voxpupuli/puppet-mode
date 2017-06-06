@@ -891,6 +891,74 @@ class foo {
 "
 ))))
 
+(ert-deftest puppet-indent-line/nested-hash-inside-array ()
+  (puppet-test-with-temp-buffer
+      "
+$shadow_config_settings = [
+{
+section => 'CROS',
+setting => 'dev_server',
+value   => join($dev_server, ','),
+require => Package['foo'],
+},
+]
+"
+    (indent-region (point-min) (point-max))
+    (should (string= (buffer-string)
+                     "
+$shadow_config_settings = [
+  {
+    section => 'CROS',
+    setting => 'dev_server',
+    value   => join($dev_server, ','),
+    require => Package['foo'],
+  },
+]
+"
+))))
+
+(ert-deftest puppet-indent-line/nested-hash-inside-array-inside-hash ()
+  (puppet-test-with-temp-buffer
+      "
+class openvpn::config {
+$defaultRules = [
+{
+'destination' => '192.168.540.162',
+'netmask' => '255.255.255.255',
+'protocol' => 'udp',
+'ports' => '53',
+},
+{
+'destination' => '192.168.540.163',
+'netmask' => '255.255.255.255',
+'protocol' => 'udp',
+'ports' => '53',
+},
+]
+}
+"
+    (indent-region (point-min) (point-max))
+    (should (string= (buffer-string)
+                     "
+class openvpn::config {
+  $defaultRules = [
+    {
+      'destination' => '192.168.540.162',
+      'netmask' => '255.255.255.255',
+      'protocol' => 'udp',
+      'ports' => '53',
+    },
+    {
+      'destination' => '192.168.540.163',
+      'netmask' => '255.255.255.255',
+      'protocol' => 'udp',
+      'ports' => '53',
+    },
+  ]
+}
+"
+))))
+
 
 ;;;; Major mode definition
 
