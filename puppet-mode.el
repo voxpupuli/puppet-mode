@@ -156,7 +156,7 @@ buffer-local wherever it is set."
 (defcustom puppet-lint-command
   (concat
    "puppet-lint --with-context "
-   "--log-format \"%{path}:%{linenumber}: %{kind}: %{message} (%{check})\"")
+   "--log-format \"%{path}:%{line}: %{kind}: %{message} (%{check})\"")
   "Command to lint a Puppet manifest."
   :type 'string
   :group 'puppet
