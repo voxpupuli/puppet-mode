@@ -861,6 +861,36 @@ class foo {
 }"
 ))))
 
+(ert-deftest puppet-indent-line/ignore-block-start-and-end-in-comment ()
+  (puppet-test-with-temp-buffer
+      "
+if $foo {
+if $foo {
+if $foo {
+# {
+# ;
+# }
+# :
+}
+}
+}
+"
+    (indent-region (point-min) (point-max))
+    (should (string= (buffer-string)
+      "
+if $foo {
+  if $foo {
+    if $foo {
+      # {
+      # ;
+      # }
+      # :
+    }
+  }
+}
+"
+))))
+
 (ert-deftest puppet-indent-line/nested-hash ()
   (puppet-test-with-temp-buffer
       "
