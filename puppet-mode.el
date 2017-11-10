@@ -679,15 +679,21 @@ of the initial include plus puppet-include-indent."
              ;; itself will be indented one level too much, but don't catch
              ;; cases where the block is started and closed on the same line.
              ((looking-at "^[^\n\({]*[\)}],?\\s-*$")
-              (setq cur-indent (- (current-indentation) puppet-indent-level))
-              (setq not-indented nil))
+              (end-of-line)
+              (if (not (eq (puppet-syntax-context) 'comment))
+                  (progn (setq cur-indent (- (current-indentation)
+                                             puppet-indent-level))
+                         (setq not-indented nil))))
 
              ;; Indent by one level more than the start of our block.  We lose
              ;; if there is more than one block opened and closed on the same
              ;; line but it's still unbalanced; hopefully people don't do that.
              ((looking-at "^.*{[^\n}]*$")
-              (setq cur-indent (+ (current-indentation) puppet-indent-level))
-              (setq not-indented nil))
+              (end-of-line)
+              (if (not (eq (puppet-syntax-context) 'comment))
+                  (progn (setq cur-indent (+ (current-indentation)
+                                             puppet-indent-level))
+                         (setq not-indented nil))))
 
              ;; Indent by one level if the line ends with an open paren.
              ((looking-at "^.*\(\\s-*$")
@@ -698,17 +704,20 @@ of the initial include plus puppet-include-indent."
              ;; are defined in the same block, but try not to get the case of
              ;; a complete resource on a single line wrong.
              ((looking-at "^\\([^'\":\n]\\|\"[^\n\"]*\"\\|'[^\n']*'\\)*;\\s-*$")
-              (setq cur-indent (- (current-indentation) puppet-indent-level))
-              (setq not-indented nil))
+              (end-of-line)
+              (if (not (eq (puppet-syntax-context) 'comment))
+                  (progn (setq cur-indent (- (current-indentation)
+                                             puppet-indent-level))
+                         (setq not-indented nil))))
 
              ;; Indent an extra level after : since it introduces a resource.
              ;; Unless the : is in a comment
              ((looking-at "^.*:\\s-*$")
               (end-of-line)
-              (if (eq (puppet-syntax-context) 'comment)
-                  (setq cur-indent (current-indentation))
-                (setq cur-indent (+ (current-indentation) puppet-indent-level)))
-              (setq not-indented nil))
+              (if (not (eq (puppet-syntax-context) 'comment))
+                  (progn (setq cur-indent (+ (current-indentation)
+                                             puppet-indent-level))
+                         (setq not-indented nil))))
 
              ;; Start of buffer.
              ((bobp)
