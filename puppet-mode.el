@@ -352,6 +352,24 @@ Return nil, if there is no special context at POS, or one of
                                     "subscribe" "tag"
                                     ;; Because it's so common and important
                                     "ensure")))
+      ;; https://github.com/puppetlabs/puppet-specifications/blob/master/language/types_values_variables.md
+      (data-type . ,(rx (or
+                         ;; Data Types
+                         "Array" "Binary" "Hash"
+                         ;; Scalar Types
+                         "Boolean" "Float" "Integer" "Regexp" "SemVer" "String"
+                         "Timespan" "Timestamp"
+                         ;; Catalog Types
+                         "Class" "Resource"
+                         ;; Abstract Types
+                         "Any" "CatalogEntry" "Collection" "Data" "Enum"
+                         "Iterable" "Iterator" "NotUndef" "Numeric" "Optional"
+                         "Pattern" "RichData" "Scalar" "ScalarData"
+                         "SemVerRange" "Struct" "Tuple" "Variant"
+                         ;; Platform Types:
+                         "Callable" "Default" "Runtime" "Sensitive" "Type"
+                         "Undef"
+                         )))
       ;; http://docs.puppetlabs.com/puppet/latest/reference/lang_reserved.html#classes-and-types
       (resource-name . ,(rx
                          ;; Optional top-level scope
@@ -416,6 +434,9 @@ are available:
 
 `builtin-metaparam'
      Any built-in meta-parameter, and `ensure'
+
+`data-type'
+     Any Puppet data type
 
 `resource-name'
      Any valid resource name, including scopes
@@ -766,6 +787,8 @@ of the initial include plus puppet-include-indent."
   `(
     ;; Keywords
     (,(puppet-rx (symbol keyword)) 0 font-lock-keyword-face)
+    ;; Data Types
+    (,(puppet-rx (symbol data-type)) 0 font-lock-type-face)
     ;; Variables
     (,(puppet-rx "$" (symbol variable-name)) 0 font-lock-variable-name-face)
     ;; Class and type declarations
