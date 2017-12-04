@@ -801,6 +801,35 @@ class foo::bar (
 }"
 ))))
 
+(ert-deftest puppet-indent-line/comments-change-indentation-level ()
+  :expected-result :failed
+  (puppet-test-with-temp-buffer
+      "
+if $foo {
+# {
+# (
+# :
+# ;
+# }
+# )
+#
+}
+"
+    (indent-region (point-min) (point-max))
+    (should (string= (buffer-string)
+      "
+if $foo {
+  # {
+  # (
+  # :
+  # ;
+  # }
+  # )
+  #
+}
+"
+))))
+
 (ert-deftest puppet-indent-line/define ()
   (puppet-test-with-temp-buffer
       "
