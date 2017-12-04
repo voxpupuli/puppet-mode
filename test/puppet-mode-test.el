@@ -802,7 +802,6 @@ class foo::bar (
 ))))
 
 (ert-deftest puppet-indent-line/comments-change-indentation-level ()
-  :expected-result :failed
   (puppet-test-with-temp-buffer
       "
 if $foo {

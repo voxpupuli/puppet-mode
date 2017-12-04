@@ -664,7 +664,9 @@ of the initial include plus puppet-include-indent."
             (cond
              ;; Comment lines are ignored unless we're at the start of the
              ;; buffer.
-             ((eq (puppet-syntax-context) 'comment)
+             ((or (eq (puppet-syntax-context) 'comment)
+                  (save-excursion (end-of-line)
+                                  (eq (puppet-syntax-context) 'comment)))
               (if (bobp)
                   (setq not-indented nil)))
 
