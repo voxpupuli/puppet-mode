@@ -73,6 +73,17 @@ POS."
   (let ((code (syntax-class (syntax-after pos))))
     (aref puppet-test-syntax-classes code)))
 
+(defun puppet-test-indent (code)
+  "Test indentation of Puppet code.
+
+The code argument is a string that should contain correctly
+indented Puppet code. The code is indented using indent-region
+and the test succeeds if the result did not change"
+  (puppet-test-with-temp-buffer code
+                                (indent-region (point-min) (point-max))
+                                (should (string= (buffer-string)
+                                                 code))))
+
 
 ;;;; Navigation
 
