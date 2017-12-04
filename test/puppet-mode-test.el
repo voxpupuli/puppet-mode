@@ -876,6 +876,46 @@ class foo::bar (
 }"
 ))))
 
+(ert-deftest puppet-indent-line/class-parameter-list ()
+  (puppet-test-indent "
+class foo::bar1 ($a, $b,
+                 $c, $d,
+) {
+  $foo = $bar
+}
+
+class foo::bar2 ($a, $b,
+                 $c, $d)
+{
+  $foo = $bar
+}
+
+class foo::bar3 ($a, $b,
+                 $c, $d,
+)
+{
+  $foo = $bar
+}
+
+class foo::bar4 ($a, $b)
+{
+  $foo = $bar
+}
+
+class foo::bar5 ($a, $b) {
+  $foo = $bar
+}
+"))
+
+(ert-deftest puppet-indent-line/class-parameter-list-fail ()
+  :expected-result :failed
+  (puppet-test-indent "
+class foo::bar ($a, $b,
+                $c, $d) {
+  $foo = $bar
+}
+"))
+
 (ert-deftest puppet-indent-line/comments-change-indentation-level ()
   (puppet-test-with-temp-buffer
       "
