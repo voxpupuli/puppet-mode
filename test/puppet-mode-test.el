@@ -698,6 +698,34 @@ foo(foo(2),
     (forward-line 1)
     (should (not (puppet-in-argument-list)))))
 
+(ert-deftest puppet-indent-line/array ()
+  (puppet-test-indent "
+class foo {
+  $foo = [
+    $bar,
+  ]
+  $foo = [
+    $bar]
+  $foo = [$bar,
+          $bar,
+         ]
+  $foo = [$bar,
+          $bar]
+  foo { 'foo':
+    bar => [
+      $bar,
+      $bar,
+    ],
+    bar => [$bar,
+            $bar,
+           ],
+    bar => [$bar,
+            $bar],
+    bar => $bar;
+  }
+}
+"))
+
 (ert-deftest puppet-indent-line/class ()
   (puppet-test-with-temp-buffer
       "class test (
