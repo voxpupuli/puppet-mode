@@ -704,12 +704,8 @@ of the initial include plus puppet-include-indent."
               (setq not-indented nil))
 
              ;; Indent an extra level after : since it introduces a resource.
-             ;; Unless the : is in a comment
              ((looking-at "^.*:\\s-*$")
-              (end-of-line)
-              (if (eq (puppet-syntax-context) 'comment)
-                  (setq cur-indent (current-indentation))
-                (setq cur-indent (+ (current-indentation) puppet-indent-level)))
+              (setq cur-indent (+ (current-indentation) puppet-indent-level))
               (setq not-indented nil))
 
              ;; Start of buffer.
