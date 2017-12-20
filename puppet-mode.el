@@ -311,21 +311,27 @@ Return nil, if there is no special context at POS, or one of
                                ;; Any escaped character
                                (and "\\" not-newline)))))
       ;; http://docs.puppetlabs.com/puppet/latest/reference/lang_reserved.html#reserved-words
-      (keyword . ,(rx (or "and" "case" "class" "default" "define" "else" "elsif"
-                          "false" "if" "in" "import" "inherits" "node" "or"
-                          "true" "undef" "unless")))
+      (keyword . ,(rx (or "and" "application" "attr" "case" "class" "consumes"
+                          "default" "define" "else" "elsif" "environment"
+                          "false" "function" "if" "import" "in" "inherits"
+                          "node" "or" "private" "produces" "site" "true"
+                          "type" "undef" "unless")))
       ;; http://docs.puppetlabs.com/references/latest/function.html
-      (builtin-function . ,(rx (or "alert" "collect" "contain"
-                                   "create_resources" "crit" "debug" "defined"
-                                   "each" "emerg" "err" "extlookup" "fail"
-                                   "file" "filter" "fqdn_rand" "generate"
-                                   "hiera" "hiera_array" "hiera_hash"
-                                   "hiera_include" "include" "info"
-                                   "inline_template" "lookup" "map" "md5"
-                                   "notice" "realize" "reduce" "regsubst"
-                                   "require" "search" "select" "sha1"
-                                   "shellquote" "slice" "split" "sprintf" "tag"
-                                   "tagged" "template" "versioncmp" "warning")))
+      (builtin-function . ,(rx (or "alert" "assert_type" "binary_file" "break"
+                                   "contain" "create_resources" "crit" "debug"
+                                   "defined" "dig" "digest" "each" "emerg"
+                                   "epp" "err" "fail" "file" "filter"
+                                   "find_file" "fqdn_rand" "generate" "hiera"
+                                   "hiera_array" "hiera_hash" "hiera_include"
+                                   "include" "info" "inline_epp"
+                                   "inline_template" "lest" "lookup" "map"
+                                   "match" "md5" "new" "next" "notice"
+                                   "realize" "reduce" "regsubst" "require"
+                                   "return" "reverse_each" "scanf" "sha1"
+                                   "shellquote" "slice" "split" "sprintf"
+                                   "step" "strftime" "tag" "tagged" "template"
+                                   "then" "type" "versioncmp" "warning" "with"
+                                   )))
       ;; http://docs.puppetlabs.com/references/latest/type.html
       (builtin-type . ,(rx (or "augeas" "computer" "cron" "exec" "file"
                                "filebucket" "group" "host" "interface" "k5login"
@@ -347,9 +353,9 @@ Return nil, if there is no special context at POS, or one of
       ;; it got a mention in the docs, see
       ;; http://docs.puppetlabs.com/puppet/latest/reference/lang_resources.html#ensure,
       ;; so we'll consider it as metaparameter anyway
-      (builtin-metaparam . ,(rx (or "alias" "audit" "before" "loglevel" "noop"
-                                    "notify" "require" "schedule" "stage"
-                                    "subscribe" "tag"
+      (builtin-metaparam . ,(rx (or "alias" "audit" "before" "consume" "export"
+                                    "loglevel" "noop" "notify" "require"
+                                    "schedule" "stage" "subscribe" "tag"
                                     ;; Because it's so common and important
                                     "ensure")))
       ;; http://docs.puppetlabs.com/puppet/latest/reference/lang_reserved.html#classes-and-types
