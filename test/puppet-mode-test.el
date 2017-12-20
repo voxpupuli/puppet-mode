@@ -861,6 +861,86 @@ class foo {
 }"
 ))))
 
+(ert-deftest puppet-indent-line/if ()
+  (puppet-test-with-temp-buffer
+      "
+class foo {
+if $foo {
+$foo = 'bar'
+}
+}
+"
+    (indent-region (point-min) (point-max))
+    (should (string= (buffer-string)
+      "
+class foo {
+  if $foo {
+    $foo = 'bar'
+  }
+}
+"
+))))
+
+(ert-deftest puppet-indent-line/if-elsif-else ()
+  (puppet-test-with-temp-buffer
+      "
+class foo {
+if $foo == 'foo' {
+$bar = 'foo1'
+}
+elsif $foo == 'bar' {
+$bar = 'foo2'
+}
+else {
+$bar = 'foo3'
+}
+}
+"
+    (indent-region (point-min) (point-max))
+    (should (string= (buffer-string)
+      "
+class foo {
+  if $foo == 'foo' {
+    $bar = 'foo1'
+  }
+  elsif $foo == 'bar' {
+    $bar = 'foo2'
+  }
+  else {
+    $bar = 'foo3'
+  }
+}
+"
+))))
+
+(ert-deftest puppet-indent-line/if-statement-with-no-newline-after-closing-braces ()
+  (puppet-test-with-temp-buffer
+      "
+class foo {
+if $foo == 'foo' {
+$bar = 'foo1'
+} elsif $foo == 'bar' {
+$bar = 'foo2'
+} else {
+$bar = 'foo3'
+}
+}
+"
+    (indent-region (point-min) (point-max))
+    (should (string= (buffer-string)
+      "
+class foo {
+  if $foo == 'foo' {
+    $bar = 'foo1'
+  } elsif $foo == 'bar' {
+    $bar = 'foo2'
+  } else {
+    $bar = 'foo3'
+  }
+}
+"
+))))
+
 (ert-deftest puppet-indent-line/nested-hash ()
   (puppet-test-with-temp-buffer
       "

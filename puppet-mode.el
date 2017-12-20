@@ -643,10 +643,11 @@ of the initial include plus puppet-include-indent."
               (setq cur-indent (current-column))))))
        (include-start
         (setq cur-indent include-start))
-       ((and (looking-at "^\\s-*}\\(,\\|\\s-*[-~]>\\)?\\s-*$") block-indent)
-        ;; This line contains a closing brace or a closing brace followed by a
-        ;; comma and we're at the inner block, so we should indent it matching
-        ;; the indentation of the opening brace of the block.
+
+       ((and (looking-at "^\\s-*}.*$") block-indent)
+        ;; This line contains a closing brace and we're at the inner
+        ;; block, so we should indent it matching the indentation of
+        ;; the opening brace of the block.
         (setq cur-indent block-indent))
 
        ;; Class argument list ends with a closing paren and needs to be
