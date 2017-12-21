@@ -73,6 +73,17 @@ POS."
   (let ((code (syntax-class (syntax-after pos))))
     (aref puppet-test-syntax-classes code)))
 
+(defun puppet-test-indent (code)
+  "Test indentation of Puppet code.
+
+The code argument is a string that should contain correctly
+indented Puppet code. The code is indented using indent-region
+and the test succeeds if the result did not change"
+  (puppet-test-with-temp-buffer code
+                                (indent-region (point-min) (point-max))
+                                (should (string= (buffer-string)
+                                                 code))))
+
 
 ;;;; Navigation
 
@@ -687,6 +698,70 @@ foo(foo(2),
     (forward-line 1)
     (should (not (puppet-in-argument-list)))))
 
+(ert-deftest puppet-indent-line/argument-list ()
+  (puppet-test-indent "
+class foo {
+  $foo = bar(1,2)
+  $foo = bar(
+    1,
+    2
+  )
+  $foo = bar(
+    1,
+    2)
+  $foo = bar(1,
+             2
+            )
+  $foo = bar(1,
+             2)
+
+  foo { 'foo':
+    foo => bar(1,2),
+    foo => bar(
+      1,
+      2,
+    ),
+    foo => bar(
+      1,
+      2),
+    foo => bar(1,
+               2,
+              ),
+    foo => bar(1,
+               2),
+    foo => 0;
+  }
+}
+"))
+
+(ert-deftest puppet-indent-line/array ()
+  (puppet-test-indent "
+class foo {
+  $foo = [
+    $bar,
+  ]
+  $foo = [
+    $bar]
+  $foo = [$bar,
+          $bar,
+         ]
+  $foo = [$bar,
+          $bar]
+  foo { 'foo':
+    bar => [
+      $bar,
+      $bar,
+    ],
+    bar => [$bar,
+            $bar,
+           ],
+    bar => [$bar,
+            $bar],
+    bar => $bar;
+  }
+}
+"))
+
 (ert-deftest puppet-indent-line/class ()
   (puppet-test-with-temp-buffer
       "class test (
@@ -800,6 +875,46 @@ class foo::bar (
 ) inherits foo {
 }"
 ))))
+
+(ert-deftest puppet-indent-line/class-parameter-list ()
+  (puppet-test-indent "
+class foo::bar1 ($a, $b,
+                 $c, $d,
+) {
+  $foo = $bar
+}
+
+class foo::bar2 ($a, $b,
+                 $c, $d)
+{
+  $foo = $bar
+}
+
+class foo::bar3 ($a, $b,
+                 $c, $d,
+)
+{
+  $foo = $bar
+}
+
+class foo::bar4 ($a, $b)
+{
+  $foo = $bar
+}
+
+class foo::bar5 ($a, $b) {
+  $foo = $bar
+}
+"))
+
+(ert-deftest puppet-indent-line/class-parameter-list-fail ()
+  :expected-result :failed
+  (puppet-test-indent "
+class foo::bar ($a, $b,
+                $c, $d) {
+  $foo = $bar
+}
+"))
 
 (ert-deftest puppet-indent-line/comments-change-indentation-level ()
   (puppet-test-with-temp-buffer

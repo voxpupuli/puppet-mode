@@ -603,6 +603,48 @@ of the initial include plus puppet-include-indent."
             (setq not-found nil))))
         include-column))))
 
+(defun puppet-indent-listlike (listtype closing-regex list-start)
+  ;; This line starts with an element from an array or parameter list.
+  ;; Indent to the same indentation as the first element of the list:
+  ;;
+  ;; $example = ['string1', 'string2',
+  ;;             'string3', 'string4']
+  ;; $example = example('string1',
+  ;;                    'string2')
+  (save-excursion
+    (if (looking-at closing-regex)
+        ;; Closing bracket on a line by itself. Align with opening bracket.
+        (progn
+          (goto-char list-start)
+          (if (or (save-excursion (forward-char) (eolp))
+                  ;; closing class parameter list:
+                  (and (eq listtype 'arglist)
+                       (save-excursion
+                         (backward-sexp 2)
+                         (looking-at "class.*"))))
+              (current-indentation)
+            (current-column)))
+      ;; Use normal indentation if the point is at the end of the line.
+      ;;
+      ;; $example => [
+      ;;   'foo',
+      ;;   'bar',
+      ;; ]
+      (goto-char list-start)
+      (forward-char 1)
+      (if (eolp)
+          (+ (current-indentation) puppet-indent-level)
+        ;; Otherwise, attempt to align as described above.
+        (re-search-forward "\\S-")
+        (forward-char -1)
+        (current-column)))))
+
+(defun puppet-indent-array (array-start)
+  (puppet-indent-listlike 'array "^\\s-*],*" array-start))
+
+(defun puppet-indent-arglist (arglist-start)
+  (puppet-indent-listlike 'arglist "^\\s-*),*" arglist-start))
+
 (defun puppet-indent-line ()
   "Indent current line as puppet code."
   (interactive)
@@ -610,64 +652,14 @@ of the initial include plus puppet-include-indent."
   (if (bobp)
       (indent-line-to 0)                ; First line is always non-indented
     (let ((not-indented t)
+          (arglist-start (puppet-in-argument-list))
           (array-start (puppet-in-array))
           (include-start (puppet-in-include))
           (block-indent (puppet-block-indent))
           cur-indent)
       (cond
-       (array-start
-        ;; This line probably starts with an element from an array.
-        ;; Indent the line to the same indentation as the first
-        ;; element in that array.  That is, this...
-        ;;
-        ;;    exec {
-        ;;      "add_puppetmaster_mongrel_startup_links":
-        ;;      command => "string1",
-        ;;      creates => [ "string2", "string3",
-        ;;      "string4", "string5",
-        ;;      "string6", "string7",
-        ;;      "string3" ],
-        ;;      refreshonly => true,
-        ;;    }
-        ;;
-        ;; ...should instead look like this:
-        ;;
-        ;;    exec {
-        ;;      "add_puppetmaster_mongrel_startup_links":
-        ;;      command => "string1",
-        ;;      creates => [ "string2", "string3",
-        ;;                   "string4", "string5",
-        ;;                   "string6", "string7",
-        ;;                   "string8" ],
-        ;;      refreshonly => true,
-        ;;    }
-        (save-excursion
-          (if (looking-at "^\\s-*],*")
-              ;; If a closing bracket is on a line by itself, align it with the
-              ;; opening bracket.
-              (progn
-                (goto-char array-start)
-                (setq cur-indent (current-indentation)))
-
-            (goto-char array-start)
-            (forward-char 1)
-
-            ;; If the point is at the end of the line, use normal indentation.
-            ;;
-            ;; For example:
-            ;; exec { 'foo':
-            ;;   creates => [
-            ;;     'foo',
-            ;;     'bar',
-            ;;   ]
-            ;; }
-            ;;
-            (if (eolp)
-                (setq cur-indent (+ (current-indentation) puppet-indent-level))
-              ;; Otherwise, attempt to align as described above.
-              (re-search-forward "\\S-")
-              (forward-char -1)
-              (setq cur-indent (current-column))))))
+       (array-start (setq cur-indent (puppet-indent-array array-start)))
+       (arglist-start (setq cur-indent (puppet-indent-arglist arglist-start)))
        (include-start
         (setq cur-indent include-start))
 
@@ -676,13 +668,6 @@ of the initial include plus puppet-include-indent."
         ;; block, so we should indent it matching the indentation of
         ;; the opening brace of the block.
         (setq cur-indent block-indent))
-
-       ;; Class argument list ends with a closing paren and needs to be
-       ;; indented to the level of the class token.
-       ((looking-at "^\s*\).*?{\s*$")
-        (save-excursion
-          (goto-char (puppet-in-argument-list))
-          (setq cur-indent (current-indentation))))
        (t
         ;; Otherwise, we did not start on a block-ending-only line.
         (save-excursion
@@ -697,6 +682,14 @@ of the initial include plus puppet-include-indent."
                                   (eq (puppet-syntax-context) 'comment)))
               (if (bobp)
                   (setq not-indented nil)))
+
+             ;; Closing paren. Use indentation based on start of
+             ;; argument list
+             ((or (looking-at "^\\s-*\)\\s-*$")
+                  (looking-at "^[^\n\(]*[\)],?\\s-*$"))
+              (goto-char (puppet-in-argument-list))
+              (setq cur-indent (current-indentation))
+              (setq not-indented nil))
 
              ;; Brace (possibly followed by a comma) or paren on a
              ;; line by itself will already be indented to the right
