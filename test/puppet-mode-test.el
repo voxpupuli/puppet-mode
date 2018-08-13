@@ -314,6 +314,23 @@ class */ bar"
     (should (eq (puppet-test-face-at 23) 'font-lock-type-face))
     (should-not (puppet-test-face-at 25))))
 
+(ert-deftest puppet-font-lock-keywords/plan ()
+  :tags '(fontification font-lock-keywords)
+  (puppet-test-with-temp-buffer "plan foo::bar($foo) {"
+    ;; The keyword
+    (should (eq (puppet-test-face-at 1) 'font-lock-keyword-face))
+    ;; The scope
+    (should (eq (puppet-test-face-at 6) 'font-lock-type-face))
+    ;; The scope operator
+    (should (eq (puppet-test-face-at 9) 'font-lock-type-face))
+    ;; The name
+    (should (eq (puppet-test-face-at 11) 'font-lock-type-face))
+    ;; The parenthesis
+    (should-not (puppet-test-face-at 14))
+    ;; The parameter
+    (should (eq (puppet-test-face-at 15) 'font-lock-variable-name-face))
+    (should-not (puppet-test-face-at 19))))
+
 (ert-deftest puppet-font-lock-keywords/resource ()
   :tags '(fontification font-lock-keywords)
   (puppet-test-with-temp-buffer "foo::bar {"
