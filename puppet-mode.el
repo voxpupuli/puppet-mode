@@ -4,14 +4,16 @@
 ;; Copyright (C) 2013, 2014  Bozhidar Batsov <bozhidar@batsov.com>
 ;; Copyright (C) 2011  Puppet Labs Inc
 
-;; Author: Bozhidar Batsov <bozhidar@batsov.com>
+;; Author: Vox Pupuli <voxpupuli@groups.io>
+;;     Bozhidar Batsov <bozhidar@batsov.com>
 ;;     Sebastian Wiesner <swiesner@lunaryorn.com>
 ;;     Russ Allbery <rra@stanford.edu>
-;; Maintainer: Bozhidar Batsov <bozhidar@batsov.com>
+;; Maintainer: Vox Pupuli <voxpupuli@groups.io>
+;;     Bozhidar Batsov <bozhidar@batsov.com>
 ;;     Sebastian Wiesner <swiesner@lunaryorn.com>
 ;; URL: https://github.com/voxpupuli/puppet-mode
 ;; Keywords: languages
-;; Version: 0.4-cvs
+;; Version: 0.4
 ;; Package-Requires: ((emacs "24.1") (pkg-info "0.4"))
 
 ;; This file is not part of GNU Emacs.
