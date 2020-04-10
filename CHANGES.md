@@ -1,8 +1,8 @@
 Changes
 =======
 
-master (in development)
------------------------
+0.4 (UNRELEASED, CHANGES.md progress is 0.3...c5a0fc8, Apr 10, 2020)
+------------------
 
 - New features:
 
@@ -11,6 +11,10 @@ master (in development)
     - New interactive command `puppet-toggle-string-quotes` bound to <kbd>C-c
       C-'</kbd>
     - New interactive command `puppet-clear-string` bound to <kbd>C-c C-;</kbd>
+    - Uniform region alignment
+    - Add basic support for working with puppet-repl [GH-68]
+    - New function `puppet-in-argument-list`.  At any point in an argument 
+      list, return the position of the list's opening '('
 
 - Improvements:
 
@@ -18,6 +22,9 @@ master (in development)
     - Highlight regular expression literals in valid contexts only [GH-39]
     - `forward-sexp` and friends treat regular expression literals as a single
       expression now [GH-39]
+    - Add prefix arg support to puppet-interpolate
+    - Document puppet-debugger integration
+    - Make puppet-in-array understand brackets in comments
 
 - Bug fixes:
 
@@ -29,11 +36,36 @@ master (in development)
       into symbol syntax [GH-38]
     - Pass proper local file names to commands that run remotely [GH-46]
     - Remember the last `apply` command per buffer [GH-46]
+    - Take the syntactic context at the right position in
+      puppet-syntax-propertize-match
+    - Add pcase fix for emacs 24.1
+    - Do not set require-final-newline [GH-52]
+    - Fix multi-line indentation
+    - Fix indentation of function arguments [GH-60, GH-64]
+    - Ignore commented out lines when aligning [GH-75]
+    - Add missing requirements to fix byte compiler warnings
+    - Add missing second argument for ‘looking-back
+    - Update puppet-repl-command to use new executable named "puppet debugger"
+      [GH-82]
+    - Fix binding repl-args when calling make-comint
+    - Fix indentation after comments ending with a colon
+    - Fix indent handling of class params closing paren [GH-90]
+    - Make indent recognize closing braces with commas [GH-88]
+    - Skip nested block when aligning [GH-92]
+    - Handle aligning nested block before point [GH-93]
+    - Fix infinite loop when indenting defined type [GH-77]
 
 - Miscellaneous:
 
     - Drop cl-lib dependency
     - Add unit tests for fontification, alignment and Imenu [GH-34]
+    - Replace Marmalade with MELPA Stable for stable releases
+    - Address style comments, remove unnecessary progns.
+    - Fix test runs
+    - Update links to point to voxpupuli
+    - Update links to Flycheck website
+    - Update MELPA links
+    - Added failing test for alignment of nested blocks
 
 0.3 (Mar 13, 2014)
 ------------------
