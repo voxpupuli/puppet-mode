@@ -7,8 +7,7 @@
 ;; Author: Bozhidar Batsov <bozhidar@batsov.com>
 ;;     Sebastian Wiesner <swiesner@lunaryorn.com>
 ;;     Russ Allbery <rra@stanford.edu>
-;; Maintainer: Bozhidar Batsov <bozhidar@batsov.com>
-;;     Sebastian Wiesner <swiesner@lunaryorn.com>
+;; Maintainer: Tim Meusel <tim@bastelfreak.de>
 ;; URL: https://github.com/voxpupuli/puppet-mode
 ;; Keywords: languages
 ;; Version: 0.4-cvs
