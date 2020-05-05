@@ -4,10 +4,14 @@
 ;; Copyright (C) 2013, 2014  Bozhidar Batsov <bozhidar@batsov.com>
 ;; Copyright (C) 2011  Puppet Labs Inc
 
-;; Author: Bozhidar Batsov <bozhidar@batsov.com>
+;; Author: Vox Pupuli <voxpupuli@groups.io>
+;;     Bozhidar Batsov <bozhidar@batsov.com>
 ;;     Sebastian Wiesner <swiesner@lunaryorn.com>
 ;;     Russ Allbery <rra@stanford.edu>
-;; Maintainer: Tim Meusel <tim@bastelfreak.de>
+;; Maintainer: Vox Pupuli <voxpupuli@groups.io>
+;;     Bozhidar Batsov <bozhidar@batsov.com>
+;;     Sebastian Wiesner <swiesner@lunaryorn.com>
+;;     Tim Meusel <tim@bastelfreak.de>
 ;; URL: https://github.com/voxpupuli/puppet-mode
 ;; Keywords: languages
 ;; Version: 0.4
