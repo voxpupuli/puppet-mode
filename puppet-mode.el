@@ -11,6 +11,7 @@
 ;; Maintainer: Vox Pupuli <voxpupuli@groups.io>
 ;;     Bozhidar Batsov <bozhidar@batsov.com>
 ;;     Sebastian Wiesner <swiesner@lunaryorn.com>
+;;     Tim Meusel <tim@bastelfreak.de>
 ;; URL: https://github.com/voxpupuli/puppet-mode
 ;; Keywords: languages
 ;; Version: 0.4
@@ -148,7 +149,7 @@ buffer-local wherever it is set."
   :type 'boolean
   :group 'puppet
   :safe 'booleanp
-  :package-version '(puppet-mode . "0.3"))
+  :package-version '(puppet-mode . "0.4"))
 
 (defcustom puppet-validate-command "puppet parser validate --color=false"
   "Command to validate the syntax of a Puppet manifest."
@@ -162,13 +163,13 @@ buffer-local wherever it is set."
   "Command to lint a Puppet manifest."
   :type 'string
   :group 'puppet
-  :package-version '(puppet-mode . "0.3"))
+  :package-version '(puppet-mode . "0.4"))
 
 (defcustom puppet-apply-command "puppet apply --verbose --noop"
   "Command to apply a Puppet manifest."
   :type 'string
   :group 'puppet
-  :package-version '(puppet-mode . "0.3"))
+  :package-version '(puppet-mode . "0.4"))
 
 (defcustom puppet-repl-command "puppet debugger"
   "The Puppet REPL command used to interact with code."
@@ -192,13 +193,13 @@ buffer-local wherever it is set."
   '((t :inherit font-lock-constant-face))
   "Face for regular expression literals in Puppet."
   :group 'puppet
-  :package-version '(puppet-mode . "0.3"))
+  :package-version '(puppet-mode . "0.4"))
 
 (defface puppet-escape-sequence
   '((t :inherit font-lock-constant-face))
   "Face for escape sequences in double-quoted strings-consed literals in Puppet."
   :group 'puppet
-  :package-version '(puppet-mode . "0.3"))
+  :package-version '(puppet-mode . "0.4"))
 
 
 ;;; Version information
