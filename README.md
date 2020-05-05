@@ -28,7 +28,9 @@ Installation
 ------------
 
 From [MELPA][] or [MELPA Stable][] with <kbd>M-x package-install RET
-puppet-mode</kbd>.
+puppet-mode</kbd>.  Users of Debian ≥11 and derivatives can `sudo apt
+install elpa-puppet-mode`.  Manifest validation and linting support is
+enabled by installing the `elpa-flycheck` package.
 
 In your [`Cask`][cask] file:
 
