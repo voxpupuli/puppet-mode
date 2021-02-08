@@ -711,6 +711,13 @@ of the initial include plus puppet-include-indent."
               (setq cur-indent (current-indentation))
               (setq not-indented nil))
 
+             ;; Closing bracket. Use indentation based on start of
+             ;; array.
+             ((looking-at "^[^[\n]*],?\\s-*$")
+              (goto-char (puppet-in-array))
+              (setq cur-indent (current-indentation))
+              (setq not-indented nil))
+
              ;; Brace, paren or bracket (possibly followed by a comma)
              ;; on a line by itself will already be indented to the
              ;; right level, so we can cheat and stop there.
