@@ -201,6 +201,12 @@ buffer-local wherever it is set."
   :group 'puppet
   :package-version '(puppet-mode . "0.4"))
 
+(defcustom puppet-module-path
+  '("/etc/puppetlabs/code/environments/production")
+  "Paths to search for modules when resolving cross-references."
+  :group 'puppet
+  :type '(repeat directory))
+
 
 ;;; Version information
 (defun puppet-version (&optional show-version)
@@ -1123,6 +1129,105 @@ With a prefix argument SUPPRESS it simply inserts $."
 
 
 
+;;; Xref
+
+(defun puppet-module-root (file)
+  "Return the Puppet module root directory for FILE.
+Walk up the directory tree until a directory is found, that
+either contains a \"manifests\", \"lib\" or \"types\" subdir.
+Return the directory name or nil if no directory is found."
+  (locate-dominating-file
+   file
+   (lambda (path)
+     (and (file-accessible-directory-p path)
+          (or (file-readable-p (expand-file-name "manifests" path))
+              (file-readable-p (expand-file-name "lib" path))
+              (file-readable-p (expand-file-name "types" path)))))))
+
+(defun puppet-autoload-path (identifier &optional directory extension)
+  "Resolve IDENTIFIER into Puppet module and relative autoload path.
+Use DIRECTORY as module subdirectory (defaults to \"manifests\"
+and EXTENSION as file extension (defaults to \".pp\") when
+building the path.  Return a cons cell where the first part is
+the module name and the second part is a relative path name below
+that module where the identifier should be defined according to
+the Puppet autoload rules."
+  (let* ((components (split-string identifier "::"))
+         (module (car components))
+         (path (cons (or directory "manifests")
+                     (butlast (cdr components))))
+         (file (if (cdr components)
+                   (car (last components))
+                 "init")))
+    (cons module
+          (concat (mapconcat #'file-name-as-directory path "")
+                  file
+                  (or extension ".pp")))))
+
+(defun puppet--xref-backend ()
+  "The Xref backend for `puppet-mode'."
+  'puppet)
+
+(cl-defmethod xref-backend-identifier-at-point ((_backend (eql puppet)))
+  "Return the Puppet identifier at point."
+  (let ((thing (thing-at-point 'symbol)))
+    (and thing (substring-no-properties thing))))
+
+(cl-defmethod xref-backend-definitions ((_backend (eql puppet)) identifier)
+  "Find the definitions of a Puppet resource IDENTIFIER.
+First the location of the visited file is checked.  Then all
+directories from `puppet-module-path' are searched for the module
+and the file according to Puppet's autoloading rules."
+  (let* ((resource (downcase (if (string-prefix-p "::" identifier)
+                                 (substring identifier 2)
+                               identifier)))
+         (pupfiles (puppet-autoload-path resource))
+         (typfiles (puppet-autoload-path resource "types"))
+         (funfiles (puppet-autoload-path resource "functions"))
+         (xrefs '()))
+    (if pupfiles
+        (let* ((module (car pupfiles))
+               ;; merged list of relative path names to classes/defines/types
+               (pathlist (mapcar #'cdr (list pupfiles typfiles funfiles)))
+               ;; list of directories where this module might be
+               (moddirs (mapcar (lambda (dir) (expand-file-name module dir))
+                                puppet-module-path))
+               ;; the regexp to find the resource definition in the file
+               (resdef (concat "^\\(class\\|define\\|type\\|function\\)\\s-+"
+                               resource
+                               "\\((\\|{\\|\\s-\\|$\\)"))
+               ;; files to visit when searching for the resource
+               (files '()))
+          ;; Check the current module directory (if the buffer actually visits
+          ;; a file) and all module subdirectories from `puppet-module-path'.
+          (dolist (dir (if buffer-file-name
+                           (cons (puppet-module-root buffer-file-name) moddirs)
+                         moddirs))
+            ;; Try all relative path names below the module directory that
+            ;; might contain the resource; save the file name if the file
+            ;; exists and we haven't seen it (we might try to check a file
+            ;; twice if the current module is also below one of the dirs in
+            ;; `puppet-module-path').
+            (dolist (path pathlist)
+              (let ((file (expand-file-name path dir)))
+                (if (and (not (member file files))
+                         (file-readable-p file))
+                    (setq files (cons file files))))))
+          ;; Visit all found files to finally locate the resource definition
+          (dolist (file files)
+            (with-temp-buffer
+              (insert-file-contents-literally file)
+              (save-match-data
+                (when (re-search-forward resdef nil t)
+                  (push (xref-make
+                         (match-string-no-properties 0)
+                         (xref-make-file-location
+                          file (line-number-at-pos (match-beginning 1)) 0))
+                        xrefs)))))))
+    xrefs))
+
+
+
 ;;; Imenu
 
 (defun puppet-imenu-collect-entries (pattern)
@@ -1273,6 +1378,8 @@ for each entry."
   ;; Alignment
   (setq align-mode-rules-list puppet-mode-align-rules)
   (setq align-mode-exclude-rules-list puppet-mode-align-exclude-rules)
+  ;; Xref
+  (add-hook 'xref-backend-functions #'puppet--xref-backend)
   ;; IMenu
   (setq imenu-create-index-function #'puppet-imenu-create-index))
 
