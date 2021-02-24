@@ -202,8 +202,10 @@ buffer-local wherever it is set."
   :package-version '(puppet-mode . "0.4"))
 
 (defcustom puppet-module-path
-  '("/etc/puppetlabs/code/environments/production")
-  "Paths to search for modules when resolving cross-references."
+  '("/etc/puppetlabs/code/environments/production/modules")
+  "Paths to search for modules when resolving cross references.
+Remote directories as defined by TRAMP are possible but very slow
+when accessed."
   :group 'puppet
   :type '(repeat directory))
 
