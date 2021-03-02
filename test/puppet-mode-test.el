@@ -615,6 +615,32 @@ class foo {
   }
 }"))))
 
+(ert-deftest puppet-align-block/point-in-string ()
+  :tags '(alignment)
+   (puppet-test-with-temp-buffer
+      "
+class foo {
+  $x = {
+    'a'=>1,
+    'foo'=>{
+      'apples'=>1,
+    },
+    'metafalica'=>1,
+  }
+}"
+    (search-forward "tafalica")
+    (puppet-align-block)
+    (should (string= (buffer-string) "
+class foo {
+  $x = {
+    'a'          => 1,
+    'foo'        => {
+      'apples'=>1,
+    },
+    'metafalica' => 1,
+  }
+}"))))
+
 
 ;;;; Imenu
 
