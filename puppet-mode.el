@@ -678,107 +678,112 @@ of the initial include plus puppet-include-indent."
 (defun puppet-indent-line ()
   "Indent current line as puppet code."
   (interactive)
-  (beginning-of-line)
-  (if (bobp)
-      (indent-line-to 0)                ; First line is always non-indented
-    (let ((not-indented t)
-          (arglist-start (puppet-in-argument-list))
-          (array-start (puppet-in-array))
-          (include-start (puppet-in-include))
-          (block-indent (puppet-block-indent))
-          cur-indent)
-      (cond
-       (array-start (setq cur-indent (puppet-indent-array array-start)))
-       (arglist-start (setq cur-indent (puppet-indent-arglist arglist-start)))
-       (include-start
-        (setq cur-indent include-start))
+  (let ((pos (- (point-max) (point))))
+    (beginning-of-line)
+    (if (bobp)
+        (indent-line-to 0)              ; First line is always non-indented
+      (let ((not-indented t)
+            (arglist-start (puppet-in-argument-list))
+            (array-start (puppet-in-array))
+            (include-start (puppet-in-include))
+            (block-indent (puppet-block-indent))
+            cur-indent)
+        (cond
+         (array-start (setq cur-indent (puppet-indent-array array-start)))
+         (arglist-start (setq cur-indent (puppet-indent-arglist arglist-start)))
+         (include-start
+          (setq cur-indent include-start))
 
-       ((and (looking-at "^\\s-*}.*$") block-indent)
-        ;; This line contains a closing brace and we're at the inner
-        ;; block, so we should indent it matching the indentation of
-        ;; the opening brace of the block.
-        (setq cur-indent block-indent))
-       (t
-        ;; Otherwise, we did not start on a block-ending-only line.
-        (save-excursion
-          ;; Iterate backwards until we find an indentation hint
-          (while not-indented
-            (forward-line -1)
-            (cond
-             ;; Comment lines are ignored unless we're at the start of the
-             ;; buffer.
-             ((or (eq (puppet-syntax-context) 'comment)
-                  (save-excursion (end-of-line)
-                                  (eq (puppet-syntax-context) 'comment)))
-              (if (bobp)
-                  (setq not-indented nil)))
+         ((and (looking-at "^\\s-*}.*$") block-indent)
+          ;; This line contains a closing brace and we're at the inner
+          ;; block, so we should indent it matching the indentation of
+          ;; the opening brace of the block.
+          (setq cur-indent block-indent))
+         (t
+          ;; Otherwise, we did not start on a block-ending-only line.
+          (save-excursion
+            ;; Iterate backwards until we find an indentation hint
+            (while not-indented
+              (forward-line -1)
+              (cond
+               ;; Comment lines are ignored unless we're at the start of the
+               ;; buffer.
+               ((or (eq (puppet-syntax-context) 'comment)
+                    (save-excursion (end-of-line)
+                                    (eq (puppet-syntax-context) 'comment)))
+                (if (bobp)
+                    (setq not-indented nil)))
 
-             ;; Closing paren. Use indentation based on start of
-             ;; argument list
-             ((or (looking-at "^\\s-*\)\\s-*$")
-                  (looking-at "^[^\n\(]*[\)],?\\s-*$"))
-              (goto-char (puppet-in-argument-list))
-              (setq cur-indent (current-indentation))
-              (setq not-indented nil))
+               ;; Closing paren. Use indentation based on start of
+               ;; argument list
+               ((or (looking-at "^\\s-*\)\\s-*$")
+                    (looking-at "^[^\n\(]*[\)],?\\s-*$"))
+                (goto-char (puppet-in-argument-list))
+                (setq cur-indent (current-indentation))
+                (setq not-indented nil))
 
-             ;; Closing bracket. Use indentation based on start of
-             ;; array.
-             ((looking-at "^[^[\n]*],?\\s-*$")
-              (goto-char (puppet-in-array))
-              (setq cur-indent (current-indentation))
-              (setq not-indented nil))
+               ;; Closing bracket. Use indentation based on start of
+               ;; array.
+               ((looking-at "^[^[\n]*],?\\s-*$")
+                (goto-char (puppet-in-array))
+                (setq cur-indent (current-indentation))
+                (setq not-indented nil))
 
-             ;; Brace, paren or bracket (possibly followed by a comma)
-             ;; on a line by itself will already be indented to the
-             ;; right level, so we can cheat and stop there.
-             ((looking-at "^\\s-*[])}]\\(,\\|\\s-*[-~]>\\)?\\s-*\s?$")
-              (setq cur-indent (current-indentation))
-              (setq not-indented nil))
+               ;; Brace, paren or bracket (possibly followed by a comma)
+               ;; on a line by itself will already be indented to the
+               ;; right level, so we can cheat and stop there.
+               ((looking-at "^\\s-*[])}]\\(,\\|\\s-*[-~]>\\)?\\s-*\s?$")
+                (setq cur-indent (current-indentation))
+                (setq not-indented nil))
 
-             ;; Brace (possibly followed by a comma) or paren not on a line by
-             ;; itself will be indented one level too much, but don't catch
-             ;; cases where the block is started and closed on the same line.
-             ((looking-at "^[^\n\({]*[\)}],?\\s-*$")
-              (setq cur-indent (- (current-indentation) puppet-indent-level))
-              (setq not-indented nil))
+               ;; Brace (possibly followed by a comma) or paren not on a line by
+               ;; itself will be indented one level too much, but don't catch
+               ;; cases where the block is started and closed on the same line.
+               ((looking-at "^[^\n\({]*[\)}],?\\s-*$")
+                (setq cur-indent (- (current-indentation) puppet-indent-level))
+                (setq not-indented nil))
 
-             ;; Indent by one level more than the start of our block.  We lose
-             ;; if there is more than one block opened and closed on the same
-             ;; line but it's still unbalanced; hopefully people don't do that.
-             ((looking-at "^.*{[^\n}]*$")
-              (setq cur-indent (+ (current-indentation) puppet-indent-level))
-              (setq not-indented nil))
+               ;; Indent by one level more than the start of our block.  We lose
+               ;; if there is more than one block opened and closed on the same
+               ;; line but it's still unbalanced; hopefully people don't do that.
+               ((looking-at "^.*{[^\n}]*$")
+                (setq cur-indent (+ (current-indentation) puppet-indent-level))
+                (setq not-indented nil))
 
-             ;; Indent by one level if the line ends with an open paren.
-             ((looking-at "^.*\(\\s-*$")
-              (setq cur-indent (+ (current-indentation) puppet-indent-level))
-              (setq not-indented nil))
+               ;; Indent by one level if the line ends with an open paren.
+               ((looking-at "^.*\(\\s-*$")
+                (setq cur-indent (+ (current-indentation) puppet-indent-level))
+                (setq not-indented nil))
 
-             ;; Semicolon ends a block for a resource when multiple resources
-             ;; are defined in the same block, but try not to get the case of
-             ;; a complete resource on a single line wrong.
-             ((looking-at "^\\([^'\":\n]\\|\"[^\n\"]*\"\\|'[^\n']*'\\)*;\\s-*$")
-              (setq cur-indent (- (current-indentation) puppet-indent-level))
-              (setq not-indented nil))
+               ;; Semicolon ends a block for a resource when multiple resources
+               ;; are defined in the same block, but try not to get the case of
+               ;; a complete resource on a single line wrong.
+               ((looking-at "^\\([^'\":\n]\\|\"[^\n\"]*\"\\|'[^\n']*'\\)*;\\s-*$")
+                (setq cur-indent (- (current-indentation) puppet-indent-level))
+                (setq not-indented nil))
 
-             ;; Indent an extra level after : since it introduces a resource.
-             ((looking-at "^.*:\\s-*$")
-              (setq cur-indent (+ (current-indentation) puppet-indent-level))
-              (setq not-indented nil))
+               ;; Indent an extra level after : since it introduces a resource.
+               ((looking-at "^.*:\\s-*$")
+                (setq cur-indent (+ (current-indentation) puppet-indent-level))
+                (setq not-indented nil))
 
-             ;; Start of buffer.
-             ((bobp)
-              (setq not-indented nil)))))
+               ;; Start of buffer.
+               ((bobp)
+                (setq not-indented nil)))))
 
-        ;; If this line contains only a closing paren, we should lose one
-        ;; level of indentation.
-        (if (looking-at "^\\s-*\)\\s-*$")
-            (setq cur-indent (- cur-indent puppet-indent-level)))))
+          ;; If this line contains only a closing paren, we should lose one
+          ;; level of indentation.
+          (if (looking-at "^\\s-*\)\\s-*$")
+              (setq cur-indent (- cur-indent puppet-indent-level)))))
 
-      ;; We've figured out the indentation, so do it.
-      (if (and cur-indent (> cur-indent 0))
-          (indent-line-to cur-indent)
-        (indent-line-to 0)))))
+        ;; We've figured out the indentation, so do it.
+        (if (and cur-indent (> cur-indent 0))
+            (indent-line-to cur-indent)
+          (indent-line-to 0))))
+    ;; If initial point was within line's indentation,
+    ;; position after the indentation.  Else stay at same point in text.
+    (if (> (- (point-max) pos) (point))
+        (goto-char (- (point-max) pos)))))
 
 
 ;;; Font locking
