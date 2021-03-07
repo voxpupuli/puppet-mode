@@ -616,6 +616,434 @@ class foo {
 }"))))
 
 
+;;;; Skeletons
+
+(ert-deftest puppet-skeleton/puppet-dissect-filename-unix ()
+  :tags '(skeleton)
+  (should (equal (puppet-dissect-filename "/modules/foo/manifests/init.pp")
+                 '("foo")))
+  (should (equal (puppet-dissect-filename "/modules/foo/manifests/bar.pp")
+                 '("foo" "bar")))
+  (should (equal (puppet-dissect-filename "/modules/foo/manifests/bar/baz.pp")
+                 '("foo" "bar" "baz"))))
+
+(ert-deftest puppet-skeleton/puppet-dissect-filename-windows ()
+  :tags '(skeleton)
+  (should (equal (puppet-dissect-filename "C:/modules/foo/manifests/init.pp")
+                 '("foo")))
+  (should (equal (puppet-dissect-filename "C:/modules/foo/manifests/bar.pp")
+                 '("foo" "bar")))
+  (should (equal (puppet-dissect-filename "C:/modules/foo/manifests/bar/baz.pp")
+                 '("foo" "bar" "baz"))))
+
+(ert-deftest puppet-skeleton/puppet-dissect-filename-unidentified ()
+  :tags '(skeleton)
+  (should (equal (puppet-dissect-filename "/modules/init.pp")
+                 '("unidentified")))
+  (should (equal (puppet-dissect-filename "/modules/foo/init.pp")
+                 '("unidentified")))
+  (should (equal (puppet-dissect-filename "/modules/foo/bar/init.pp")
+                 '("unidentified"))))
+
+(ert-deftest puppet-skeleton/puppet-dissect-filename-nil ()
+  :tags '(skeleton)
+  (should (equal (puppet-dissect-filename nil)
+                 '("unidentified"))))
+
+(ert-deftest puppet-skeleton/puppet-dissect-filename-invalid-module ()
+  :tags '(skeleton)
+  (should (equal (puppet-dissect-filename "/puppet-foo/manifests/init.pp")
+                 '("foo"))))
+
+(ert-deftest puppet-skeleton/keyword-class ()
+  :tags '(skeleton)
+  (puppet-test-with-temp-buffer
+   ""
+   (set-visited-file-name "/modules/foo/manifests/bar.pp" t)
+   (puppet-keyword-class)
+   (should (string= (buffer-string) "class foo::bar (
+) {
+}"))))
+
+(ert-deftest puppet-skeleton/keyword-define ()
+  :tags '(skeleton)
+  (puppet-test-with-temp-buffer
+   ""
+   (set-visited-file-name "/modules/foo/manifests/bar.pp" t)
+   (puppet-keyword-define)
+   (should (string= (buffer-string) "define foo::bar (
+) {
+}"))))
+
+(ert-deftest puppet-skeleton/keyword-node ()
+  :tags '(skeleton)
+  (puppet-test-with-temp-buffer
+   ""
+   (puppet-keyword-node)
+   (should (looking-at " {"))           ; node name
+   (should (string= (buffer-string) "node  {
+}"))))
+
+(ert-deftest puppet-skeleton/keyword-if-no-region ()
+  :tags '(skeleton)
+  (puppet-test-with-temp-buffer
+   "
+class foo {
+}"
+   (goto-char (point-min))
+   (forward-line 2)
+   (puppet-keyword-if)
+   (should (looking-at " {"))           ; condition
+   (should (string= (buffer-string) "
+class foo {
+  if  {
+  }
+}"))))
+
+(ert-deftest puppet-skeleton/keyword-if-region ()
+  :tags '(skeleton)
+  (puppet-test-with-temp-buffer
+   "
+class foo {
+  notify { 'foo': }
+  notify { 'bar': }
+}"
+   (goto-char (point-min))
+   (forward-line 2)
+   (push-mark (line-beginning-position 2) t)
+   (activate-mark)
+   (puppet-keyword-if)
+   (should (looking-at " {"))           ; condition
+   (should (string= (buffer-string) "
+class foo {
+  if  {
+    notify { 'foo': }
+  }
+  notify { 'bar': }
+}"))))
+
+(ert-deftest puppet-skeleton/keyword-elsif-no-region ()
+  :tags '(skeleton)
+  (puppet-test-with-temp-buffer
+   "
+class foo {
+}"
+   (goto-char (point-min))
+   (forward-line 2)
+   (puppet-keyword-elsif)
+   (should (looking-at " {"))           ; condition
+   (should (string= (buffer-string) "
+class foo {
+  elsif  {
+  }
+}"))))
+
+(ert-deftest puppet-skeleton/keyword-elsif-region ()
+  :tags '(skeleton)
+  (puppet-test-with-temp-buffer
+   "
+class foo {
+  notify { 'foo': }
+  notify { 'bar': }
+}"
+   (goto-char (point-min))
+   (forward-line 2)
+   (push-mark (line-beginning-position 2) t)
+   (activate-mark)
+   (puppet-keyword-elsif)
+   (should (looking-at " {"))           ; condition
+   (should (string= (buffer-string) "
+class foo {
+  elsif  {
+    notify { 'foo': }
+  }
+  notify { 'bar': }
+}"))))
+
+(ert-deftest puppet-skeleton/keyword-else-no-region ()
+  :tags '(skeleton)
+  (puppet-test-with-temp-buffer
+   "
+class foo {
+}"
+   (goto-char (point-min))
+   (forward-line 2)
+   (puppet-keyword-else)
+   (should (string= (buffer-string) "
+class foo {
+  else {
+  }
+}"))))
+
+(ert-deftest puppet-skeleton/keyword-else-region ()
+  :tags '(skeleton)
+  (puppet-test-with-temp-buffer
+   "
+class foo {
+  notify { 'foo': }
+  notify { 'bar': }
+}"
+   (goto-char (point-min))
+   (forward-line 2)
+   (push-mark (line-beginning-position 2) t)
+   (activate-mark)
+   (puppet-keyword-else)
+   (should (string= (buffer-string) "
+class foo {
+  else {
+    notify { 'foo': }
+  }
+  notify { 'bar': }
+}"))))
+
+(ert-deftest puppet-skeleton/keyword-unless-no-region ()
+  :tags '(skeleton)
+  (puppet-test-with-temp-buffer
+   "
+class foo {
+}"
+   (goto-char (point-min))
+   (forward-line 2)
+   (puppet-keyword-unless)
+   (should (looking-at " {"))           ; condition
+   (should (string= (buffer-string) "
+class foo {
+  unless  {
+  }
+}"))))
+
+(ert-deftest puppet-skeleton/keyword-unless-region ()
+  :tags '(skeleton)
+  (puppet-test-with-temp-buffer
+   "
+class foo {
+  notify { 'foo': }
+  notify { 'bar': }
+}"
+   (goto-char (point-min))
+   (forward-line 2)
+   (push-mark (line-beginning-position 2) t)
+   (activate-mark)
+   (puppet-keyword-unless)
+   (should (looking-at " {"))           ; condition
+   (should (string= (buffer-string) "
+class foo {
+  unless  {
+    notify { 'foo': }
+  }
+  notify { 'bar': }
+}"))))
+
+(ert-deftest puppet-skeleton/keyword-case ()
+  :tags '(skeleton)
+  (puppet-test-with-temp-buffer
+   "
+class foo {
+}"
+   (goto-char (point-min))
+   (forward-line 2)
+   (puppet-keyword-case)
+   (should (looking-at " {"))           ; expression
+   (should (string= (buffer-string) "
+class foo {
+  case  {
+    default: {
+    }
+  }
+}"))))
+
+(ert-deftest puppet-skeleton/keyword-selector ()
+  :tags '(skeleton)
+  (puppet-test-with-temp-buffer
+   "
+class foo {
+}"
+   (goto-char (point-min))
+   (forward-line 2)
+   (insert "  $foo ")
+   (puppet-keyword-selector)
+   (should (looking-at ","))            ; value
+   (should (string= (buffer-string) "
+class foo {
+  $foo ? {
+    default => ,
+  }
+}"))))
+
+(ert-deftest puppet-skeleton/type-anchor ()
+  :tags '(skeleton)
+  (puppet-test-with-temp-buffer
+   "
+class foo {
+}"
+   (goto-char (point-min))
+   (forward-line 2)
+   (puppet-type-anchor)
+   (should (looking-at ":"))            ; title
+   (should (string= (buffer-string) "
+class foo {
+  anchor { : }
+}"))))
+
+(ert-deftest puppet-skeleton/type-class ()
+  :tags '(skeleton)
+  (puppet-test-with-temp-buffer
+   "
+class foo {
+}"
+   (goto-char (point-min))
+   (forward-line 2)
+   (puppet-type-class)
+   (should (looking-at ":"))            ; title
+   (should (string= (buffer-string) "
+class foo {
+  class { :
+  }
+}"))))
+
+(ert-deftest puppet-skeleton/type-exec ()
+  :tags '(skeleton)
+  (puppet-test-with-temp-buffer
+   "
+class foo {
+}"
+   (goto-char (point-min))
+   (forward-line 2)
+   (puppet-type-exec)
+   (should (looking-at ":"))            ; title
+   (should (string= (buffer-string) "
+class foo {
+  exec { :
+    path => [ '/bin', '/sbin', '/usr/bin', '/usr/sbin', ],
+    user => 'root',
+    cwd  => '/',
+  }
+}"))))
+
+(ert-deftest puppet-skeleton/type-file ()
+  :tags '(skeleton)
+  (puppet-test-with-temp-buffer
+   "
+class foo {
+}"
+   (goto-char (point-min))
+   (forward-line 2)
+   (puppet-type-file)
+   (should (looking-at ":"))            ; title
+   (should (string= (buffer-string) "
+class foo {
+  file { :
+    ensure => file,
+    owner  => 'root',
+    group  => 'root',
+    mode   => '0644',
+  }
+}"))))
+
+(ert-deftest puppet-skeleton/type-group ()
+  :tags '(skeleton)
+  (puppet-test-with-temp-buffer
+   "
+class foo {
+}"
+   (goto-char (point-min))
+   (forward-line 2)
+   (puppet-type-group)
+   (should (looking-at ":"))            ; title
+   (should (string= (buffer-string) "
+class foo {
+  group { :
+    ensure => present,
+  }
+}"))))
+
+(ert-deftest puppet-skeleton/type-host ()
+  :tags '(skeleton)
+  (puppet-test-with-temp-buffer
+   "
+class foo {
+}"
+   (goto-char (point-min))
+   (forward-line 2)
+   (puppet-type-host)
+   (should (looking-at ":"))            ; title
+   (should (string= (buffer-string) "
+class foo {
+  host { :
+    ensure => present,
+  }
+}"))))
+
+(ert-deftest puppet-skeleton/type-notify ()
+  :tags '(skeleton)
+  (puppet-test-with-temp-buffer
+   "
+class foo {
+}"
+   (goto-char (point-min))
+   (forward-line 2)
+   (puppet-type-notify)
+   (should (looking-at ":"))            ; title
+   (should (string= (buffer-string) "
+class foo {
+  notify { : }
+}"))))
+
+(ert-deftest puppet-skeleton/type-package ()
+  :tags '(skeleton)
+  (puppet-test-with-temp-buffer
+   "
+class foo {
+}"
+   (goto-char (point-min))
+   (forward-line 2)
+   (puppet-type-package)
+   (should (looking-at ":"))            ; title
+   (should (string= (buffer-string) "
+class foo {
+  package { :
+    ensure => present,
+  }
+}"))))
+
+(ert-deftest puppet-skeleton/type-service ()
+  :tags '(skeleton)
+  (puppet-test-with-temp-buffer
+   "
+class foo {
+}"
+   (goto-char (point-min))
+   (forward-line 2)
+   (puppet-type-service)
+   (should (looking-at ":"))            ; title
+   (should (string= (buffer-string) "
+class foo {
+  service { :
+    ensure => running,
+    enable => true,
+  }
+}"))))
+
+(ert-deftest puppet-skeleton/type-user ()
+  :tags '(skeleton)
+  (puppet-test-with-temp-buffer
+   "
+class foo {
+}"
+   (goto-char (point-min))
+   (forward-line 2)
+   (puppet-type-user)
+   (should (looking-at ":"))            ; title
+   (should (string= (buffer-string) "
+class foo {
+  user { :
+    ensure   => present,
+    shell    => '/bin/bash',
+    password => '*',
+  }
+}"))))
+
+
 ;;;; Imenu
 
 (ert-deftest puppet-imenu-create-index/class-with-variable ()

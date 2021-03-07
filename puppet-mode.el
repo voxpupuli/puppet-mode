@@ -105,6 +105,8 @@ buffer-local wherever it is set."
 (declare-function pkg-info-version-info "pkg-info" (library))
 
 (eval-when-compile
+  (require 'cl-macs)
+  (require 'skeleton)
   (require 'rx))
 
 (require 'align)
@@ -1128,6 +1130,189 @@ With a prefix argument SUPPRESS it simply inserts $."
 
 
 
+;;; Skeletons
+
+(defun puppet-dissect-filename (file)
+  "Return list of path components for the Puppet manifest FILE.
+The first element of the list will be the module name and the
+remaining elements are the relative path components below the
+‘manifests’ subdirectory.  The names of the path components are
+only derived from the file name by using the Puppet auto-loader
+rules.  FILE must be an absolute file name.
+
+The module name \"unidentified\" is returned if a module name
+can't be inferred from the file name.
+
+If the directory name contains characters that are not legal for
+a Puppet module name, then all leading characters including the
+last illegal character are removed from the module name.  The
+function will for example return ‘foo’ as module name even if the
+module is using the ‘puppet-foo’ directory (e.g. for module
+development in a user's home directory)."
+  (if (stringp file)
+      (let* ((parts (cl-loop for path = file then (directory-file-name
+                                                   (file-name-directory path))
+                             ;; stop iteration at the root of the directory
+                             ;; tree (should work for Windows & Unix/Linux)
+                             until (or (string-suffix-p ":" path)
+                                       (string-equal (file-name-directory path)
+                                                     path))
+                             collect (file-name-base path)))
+             ;; Remove "init" if it is the first element
+             (compact (if (string-equal (car parts) "init")
+                          (cdr parts)
+                        parts)))
+        (cons
+         ;; module name with illegal prefixes removed or "unidentified" if
+         ;; path is not compliant with the standard Puppet file hierarchy
+         (replace-regexp-in-string
+          "^.*[^a-z0-9_]" "" (or (cadr (member "manifests" parts))
+                                 "unidentified"))
+         ;; remaining path components
+         (cdr (member "manifests" (reverse compact)))))
+    '("unidentified")))
+
+(defun puppet-file-module-name (file)
+  "Return the module name for the Puppet class in FILE."
+  (car (puppet-dissect-filename file)))
+
+(defun puppet-file-class-name (file)
+  "Return the class name for the Puppet class in FILE."
+  (mapconcat #'identity (puppet-dissect-filename file) "::"))
+
+(define-skeleton puppet-keyword-class
+  "Insert \"class\" skeleton."
+  nil
+  "class " (puppet-file-class-name (buffer-file-name)) " (" > \n
+  ") {" > \n
+  > _ "}" > \n)
+
+(define-skeleton puppet-keyword-define
+  "Insert \"class\" skeleton."
+  nil
+  "define " (puppet-file-class-name (buffer-file-name)) " (" > \n
+  ") {" > \n
+  > _ "}" > \n)
+
+(define-skeleton puppet-keyword-node
+  "Insert \"node\" skeleton."
+  nil
+  "node " > - " {" \n
+  > _ "}" > \n)
+
+(define-skeleton puppet-keyword-if
+  "Insert \"if\" statement."
+  nil
+  "if " > - " {" \n
+  > _ "}" > \n)
+
+(define-skeleton puppet-keyword-elsif
+  "Insert \"elsif\" statement."
+  nil
+  "elsif " > - " {" \n
+  > _ "}" > \n)
+
+(define-skeleton puppet-keyword-else
+  "Insert \"else\" statement."
+  nil
+  "else {" > \n
+  > _ "}" > \n)
+
+(define-skeleton puppet-keyword-unless
+  "Insert \"unless\" statement."
+  nil
+  "unless " > - " {" \n
+  > _ "}" > \n)
+
+(define-skeleton puppet-keyword-case
+  "Insert \"case\" statement."
+  nil
+  "case " > - " {" \n
+  "default: {" > \n
+  "}" > \n
+  "}" > \n)
+
+(define-skeleton puppet-keyword-selector
+  "Insert \"?\" selector."
+  nil
+  "? {" > \n
+  "default => " > - "," \n
+  "}" > \n)
+
+(define-skeleton puppet-type-anchor
+  "Insert the \"anchor\" resource type."
+  nil
+  "anchor { " > - ": }" \n)
+
+(define-skeleton puppet-type-class
+  "Insert the \"class\" resource type."
+  nil
+  "class { " > - ":" \n
+  "}" > \n)
+
+(define-skeleton puppet-type-exec
+  "Insert the \"exec\" resource type."
+  nil
+  "exec { " > - ":" \n
+  "path => [ '/bin', '/sbin', '/usr/bin', '/usr/sbin', ]," > \n
+  "user => 'root'," > \n
+  "cwd  => '/'," > \n
+  "}" > \n)
+
+(define-skeleton puppet-type-file
+  "Insert the \"file\" resource type."
+  nil
+  "file { " > - ":" \n
+  "ensure => file," > \n
+  "owner  => 'root'," > \n
+  "group  => 'root'," > \n
+  "mode   => '0644'," > \n
+  "}" > \n)
+
+(define-skeleton puppet-type-group
+  "Insert the \"group\" resource type."
+  nil
+  "group { " > - ":" \n
+  "ensure => present," > \n
+  "}" > \n)
+
+(define-skeleton puppet-type-host
+  "Insert the \"host\" resource type."
+  nil
+  "host { " > - ":" \n
+  "ensure => present," > \n
+  "}" > \n)
+
+(define-skeleton puppet-type-notify
+  "Insert the \"notify\" resource type."
+  nil
+  "notify { " > - ": }" \n)
+
+(define-skeleton puppet-type-package
+  "Insert the \"package\" resource type."
+  nil
+  "package { " > - ":" \n
+  "ensure => present," > \n
+  "}" > \n)
+
+(define-skeleton puppet-type-service
+  "Insert the \"service\" resource type."
+  nil
+  "service { " > - ":" \n
+  "ensure => running," > \n
+  "enable => true," > \n
+  "}" > \n)
+
+(define-skeleton puppet-type-user
+  "Insert the \"user\" resource type."
+  nil
+  "user { " > - ":" \n
+  "ensure   => present," > \n
+  "shell    => '/bin/bash'," > \n
+  "password => '*'," > \n
+  "}" > \n)
+
+
 ;;; Imenu
 
 (defun puppet-imenu-collect-entries (pattern)
@@ -1220,6 +1405,27 @@ for each entry."
     ;; Linting and validation
     (define-key map (kbd "C-c C-v") #'puppet-validate)
     (define-key map (kbd "C-c C-l") #'puppet-lint)
+    ;; Skeletons for types
+    (define-key map (kbd "C-c C-t a") #'puppet-type-anchor)
+    (define-key map (kbd "C-c C-t c") #'puppet-type-class)
+    (define-key map (kbd "C-c C-t e") #'puppet-type-exec)
+    (define-key map (kbd "C-c C-t f") #'puppet-type-file)
+    (define-key map (kbd "C-c C-t g") #'puppet-type-group)
+    (define-key map (kbd "C-c C-t h") #'puppet-type-host)
+    (define-key map (kbd "C-c C-t n") #'puppet-type-notify)
+    (define-key map (kbd "C-c C-t p") #'puppet-type-package)
+    (define-key map (kbd "C-c C-t s") #'puppet-type-service)
+    (define-key map (kbd "C-c C-t u") #'puppet-type-user)
+    ;; Skeletons for keywords
+    (define-key map (kbd "C-c C-k c") #'puppet-keyword-class)
+    (define-key map (kbd "C-c C-k d") #'puppet-keyword-define)
+    (define-key map (kbd "C-c C-k n") #'puppet-keyword-node)
+    (define-key map (kbd "C-c C-k i") #'puppet-keyword-if)
+    (define-key map (kbd "C-c C-k e") #'puppet-keyword-elsif)
+    (define-key map (kbd "C-c C-k o") #'puppet-keyword-else)
+    (define-key map (kbd "C-c C-k u") #'puppet-keyword-unless)
+    (define-key map (kbd "C-c C-k s") #'puppet-keyword-case)
+    (define-key map (kbd "C-c C-k ?") #'puppet-keyword-selector)
     ;; The menu bar
     (easy-menu-define puppet-menu map "Puppet Mode menu"
       `("Puppet"
@@ -1278,6 +1484,8 @@ for each entry."
   ;; Alignment
   (setq align-mode-rules-list puppet-mode-align-rules)
   (setq align-mode-exclude-rules-list puppet-mode-align-exclude-rules)
+  ;; Skeletons
+  (setq-local skeleton-end-newline nil)
   ;; IMenu
   (setq imenu-create-index-function #'puppet-imenu-create-index))
 
