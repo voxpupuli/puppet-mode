@@ -24,5 +24,9 @@ test: $(PKGDIR)
 	$(CASK) exec $(EMACS) -Q --batch $(EMACSFLAGS) -f batch-byte-compile $<
 
 $(PKGDIR) : Cask
-	$(CASK) install
+	@# this is a load bearing --verbose
+	@# without it pkg-info fails to install in emacs 25.3 with the error
+	@# Dependency pkg-info failed to install: Wrong type argument: stringp, nil
+	@# Most likely a bug in cask.
+	$(CASK) --verbose install
 	touch $(PKGDIR)
