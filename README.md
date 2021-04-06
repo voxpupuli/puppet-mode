@@ -23,6 +23,7 @@ Features
 4. Manual validation and linting of manifests (see [Flycheck][] for on-the-fly
    validation and linting)
 5. Integration with [Puppet Debugger][]
+6. Skeletons for many standard Puppet statements and resource declarations
 
 Installation
 ------------
@@ -48,20 +49,39 @@ manifests with the extension `.pp`.
 
 The following key bindings are available in Puppet Mode:
 
-Key                | Command
--------------------|--------------------------------------------------
-<kbd>C-M-a</kbd>   | Move to the beginning of the current block
-<kbd>C-M-e</kbd>   | Move to the end of the current block
-<kbd>C-c C-a</kbd> | Align parameters in the current block
-<kbd>C-c C-'</kbd> | Toggle string quoting between single and double
-<kbd>C-c C-;</kbd> | Blank the string at point
-<kbd>C-c C-j</kbd> | Jump to a `class`, `define`, variable or resource
-<kbd>C-c C-c</kbd> | Apply the current manifest in dry-run mode
-<kbd>C-c C-v</kbd> | Validate the syntax of the current manifest
-<kbd>C-c C-l</kbd> | Check the current manifest for semantic issues
-<kbd>C-c C-z</kbd> | Launch a puppet-debugger REPL
-<kbd>C-c C-r</kbd> | Send the currently marked region to the REPL
-<kbd>C-c C-b</kbd> | Send the current buffer to the REPL
+Key                  | Command
+---------------------|--------------------------------------------------
+<kbd>C-M-a</kbd>     | Move to the beginning of the current block
+<kbd>C-M-e</kbd>     | Move to the end of the current block
+<kbd>C-c C-a</kbd>   | Align parameters in the current block
+<kbd>C-c C-'</kbd>   | Toggle string quoting between single and double
+<kbd>C-c C-;</kbd>   | Blank the string at point
+<kbd>C-c C-j</kbd>   | Jump to a `class`, `define`, variable or resource
+<kbd>C-c C-c</kbd>   | Apply the current manifest in dry-run mode
+<kbd>C-c C-v</kbd>   | Validate the syntax of the current manifest
+<kbd>C-c C-l</kbd>   | Check the current manifest for semantic issues
+<kbd>C-c C-z</kbd>   | Launch a puppet-debugger REPL
+<kbd>C-c C-r</kbd>   | Send the currently marked region to the REPL
+<kbd>C-c C-b</kbd>   | Send the current buffer to the REPL
+<kbd>C-c C-k c</kbd> | Insert `class` definition skeleton
+<kbd>C-c C-k d</kbd> | Insert `define` definition skeleton
+<kbd>C-c C-k n</kbd> | Insert `node` definition skeleton
+<kbd>C-c C-k i</kbd> | Insert `if` statement skeleton
+<kbd>C-c C-k e</kbd> | Insert `elsif` statement skeleton
+<kbd>C-c C-k o</kbd> | Insert `else` statement skeleton
+<kbd>C-c C-k u</kbd> | Insert `unless` statement skeleton
+<kbd>C-c C-k s</kbd> | Insert `case` statement skeleton
+<kbd>C-c C-k ?</kbd> | Insert `selector` statement skeleton
+<kbd>C-c C-t a</kbd> | Insert `anchor` resource skeleton
+<kbd>C-c C-t c</kbd> | Insert `class` resource skeleton
+<kbd>C-c C-t e</kbd> | Insert `exec` resource skeleton
+<kbd>C-c C-t f</kbd> | Insert `file` resource skeleton
+<kbd>C-c C-t g</kbd> | Insert `group` resource skeleton
+<kbd>C-c C-t h</kbd> | Insert `host` resource skeleton
+<kbd>C-c C-t n</kbd> | Insert `notify` resource skeleton
+<kbd>C-c C-t p</kbd> | Insert `package` resource skeleton
+<kbd>C-c C-t s</kbd> | Insert `service` resource skeleton
+<kbd>C-c C-t u</kbd> | Insert `user` resource skeleton
 
 
 For the integration with puppet-debugger to work, the puppet-debugger gem needs
