@@ -893,10 +893,10 @@ with any of these symbols.  The expansion will only match if it
 is in any given CONTEXT.  nil means no specific syntactic context."
   (when (symbolp context)
     (setq context (list context)))
-  (let* ((pos (next-single-char-property-change (point) property nil limit)))
+  (let ((pos (next-single-char-property-change (point) property nil limit)))
     (when (and pos (> pos (point)))
       (goto-char pos)
-      (let* ((value (get-text-property pos property)))
+      (let ((value (get-text-property pos property)))
         (if (and value (memq (car value) context))
             (progn (set-match-data (cdr value)) t)
           (puppet-match-property property context limit))))))
