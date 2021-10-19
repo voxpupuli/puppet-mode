@@ -773,8 +773,8 @@ of the initial include plus puppet-include-indent."
 
           ;; If this line contains only a closing paren, we should lose one
           ;; level of indentation.
-          (if (looking-at "^\\s-*\)\\s-*$")
-              (setq cur-indent (- cur-indent puppet-indent-level)))))
+          (when (looking-at "^\\s-*\)\\s-*$")
+            (setq cur-indent (- cur-indent puppet-indent-level)))))
 
         ;; We've figured out the indentation, so do it.
         (if (and cur-indent (> cur-indent 0))
@@ -782,8 +782,8 @@ of the initial include plus puppet-include-indent."
           (indent-line-to 0))))
     ;; If initial point was within line's indentation,
     ;; position after the indentation.  Else stay at same point in text.
-    (if (> (- (point-max) pos) (point))
-        (goto-char (- (point-max) pos)))))
+    (when (> (- (point-max) pos) (point))
+      (goto-char (- (point-max) pos)))))
 
 
 ;;; Font locking
@@ -1075,8 +1075,8 @@ Used as `syntax-propertize-function' in Puppet Mode."
 
 With a prefix argument SUPPRESS it simply inserts $."
   (interactive "P")
-  (if (and mark-active (equal (point) (region-end)))
-      (exchange-point-and-mark))
+  (when (and mark-active (equal (point) (region-end)))
+    (exchange-point-and-mark))
   (insert "$")
   (when (and
          (not suppress)
