@@ -773,8 +773,8 @@ of the initial include plus puppet-include-indent."
 
           ;; If this line contains only a closing paren, we should lose one
           ;; level of indentation.
-          (if (looking-at "^\\s-*\)\\s-*$")
-              (setq cur-indent (- cur-indent puppet-indent-level)))))
+          (when (looking-at "^\\s-*\)\\s-*$")
+            (setq cur-indent (- cur-indent puppet-indent-level)))))
 
         ;; We've figured out the indentation, so do it.
         (if (and cur-indent (> cur-indent 0))
@@ -782,8 +782,8 @@ of the initial include plus puppet-include-indent."
           (indent-line-to 0))))
     ;; If initial point was within line's indentation,
     ;; position after the indentation.  Else stay at same point in text.
-    (if (> (- (point-max) pos) (point))
-        (goto-char (- (point-max) pos)))))
+    (when (> (- (point-max) pos) (point))
+      (goto-char (- (point-max) pos)))))
 
 
 ;;; Font locking
@@ -893,10 +893,10 @@ with any of these symbols.  The expansion will only match if it
 is in any given CONTEXT.  nil means no specific syntactic context."
   (when (symbolp context)
     (setq context (list context)))
-  (let* ((pos (next-single-char-property-change (point) property nil limit)))
+  (let ((pos (next-single-char-property-change (point) property nil limit)))
     (when (and pos (> pos (point)))
       (goto-char pos)
-      (let* ((value (get-text-property pos property)))
+      (let ((value (get-text-property pos property)))
         (if (and value (memq (car value) context))
             (progn (set-match-data (cdr value)) t)
           (puppet-match-property property context limit))))))
@@ -1081,8 +1081,8 @@ Used as `syntax-propertize-function' in Puppet Mode."
 
 With a prefix argument SUPPRESS it simply inserts $."
   (interactive "P")
-  (if (and mark-active (equal (point) (region-end)))
-      (exchange-point-and-mark))
+  (when (and mark-active (equal (point) (region-end)))
+    (exchange-point-and-mark))
   (insert "$")
   (when (and
          (not suppress)
